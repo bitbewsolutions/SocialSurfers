@@ -118,6 +118,7 @@ qa/
                  --nowalk skips the reveal walk (which ends at scrollTo(0,0) and would
                  destroy any load-time scroll state you're trying to measure)
   contrast.mjs   WCAG audit against rendered pixels — see below
+  seams.mjs      hard-step detector for tone boundaries — see below
   weigh.mjs      per-page gzipped weight against the budget
 tools/
   logos.mjs      client logo pipeline — see below
