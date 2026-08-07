@@ -13,3 +13,6 @@ qa-shots/
 # font sources (subset output is committed in public/fonts)
 .fontsrc/*.ttf
 .fontsrc/*.css
+
+# generated client tiles are committed; the contact sheet is not
+public/clients/_sheet.png

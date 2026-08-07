@@ -1,13 +1,10 @@
 ---
 import { stats } from '../data/content';
 
-/* The numbers that used to run along the bottom edge of the hero.
-   They also carry the dawn→day handover that Services used to own: the ramp is this
-   section's top padding, in fixed pixels, so it always completes before the first
-   piece of dark text. Services now starts on plain foam. */
+/* The numbers that used to run along the bottom edge of the hero. */
 const figures = [
   { v: `${stats.projectsDelivered}+`, l: 'Projects delivered' },
-  { v: String(stats.onRetainer).padStart(2, '0'), l: 'Active clients' },
+  { v: String(stats.brands), l: 'Brands served' },
   { v: String(stats.industriesServed), l: 'Industries served' },
   { v: String(stats.serviceLines).padStart(2, '0'), l: 'Services offered' },
 ];

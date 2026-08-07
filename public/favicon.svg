@@ -1,16 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <defs>
-    <linearGradient id="a" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#7B3AA8"/><stop offset="1" stop-color="#4A1B72"/>
-    </linearGradient>
-    <linearGradient id="b" x1="1" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#FF3E9A"/><stop offset="1" stop-color="#EA1C82"/>
-    </linearGradient>
-    <path id="d" d="M32 3 Q55 25 45 44 Q33 63 20 44 Q9 25 32 3 Z"/>
-  </defs>
-  <rect width="64" height="64" rx="14" fill="#100722"/>
-  <g>
-    <use href="#d" fill="url(#a)" transform="translate(32 32) rotate(-42) translate(0 -10) scale(.72) translate(-32 -40)"/>
-    <use href="#d" fill="url(#b)" transform="translate(32 32) rotate(138) translate(0 -10) scale(.72) translate(-32 -40)" style="mix-blend-mode:screen"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 365 365">
+  <!-- the brand mark, centred in a square frame; same geometry as components/Logo.astro -->
+  <g transform="translate(61.5 0)">
+    <path fill="#4134AA" d="M121 0 A121 121 0 0 1 242 121 L121 121 L121 242 A121 121 0 0 1 0 121 A121 121 0 0 1 121 0 Z"/>
+    <path fill="#E35E9D" d="M121 123 A121 121 0 0 1 242 244 A121 121 0 0 1 121 365 A121 121 0 0 1 0 244 L121 244 Z"/>
   </g>
 </svg>

@@ -1,0 +1,137 @@
+[
+  {
+    "name": "Design Expert",
+    "industry": "Architecture & Interiors",
+    "logo": "/clients/design-expert.webp"
+  },
+  {
+    "name": "Nayyar Plywood",
+    "industry": "Plywood & Laminates",
+    "logo": "/clients/nayyar-plywood.webp"
+  },
+  {
+    "name": "Royale Group",
+    "industry": "Real Estate",
+    "logo": "/clients/royale-group.webp"
+  },
+  {
+    "name": "The Ice Cream House",
+    "industry": "Food & Beverage",
+    "logo": "/clients/the-ice-cream-house.webp"
+  },
+  {
+    "name": "Food Arena",
+    "industry": "Restaurant",
+    "logo": "/clients/food-arena.webp"
+  },
+  {
+    "name": "Derma Luxe Clinic",
+    "industry": "Healthcare",
+    "logo": "/clients/derma-luxe-clinic.webp"
+  },
+  {
+    "name": "RK Architect",
+    "industry": "Architecture & Design",
+    "logo": "/clients/rk-architect.webp"
+  },
+  {
+    "name": "Detailing Devils",
+    "industry": "Automobile",
+    "logo": "/clients/detailing-devils.webp"
+  },
+  {
+    "name": "M.R. Metal",
+    "industry": "Manufacturing",
+    "logo": "/clients/m-r-metal.webp"
+  },
+  {
+    "name": "Gambhir Optics",
+    "industry": "Retail",
+    "logo": "/clients/gambhir-optics.webp"
+  },
+  {
+    "name": "Creative Kitchens",
+    "industry": "Modular Interiors",
+    "logo": "/clients/creative-kitchens.webp"
+  },
+  {
+    "name": "Silomin",
+    "industry": "Retail",
+    "logo": "/clients/silomin.webp"
+  },
+  {
+    "name": "The Elite Club",
+    "industry": "Gym & Fitness",
+    "logo": "/clients/the-elite-club.webp"
+  },
+  {
+    "name": "PRO Ultimate Gyms",
+    "industry": "Gym & Fitness",
+    "logo": "/clients/pro-ultimate-gyms.webp"
+  },
+  {
+    "name": "Sanders Bagzee",
+    "industry": "Fashion & Bags",
+    "logo": "/clients/sanders-bagzee.webp"
+  },
+  {
+    "name": "Mahak Makeover",
+    "industry": "Salon & Spa",
+    "logo": "/clients/mahak-makeover.webp"
+  },
+  {
+    "name": "SQDC",
+    "industry": "Retail",
+    "logo": "/clients/sqdc.webp"
+  },
+  {
+    "name": "Caballo Verticals",
+    "industry": "Architecture",
+    "logo": "/clients/caballo-verticals.webp"
+  },
+  {
+    "name": "Reborn Gym",
+    "industry": "Gym & Fitness",
+    "logo": "/clients/reborn-gym.webp"
+  },
+  {
+    "name": "Deepak Bakers",
+    "industry": "Bakery",
+    "logo": "/clients/deepak-bakers.webp"
+  },
+  {
+    "name": "JD Dream Decor",
+    "industry": "Event Decor",
+    "logo": "/clients/jd-dream-decor.webp"
+  },
+  {
+    "name": "Exotic Party Ideas",
+    "industry": "Event Decor",
+    "logo": "/clients/exotic-party-ideas.webp"
+  },
+  {
+    "name": "La Vanilla Coffee",
+    "industry": "Cafe",
+    "logo": "/clients/la-vanilla-coffee.webp"
+  },
+  {
+    "name": "Looms in Velvet",
+    "industry": "Fashion",
+    "logo": "/clients/looms-in-velvet.webp"
+  },
+  {
+    "name": "Toyz World",
+    "industry": "Retail",
+    "logo": "/clients/toyz-world.webp"
+  },
+  {
+    "name": "Client 27",
+    "industry": "Unknown",
+    "logo": "/clients/client-27.webp"
+  },
+  {
+    "name": "Romeo Lane",
+    "industry": "Hospitality",
+    "logo": "/clients/romeo-lane.webp"
+  }
+]

@@ -1,0 +1,194 @@
+[
+  {
+    "name": "Design Expert",
+    "industry": "Architecture & Interiors",
+    "logo": "/clients/design-expert.webp",
+    "from": "IMG_4325.JPG.jpeg",
+    "bg": "#f8f8f8"
+  },
+  {
+    "name": "Nayyar Plywood",
+    "industry": "Plywood & Laminates",
+    "logo": "/clients/nayyar-plywood.webp",
+    "from": "IMG_6321.PNG",
+    "bg": "#f1f1f1"
+  },
+  {
+    "name": "Royale Group",
+    "industry": "Real Estate",
+    "logo": "/clients/royale-group.webp",
+    "from": "IMG_6322.PNG",
+    "bg": "#eff0f0"
+  },
+  {
+    "name": "The Ice Cream House",
+    "industry": "Food & Beverage",
+    "logo": "/clients/the-ice-cream-house.webp",
+    "from": "IMG_6323.PNG",
+    "bg": "#e2e2e2"
+  },
+  {
+    "name": "Food Arena",
+    "industry": "Restaurant",
+    "logo": "/clients/food-arena.webp",
+    "from": "IMG_6324.PNG",
+    "bg": "#e0dfdf"
+  },
+  {
+    "name": "Derma Luxe Clinic",
+    "industry": "Healthcare",
+    "logo": "/clients/derma-luxe-clinic.webp",
+    "from": "IMG_6325.JPG.jpeg",
+    "bg": "#efeae7"
+  },
+  {
+    "name": "RK Architect",
+    "industry": "Architecture & Design",
+    "logo": "/clients/rk-architect.webp",
+    "from": "IMG_6326.PNG",
+    "bg": "#ececec"
+  },
+  {
+    "name": "Detailing Devils",
+    "industry": "Automobile",
+    "logo": "/clients/detailing-devils.webp",
+    "from": "IMG_6327.PNG",
+    "bg": "#e3e2e7"
+  },
+  {
+    "name": "M.R. Metal",
+    "industry": "Manufacturing",
+    "logo": "/clients/m-r-metal.webp",
+    "from": "IMG_6328.PNG",
+    "bg": "#eaebed"
+  },
+  {
+    "name": "Gambhir Optics",
+    "industry": "Retail",
+    "logo": "/clients/gambhir-optics.webp",
+    "from": "IMG_6329.PNG",
+    "bg": "#d0cecd"
+  },
+  {
+    "name": "Creative Kitchens",
+    "industry": "Modular Interiors",
+    "logo": "/clients/creative-kitchens.webp",
+    "from": "IMG_6330.PNG",
+    "bg": "#edeeed"
+  },
+  {
+    "name": "Silomin",
+    "industry": "Retail",
+    "logo": "/clients/silomin.webp",
+    "verify": true,
+    "from": "IMG_6331.PNG",
+    "bg": "#e0e1e2"
+  },
+  {
+    "name": "The Elite Club",
+    "industry": "Gym & Fitness",
+    "logo": "/clients/the-elite-club.webp",
+    "from": "IMG_6332.PNG",
+    "bg": "#f4f5f4"
+  },
+  {
+    "name": "PRO Ultimate Gyms",
+    "industry": "Gym & Fitness",
+    "logo": "/clients/pro-ultimate-gyms.webp",
+    "from": "IMG_6333.PNG",
+    "bg": "#ececec"
+  },
+  {
+    "name": "Sanders Bagzee",
+    "industry": "Fashion & Bags",
+    "logo": "/clients/sanders-bagzee.webp",
+    "from": "IMG_6334.PNG",
+    "bg": "#e3e3e3"
+  },
+  {
+    "name": "Mahak Makeover",
+    "industry": "Salon & Spa",
+    "logo": "/clients/mahak-makeover.webp",
+    "from": "IMG_6335.JPG.jpeg",
+    "bg": "#000000"
+  },
+  {
+    "name": "SQDC",
+    "industry": "Retail",
+    "logo": "/clients/sqdc.webp",
+    "from": "IMG_6336.PNG",
+    "bg": "#e6e7ea"
+  },
+  {
+    "name": "Caballo Verticals",
+    "industry": "Architecture",
+    "logo": "/clients/caballo-verticals.webp",
+    "from": "IMG_6337.PNG",
+    "bg": "#dddbd8"
+  },
+  {
+    "name": "Reborn Gym",
+    "industry": "Gym & Fitness",
+    "logo": "/clients/reborn-gym.webp",
+    "from": "IMG_6338.PNG",
+    "bg": "#ffffff"
+  },
+  {
+    "name": "Deepak Bakers",
+    "industry": "Bakery",
+    "logo": "/clients/deepak-bakers.webp",
+    "from": "WhatsApp Image 2026-08-07 at 3.40.44 PM (1).jpeg",
+    "bg": "#ffffff"
+  },
+  {
+    "name": "JD Dream Decor",
+    "industry": "Event Decor",
+    "logo": "/clients/jd-dream-decor.webp",
+    "from": "WhatsApp Image 2026-08-07 at 3.40.44 PM.jpeg",
+    "bg": "#000000"
+  },
+  {
+    "name": "Exotic Party Ideas",
+    "industry": "Event Decor",
+    "logo": "/clients/exotic-party-ideas.webp",
+    "from": "WhatsApp Image 2026-08-07 at 3.40.45 PM (1).jpeg",
+    "bg": "#ffffff"
+  },
+  {
+    "name": "La Vanilla Coffee",
+    "industry": "Cafe",
+    "logo": "/clients/la-vanilla-coffee.webp",
+    "from": "WhatsApp Image 2026-08-07 at 3.40.45 PM.jpeg",
+    "bg": "#ffffff"
+  },
+  {
+    "name": "Looms in Velvet",
+    "industry": "Fashion",
+    "logo": "/clients/looms-in-velvet.webp",
+    "verify": true,
+    "from": "WhatsApp Image 2026-08-07 at 3.40.46 PM (1).jpeg",
+    "bg": "#2b2e30"
+  },
+  {
+    "name": "Toyz World",
+    "industry": "Retail",
+    "logo": "/clients/toyz-world.webp",
+    "from": "WhatsApp Image 2026-08-07 at 3.40.46 PM (2).jpeg",
+    "bg": "#ece6e6"
+  },
+  {
+    "name": "Client 27",
+    "industry": "Unknown",
+    "logo": "/clients/client-27.webp",
+    "verify": true,
+    "from": "WhatsApp Image 2026-08-07 at 3.40.46 PM.jpeg",
+    "bg": "#313234"
+  },
+  {
+    "name": "Romeo Lane",
+    "industry": "Hospitality",
+    "logo": "/clients/romeo-lane.webp",
+    "from": "romeolane logo.png",
+    "bg": "#17102f"
+  }
+]

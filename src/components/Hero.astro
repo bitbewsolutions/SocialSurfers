@@ -20,9 +20,10 @@ import { waLink } from '../data/site';
     <div class="copy">
       <p class="eyebrow" data-reveal>Strategy. Creativity. Technology. Results.</p>
 
+      {/* the client's own tagline. "Social Waves" carries the gradient — one of
+          exactly two gradient fills on the site. */}
       <h1 data-reveal>
-        We don&rsquo;t just manage social media.
-        <em>We grow brands.</em>
+        Let&rsquo;s Surf Your Brand to the <em>Social Waves.</em>
       </h1>
 
       <p class="sub" data-reveal>
@@ -119,7 +120,7 @@ import { waLink } from '../data/site';
 
   .inner {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.8fr);
     gap: clamp(24px, 4vw, 64px);
     align-items: center;
     width: 100%;
@@ -142,13 +143,16 @@ import { waLink } from '../data/site';
     line-height: 1.02;
     letter-spacing: -0.035em;
     max-width: 15ch;
+    text-wrap: balance;
     color: var(--l1);
   }
   /* One of exactly two gradient fills on the site. Large bold type, so 3:1 applies;
      this ramp measures 5.1:1 at its lightest stop. */
   h1 em {
     font-style: normal;
-    display: block;
+    /* held on one line so the gradient sweep is deterministic — across a line break
+       each fragment gets its own slice of the ramp and the colour jumps */
+    white-space: nowrap;
     background: var(--grad);
     -webkit-background-clip: text;
     background-clip: text;

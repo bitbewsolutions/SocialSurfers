@@ -52,10 +52,13 @@ const year = new Date().getFullYear();
      otherwise inherits --l1 from body and lands dark-on-dark — which is exactly how
      the logo wordmark ended up at 1.08:1 here. */
   .foot {
-    background: var(--ink-deep);
+    background-color: var(--ink-deep);
     color: var(--t1);
-    border-top: 1px solid var(--hair-ink);
-    padding-top: clamp(56px, 8vh, 96px);
+    background-image: var(--ramp-down);
+    background-repeat: no-repeat;
+    background-position: top;
+    background-size: 100% var(--fade-h);
+    padding-top: calc(var(--fade-h) + clamp(24px, 4vh, 56px));
   }
   .inner {
     display: grid;

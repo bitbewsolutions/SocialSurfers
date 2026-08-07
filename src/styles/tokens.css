@@ -35,8 +35,17 @@
   --ink-deep: #0c0620;   /* the one dark ground — footer */
   --ink: #17102f;
 
-  /* ——— brand ——— */
-  --violet: #4a1b72;
+  /* ——— brand ———
+     The two logo colours are the source of truth, sampled from the client's own
+     artwork. They are reproduction values: use them for the mark, not for text.
+     (--brand-pink is 2.99:1 on paper. Logotypes are exempt from WCAG 1.4.3; body
+     copy is not.) */
+  --brand-indigo: #4134aa;
+  --brand-pink: #e35e9d;
+
+  /* The working ramp, pulled toward the logo's indigo so the mark sits on the page
+     instead of on top of it. --violet was #4A1B72, a good deal more purple. */
+  --violet: #3f2a86;
   --magenta: #8e1c74;
   --rose: #c41b6e;
   --bio: #ea1c82;        /* glow and the hero shader ONLY — 3.8:1 on paper */
@@ -53,8 +62,7 @@
    * stays >=5.6:1 across the whole sweep and the gradient can safely carry a
    * button label. Coral is beautiful and unusable for this.
    */
-  --grad: linear-gradient(102deg, #4a1b72 0%, #8e1c74 45%, #c41b6e 100%);
-  --grad-soft: linear-gradient(102deg, rgba(74, 27, 114, 0.1), rgba(196, 27, 110, 0.1));
+  --grad: linear-gradient(102deg, #3f2a86 0%, #8e1c74 45%, #c41b6e 100%);
 
   /* ——— text on paper ——— */
   --l1: #16102b;                    /* ~16.4:1 */
@@ -79,7 +87,9 @@
   --mono: 'JBMono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
   /* fluid scale, 390 → 1440 */
-  --fs-display: clamp(2.5rem, 6.6vw, 5.5rem);
+  /* sized for the full tagline, which is 41 characters — the previous 5.5rem was set
+     for a 25-character headline and forced this one to five lines in its column */
+  --fs-display: clamp(2.15rem, 4.6vw, 4.05rem);
   --fs-h2: clamp(1.9rem, 4.4vw, 3.4rem);
   --fs-h3: clamp(1.2rem, 2.3vw, 1.65rem);
   --fs-lead: clamp(1rem, 1.8vw, 1.15rem);

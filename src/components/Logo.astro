@@ -1,40 +1,40 @@
 ---
+/**
+ * The real brand mark, rebuilt as vector.
+ *
+ * The client supplied a 400x400 PNG. Its geometry turned out to be exact and simple —
+ * fitting circles to the traced edges gives two discs of identical radius sharing a
+ * centre-x, their centres one radius apart: the upper one minus its bottom-right
+ * quadrant, the lower minus its top-left. That interlock is the S.
+ *
+ * So this is ~500 bytes of path data instead of a 14.5 KB raster, it is crisp at any
+ * size including the favicon, and the two brand colours become tokens rather than
+ * being baked into pixels.
+ */
 interface Props {
   size?: number;
-  /** Hide the wordmark, e.g. in tight footers. */
+  /** Hide the wordmark, e.g. in tight spaces. */
   markOnly?: boolean;
-  /** Unique suffix so gradient ids never collide when the logo appears twice. */
-  id?: string;
 }
-const { size = 34, markOnly = false, id = 'lg' } = Astro.props;
+const { size = 34, markOnly = false } = Astro.props;
 ---
 
 <span class="logo" style={`--mark:${size}px`}>
-  <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-    <defs>
-      <linearGradient id={`${id}A`} x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#7B3AA8" /><stop offset="1" stop-color="#4A1B72" />
-      </linearGradient>
-      <linearGradient id={`${id}B`} x1="1" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#FF3E9A" /><stop offset="1" stop-color="#EA1C82" />
-      </linearGradient>
-      <path id={`${id}D`} d="M32 3 Q55 25 45 44 Q33 63 20 44 Q9 25 32 3 Z" />
-    </defs>
-    {/* two teardrops rotated about a shared belly and pushed out along their own
-        axis — reads as an S / wave rather than one blob */}
-    <use
-      href={`#${id}D`}
-      fill={`url(#${id}A)`}
-      transform="translate(32 32) rotate(-42) translate(0 -10) scale(.8) translate(-32 -40)"
+  <svg viewBox="0 0 242 365" aria-hidden="true" focusable="false">
+    <path
+      class="upper"
+      d="M121 0 A121 121 0 0 1 242 121 L121 121 L121 242 A121 121 0 0 1 0 121 A121 121 0 0 1 121 0 Z"
     />
-    <use
-      href={`#${id}D`}
-      fill={`url(#${id}B)`}
-      transform="translate(32 32) rotate(138) translate(0 -10) scale(.8) translate(-32 -40)"
-      style="mix-blend-mode:screen"
+    <path
+      class="lower"
+      d="M121 123 A121 121 0 0 1 242 244 A121 121 0 0 1 121 365 A121 121 0 0 1 0 244 L121 244 Z"
     />
   </svg>
-  {!markOnly && <b>Social<span>Surfers</span></b>}
+  {/* The wordmark is the brand lockup, so it keeps the client's exact pink even
+      though that measures 2.99:1 on paper. WCAG 1.4.3 exempts logotypes; the
+      attribute declares that to qa/contrast.mjs rather than leaving the tool to
+      guess or the failure to be ignored by hand every run. */}
+  {!markOnly && <b data-contrast-exempt="logotype">Social<span>Surfers</span></b>}
 </span>
 
 <style>
@@ -44,19 +44,21 @@ const { size = 34, markOnly = false, id = 'lg' } = Astro.props;
     gap: 11px;
   }
   .logo svg {
-    width: var(--mark);
+    /* the mark is taller than it is wide — 242:365 */
     height: var(--mark);
+    width: calc(var(--mark) * 0.663);
     flex: none;
   }
+  .upper { fill: var(--brand-indigo); }
+  .lower { fill: var(--brand-pink); }
+
   .logo b {
     font-family: var(--display);
-    font-weight: 800;
-    font-size: calc(var(--mark) * 0.56);
-    letter-spacing: -0.02em;
+    font-weight: 700;
+    font-size: calc(var(--mark) * 0.54);
+    letter-spacing: -0.03em;
     line-height: 1;
     white-space: nowrap;
   }
-  .logo b span {
-    color: var(--bio);
-  }
+  .logo b span { color: var(--brand-pink); }
 </style>

@@ -21,7 +21,7 @@ process.forEach((_, i) => {
 });
 ---
 
-<section class="process" id="process">
+<section class="process tone-dark fade-in" id="process">
   <div class="shell head">
     <p class="label" data-reveal>How we work</p>
     <h2 class="h2" data-reveal>The same seven steps,<br />every single month.</h2>
@@ -67,9 +67,10 @@ process.forEach((_, i) => {
             <defs>
               {/* the same ramp as --grad; coral is too pale to read as a line on paper */}
               <linearGradient id="tideGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#4A1B72" />
-                <stop offset=".5" stop-color="#8E1C74" />
-                <stop offset="1" stop-color="#C41B6E" />
+                {/* tokens, not literals: .tone-dark rebinds --violet/--rose to values
+                    that stay legible on ink, and this line inherits that for free */}
+                <stop offset="0" stop-color="var(--violet)" />
+                <stop offset="1" stop-color="var(--rose)" />
               </linearGradient>
             </defs>
             <path class="live" d={d} />
@@ -107,12 +108,12 @@ process.forEach((_, i) => {
      which is exactly the arc that has been removed — and it was also the section
      that first exposed the percentage-gradient contrast bug. Flat paper cannot
      drift, so that whole class of failure is gone with it. */
+  /* .tone-dark (global.css) carries the ground, the ramp in from the light half of
+     the page, and the token flip that lets the rules below stay ground-agnostic. */
   .process {
     position: relative;
-    background: var(--paper);
-    color: var(--l1);
     overflow: hidden;
-    padding-block: var(--section-y);
+    padding-bottom: var(--section-y);
   }
 
   .head { display: grid; gap: 20px; }

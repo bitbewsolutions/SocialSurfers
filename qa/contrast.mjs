@@ -135,12 +135,17 @@ const { result: nodes } = await send('Runtime.evaluate', {
       // Gradient text (background-clip:text) computes to color:transparent, so the
       // declared colour tells us nothing — those get measured off the glyph pixels.
       const clipText = cs.webkitBackgroundClip === 'text' || cs.backgroundClip === 'text';
+      // WCAG 1.4.3 exempts logotypes: "text that is part of a logo or brand name has
+      // no minimum contrast requirement". Opt in explicitly per element — never by
+      // guessing — so an exemption is always a visible decision in the markup.
+      const exempt = !!el.closest('[data-contrast-exempt]');
       out.push({
         sel: el.tagName.toLowerCase() + (el.className && typeof el.className === 'string'
           ? '.' + el.className.trim().split(/\\s+/).slice(0, 2).join('.') : ''),
         text: own.slice(0, 42),
         color: cs.color,
         clipText,
+        exempt,
         size: parseFloat(cs.fontSize),
         weight: parseInt(cs.fontWeight, 10) || 400,
         x: Math.round(r.left + scrollX), y: Math.round(r.top + scrollY),
@@ -206,24 +211,42 @@ function modalBg(x, y, bw, bh) {
  */
 function glyphRatio(x, y, bw, bh, bgRgb) {
   const bgL = lum(bgRgb);
-  const ratios = [];
   const x1 = Math.min(info.width, x + bw), y1 = Math.min(info.height, y + bh);
+
+  // First pass: how far from the background does this element's ink actually get?
+  let maxD = 0;
   for (let py = Math.max(0, y); py < y1; py++) {
     for (let px = Math.max(0, x); px < x1; px++) {
       const i = (py * info.width + px) * ch;
-      const d =
-        Math.abs(raw[i] - bgRgb[0]) + Math.abs(raw[i + 1] - bgRgb[1]) + Math.abs(raw[i + 2] - bgRgb[2]);
-      if (d < 90) continue; // background or near it
+      const d = Math.abs(raw[i] - bgRgb[0]) + Math.abs(raw[i + 1] - bgRgb[1]) + Math.abs(raw[i + 2] - bgRgb[2]);
+      if (d > maxD) maxD = d;
+    }
+  }
+  if (maxD < 60) return null;
+
+  /* Second pass: keep only pixels at >=65% of that distance — i.e. glyph CORE.
+     A fixed cutoff let partially-covered antialiased pixels through, and their share
+     of the box roughly doubles as type gets smaller, so the same colour scored worse
+     at 34px than at 65px purely from edge fringe. */
+  const cut = maxD * 0.65;
+  const ratios = [];
+  for (let py = Math.max(0, y); py < y1; py++) {
+    for (let px = Math.max(0, x); px < x1; px++) {
+      const i = (py * info.width + px) * ch;
+      const d = Math.abs(raw[i] - bgRgb[0]) + Math.abs(raw[i + 1] - bgRgb[1]) + Math.abs(raw[i + 2] - bgRgb[2]);
+      if (d < cut) continue;
       ratios.push(ratio(lum([raw[i], raw[i + 1], raw[i + 2]]), bgL));
     }
   }
-  if (ratios.length < 40) return null;
+  if (ratios.length < 30) return null;
   ratios.sort((a, b) => a - b);
-  return ratios[Math.floor(ratios.length * 0.2)];
+  return ratios[Math.floor(ratios.length * 0.1)];
 }
 
 const rows = [];
+const exempted = [];
 for (const e of els) {
+  if (e.exempt) { exempted.push(e); continue; }
   const fg = parseColor(e.color);
   if (!fg && !e.clipText) continue;
   const bg = modalBg(e.x, e.y, e.w, e.h);
@@ -248,6 +271,10 @@ const fails = rows.filter((x) => x.r < x.need).sort((a, b) => a.r - b.r);
 
 console.log(`\n  ${url}  @ ${VW}x${VH}`);
 console.log(`  ${rows.length} text elements measured against the rendered pixels`);
+if (exempted.length) {
+  console.log(`  ${exempted.length} skipped as declared logotypes: ` +
+    exempted.map((e) => JSON.stringify(e.text)).join(", "));
+}
 console.log('  ' + '-'.repeat(78));
 if (!fails.length) {
   console.log('  PASS — every text run clears its AA threshold.');

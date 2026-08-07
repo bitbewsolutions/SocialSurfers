@@ -51,6 +51,84 @@ ul, ol { list-style: none; }
   border-radius: 2px;
 }
 
+/* ═══ tonal chapters ═══════════════════════════════════════════════
+   The page is light, but not uniformly — a wall of paper from top to bottom reads
+   as unfinished. One dark chapter sits in the middle (how we work + the clients),
+   and the footer closes on dark.
+
+   Two things make this safe:
+
+   1. The handover is a long fixed-pixel ramp, never a percentage. Percentage stops
+      move with section height, which is where every contrast failure on this project
+      came from. 260px in, 260px out, and the sections pad past it so no text ever
+      sits on the ramp.
+
+   2. .tone-dark REDEFINES the light-ground tokens to their dark equivalents rather
+      than requiring every component inside it to be rewritten. --l1 becomes --t1,
+      hairlines flip, and accents that are legible on paper are swapped for ones
+      legible on ink. Components keep one set of rules and work on either ground.
+   ══════════════════════════════════════════════════════════════════ */
+
+:root {
+  --fade-h: 260px;
+  /* many stops, leaning through the brand violet — a straight two-stop paper→ink
+     ramp passes through a muddy neutral grey and reads as dirt */
+  --ramp-down: linear-gradient(
+    180deg,
+    #f6f5f9 0px, #eeecf5 44px, #ddd8ec 92px,
+    #b3abd2 140px, #7168a8 186px, #3a3270 226px, #0c0620 260px
+  );
+  --ramp-up: linear-gradient(
+    0deg,
+    #f6f5f9 0px, #eeecf5 44px, #ddd8ec 92px,
+    #b3abd2 140px, #7168a8 186px, #3a3270 226px, #0c0620 260px
+  );
+}
+
+.tone-dark {
+  background-color: var(--ink-deep);
+  color: var(--t1);
+
+  --l1: var(--t1);
+  --l2: var(--t2);
+  --l3: var(--t3);
+  --hair: var(--hair-ink);
+  --hair-2: var(--hair-ink-2);
+  --paper: var(--ink-deep);
+  --paper-2: #1b1338;
+  /* --violet and --rose are tuned for paper; on ink they measure 1.6:1 and 3.3:1 */
+  --violet: #a79cf0;
+  --rose: #ff6fa8;
+}
+
+.tone-dark.fade-in,
+.tone-dark.fade-out {
+  background-repeat: no-repeat;
+}
+.tone-dark.fade-in {
+  background-image: var(--ramp-down);
+  background-position: top;
+  background-size: 100% var(--fade-h);
+}
+.tone-dark.fade-out {
+  background-image: var(--ramp-up);
+  background-position: bottom;
+  background-size: 100% var(--fade-h);
+}
+.tone-dark.fade-in.fade-out {
+  background-image: var(--ramp-down), var(--ramp-up);
+  background-position: top, bottom;
+  background-size: 100% var(--fade-h), 100% var(--fade-h);
+}
+
+/* clear the ramp so no text lands on the transition */
+.fade-in { padding-top: calc(var(--fade-h) + var(--section-y) * 0.35); }
+.fade-out { padding-bottom: calc(var(--fade-h) + var(--section-y) * 0.35); }
+
+@media (max-width: 760px) {
+  :root { --fade-h: 190px; }
+}
+
 /* ——— shared primitives ——— */
 
 .shell {

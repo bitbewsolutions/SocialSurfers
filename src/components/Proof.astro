@@ -1,52 +1,57 @@
 ---
-import { projects, pillars, stats, hasRealTestimonials, testimonials } from '../data/content';
+import { clients, pillars, stats, hasRealTestimonials, testimonials } from '../data/content';
 
-/* The wall replaces the single strip of bunting this section used to be.
-   That strip was hard-built for six flags — it spaced them along one drooping cord,
-   so the seventh would have squeezed and the fortieth was never possible.
+/* A double marquee, because the roster outgrew the wall.
+   The bunting grid worked for six and would have worked for twenty; at twenty-seven
+   it becomes four static rows nobody scans. Two counter-rotating tracks read as one
+   continuous body of work and take any number of logos with no layout decision.
 
-   This is the same bunting idea rebuilt as a repeating grid: every row hangs from
-   its own cord (a repeating background line pitched to exactly one row), and the
-   pennant shape lives in the tile's clip-path. Six items or fifty, it just reflows —
-   no geometry to recompute, no JS. When logo files land, the tile swaps its name
-   for an <img> and the wall becomes a logo wall with no layout change. */
+   Mechanics worth keeping:
+   - Each track holds its row's tiles TWICE and translates by exactly -50%. That is
+     what makes the loop seamless: at -50% the second copy sits precisely where the
+     first started, so the reset to 0 is invisible. Any other duplication factor or
+     travel distance visibly snaps.
+   - Duration is derived from tile count, so both rows move at the same speed however
+     many logos each carries. A fixed duration would make the shorter row race.
+   - The duplicate copy is aria-hidden; the roster should be announced once. */
 
-const unnamed = Math.max(0, stats.projectsDelivered - projects.length);
+const half = Math.ceil(clients.length / 2);
+const rows = [clients.slice(0, half), clients.slice(half)];
+const SECONDS_PER_TILE = 3.6;
 ---
 
-<section class="proof" id="clients">
+<section class="proof tone-dark fade-out" id="clients">
   <div class="shell head">
     <p class="label" data-reveal>Our clients</p>
     <h2 class="h2" data-reveal>
-      {stats.projectsDelivered}+ projects delivered.<br />Here are the ones we can name.
+      {stats.projectsDelivered}+ projects delivered<br />for {stats.brands} brands.
     </h2>
     <p class="lead" data-reveal>
-      Gyms, real estate, retail, events and fashion &mdash; different businesses, the same
-      way of working. Some clients are happy to be named, others would rather not be.
+      Gyms, salons, restaurants, real estate, architecture, retail, automotive
+      &mdash; different businesses, the same way of working.
     </p>
   </div>
 
+  <div class="marquees" data-reveal>
+    {rows.map((row, i) => (
+      <div class="marquee" data-dir={i % 2 === 0 ? 'fwd' : 'rev'}>
+        <ul class="track" style={`--dur:${(row.length * SECONDS_PER_TILE).toFixed(1)}s`}>
+          {row.map((c) => (
+            <li class="tile">
+              <img src={c.logo} alt={c.name} width="160" height="160" loading="lazy" decoding="async" />
+            </li>
+          ))}
+          {row.map((c) => (
+            <li class="tile" aria-hidden="true">
+              <img src={c.logo} alt="" width="160" height="160" loading="lazy" decoding="async" />
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+
   <div class="shell">
-    <ul class="wall">
-      {projects.map((p) => (
-        <li class="tile" data-reveal data-reveal-group="wall">
-          {p.logo ? (
-            <img src={p.logo} alt={p.name} width="120" height="44" loading="lazy" decoding="async" />
-          ) : (
-            <span class="nm">{p.name}</span>
-          )}
-          <span class="ind">{p.industry}</span>
-        </li>
-      ))}
-
-      {unnamed > 0 && (
-        <li class="tile rest" data-reveal data-reveal-group="wall">
-          <span class="nm">+{unnamed}</span>
-          <span class="ind">Names on request</span>
-        </li>
-      )}
-    </ul>
-
     {hasRealTestimonials ? (
       <ul class="logs">
         {testimonials.map((t) => (
@@ -75,91 +80,53 @@ const unnamed = Math.max(0, stats.projectsDelivered - projects.length);
 </section>
 
 <style>
-  .proof {
-    background: var(--paper);
-    color: var(--l1);
-    padding-block: var(--section-y);
-  }
+  /* second half of the dark chapter; it ramps back out to paper at the bottom */
+  .proof { padding-top: var(--section-y); }
 
   .head { display: grid; gap: 20px; }
   .head .h2 { max-width: 20ch; }
 
-  /* ——— the wall ———
-     One cord per row, drawn as a repeating background line whose period is exactly
-     one row's pitch. Rows are fixed-height so that pitch is knowable in CSS alone,
-     which is what lets the wall take six tiles or fifty without any recalculation. */
-  .wall {
-    --tile-h: 118px;
-    --row-gap: 34px;
-    margin-top: clamp(48px, 8vh, 92px);
+  .marquees {
+    margin-top: clamp(44px, 7vh, 80px);
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
-    grid-auto-rows: var(--tile-h);
-    column-gap: 9px;
-    row-gap: var(--row-gap);
-    background-image: repeating-linear-gradient(
-      180deg,
-      var(--hair-2) 0 1px,
-      transparent 1px calc(var(--tile-h) + var(--row-gap))
-    );
+    gap: clamp(12px, 1.6vw, 20px);
+    /* the rows run full-bleed, so fade both ends into the ground rather than letting
+       tiles be guillotined by the viewport edge */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
   }
+
+  .marquee { overflow: hidden; }
+  .track {
+    display: flex;
+    width: max-content;
+    animation: slide var(--dur) linear infinite;
+  }
+  .marquee[data-dir='rev'] .track { animation-direction: reverse; }
+  @keyframes slide {
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(-50%, 0, 0); }
+  }
+  /* pausing on hover lets someone actually look at a logo they recognise */
+  .marquees:hover .track { animation-play-state: paused; }
 
   .tile {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    text-align: center;
-    padding: 16px 11px 30px;
-    /* flat, NOT the gradient: --grad is rationed to the hero accent and the primary
-       button. Alternating solids also read more like real bunting than a repeated
-       gradient does. */
-    background: var(--violet);
-    clip-path: polygon(0 0, 100% 0, 100% 66%, 50% 100%, 0 66%);
-    transform-origin: top center;
-    transition: transform var(--dur) var(--ease-out), filter var(--dur-fast);
+    flex: none;
+    /* Spacing is per-tile margin, NOT flex gap. With gap, N tiles have N-1 gaps, so
+       half the doubled track is one copy plus only half a gap — the loop lands half a
+       gap short and visibly ticks every cycle. A trailing margin on every tile makes
+       one copy exactly (tile + margin) x N, and -50% is exact. */
+    margin-right: clamp(12px, 1.6vw, 20px);
+    width: clamp(122px, 13vw, 168px);
+    aspect-ratio: 1;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--paper-2);
+    border: 1px solid var(--hair-ink-2);
+    transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast);
   }
-  /* alternating direction, so a long wall reads as bunting rather than a table */
-  .tile:nth-child(even) { background: var(--rose); }
-  .tile:hover { transform: rotate(-1.4deg); filter: brightness(1.1); }
-
-  /* two lines' worth of box whether the name wraps or not, so the industry label
-     sits on the same baseline right across a row */
-  .tile .nm {
-    display: flex;
-    align-items: center;
-    min-height: 2.2em;
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: clamp(0.82rem, 1.4vw, 0.98rem);
-    line-height: 1.15;
-    letter-spacing: -0.015em;
-    color: #fff;
-    text-wrap: balance;
-  }
-  .tile .ind {
-    font-family: var(--mono);
-    font-size: 8px;
-    font-weight: 600;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    /* 0.82 measured 4.21:1 on --rose and this is 8px text, so it needs 4.5 */
-    color: rgba(255, 255, 255, 0.93);
-  }
-  .tile img { width: auto; max-height: 44px; object-fit: contain; }
-
-  /* the not-yet-named remainder — deliberately reads as a placeholder, not a client */
-  .tile.rest,
-  .tile.rest:nth-child(even) {
-    background: transparent;
-    border: 1px dashed var(--hair-2);
-    border-top: 0;
-  }
-  .tile.rest .nm { font-family: var(--mono); font-weight: 700; font-size: 1.15rem; color: var(--l2); }
-  .tile.rest .ind { color: var(--l3); }
-  .tile.rest:hover { transform: none; filter: none; }
+  .tile img { width: 100%; height: 100%; object-fit: cover; }
+  .tile:hover { transform: translateY(-4px); border-color: var(--rose); }
 
   .pillars {
     display: grid;
@@ -203,18 +170,13 @@ const unnamed = Math.max(0, stats.projectsDelivered - projects.length);
   .log .result { color: var(--rose); }
 
   @media (max-width: 860px) {
-    .wall {
-      --tile-h: 104px;
-      --row-gap: 28px;
-      grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
-    }
     .pillars { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 420px) {
-    .wall { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (prefers-reduced-motion: reduce) {
+    /* stop the travel and hand the row back as an ordinary scroller */
+    .track { animation: none; }
+    .marquee { overflow-x: auto; }
     .tile:hover { transform: none; }
   }
 </style>

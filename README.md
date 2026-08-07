@@ -24,10 +24,11 @@ React into a site that has no framework at all.
 
 | | on the wire |
 |---|---|
-| CSS (gzipped) | 9.0 KB |
+| CSS (gzipped) | 9.5 KB |
 | JS (external chunks, gzipped) | 5.3 KB |
 | Fonts (woff2, precompressed) | 39.4 KB |
-| Heaviest page, first visit | **62.8 KB** |
+| Heaviest page, first visit | **63.5 KB** |
+| Client logo tiles (27, lazy) | 178 KB |
 
 Lighter than the dark version this replaced (69.5 KB) *including* the shader: Fraunces
 (22.5 KB, display only) was dropped for Space Grotesk (14.8 KB), which serves display
@@ -118,19 +119,81 @@ qa/
                  destroy any load-time scroll state you're trying to measure)
   contrast.mjs   WCAG audit against rendered pixels — see below
   weigh.mjs      per-page gzipped weight against the budget
+tools/
+  logos.mjs      client logo pipeline — see below
+  clients.json   source filename -> client name/industry (hand-maintained)
 .fontsrc/        font sources + the subsetting script (not shipped)
+brand/           the client's original artwork; source of truth, not served
 ```
+
+## The brand mark
+
+`components/Logo.astro` is vector, not the supplied raster. Fitting circles to the
+traced edges of the client's PNG showed the geometry is exact and simple: **two discs
+of identical radius sharing a centre-x, their centres one radius apart** — the upper
+minus its bottom-right quadrant, the lower minus its top-left. That interlock is the S.
+
+So it is ~500 bytes of path data instead of 14.5 KB of pixels, crisp at every size
+including `favicon.svg`, and the two brand colours became tokens.
+
+The wordmark keeps `--brand-pink` `#E35E9D` exactly as supplied, which measures 2.99:1
+on paper. WCAG 1.4.3 exempts logotypes — and that exemption is *declared* in the markup
+via `data-contrast-exempt="logotype"` so the audit reports it rather than either failing
+every run or being silently waved through. Distorting a client's own brand colour to
+satisfy a rule that explicitly does not apply would be the wrong fix.
+
+## Client logos: `node tools/logos.mjs [--sheet]`
+
+Raw phone screenshots in, uniform web tiles out. 27 clients, 178 KB total.
+
+The source material is what a client actually sends: iPhone screenshots of Instagram
+profile pictures, 2–6 MB each, with the status bar and the Following/Share/QR buttons
+still attached, plus loose wordmarks on white, cream, black and transparency. Two
+observations made this automatable rather than an afternoon of manual cropping:
+
+1. **Instagram blurs the backdrop behind the avatar**, so the avatar is the only sharp
+   thing on the frame — finding the region with real high-frequency detail beats hunting
+   for a circle. Thresholds are relative to each frame's own strongest row: a fixed
+   cutoff missed every avatar that was mostly flat colour, because a black disc with a
+   wordmark on it has enormous edge contrast but very few edge *pixels*. Where even that
+   finds nothing, a geometric fallback uses the viewer's fixed layout (disc centred, a
+   constant share of frame width).
+2. **Backgrounds never have to be removed.** Each logo is composited onto a tile filled
+   with its own corner colour. Black wordmarks keep black tiles, transparent PNGs get
+   paper — and a *light* mark on transparency gets an ink tile, which is what stops the
+   white Romeo Lane wordmark rendering as an empty rectangle.
+
+Names live in `tools/clients.json`. The tool writes `src/data/clients.json`, which the
+site reads — never hand-edit that one. To add a client: drop artwork into `src/assets`,
+add a line to the name map, re-run.
+
+> `src/assets` is **38 MB** of raw originals and is committed deliberately — it is the
+> only copy of the client's source artwork and the pipeline needs it to re-run. Move it
+> to asset storage (Drive, S3) before this repo gets a remote; nothing in the build
+> depends on it, only `tools/logos.mjs` does.
 
 ## Design system
 
-Tokens in `src/styles/tokens.css`. **Light-first**: one paper ground for the whole page,
-with darkness rationed to the footer and the service pages' CTA card.
+Tokens in `src/styles/tokens.css`. **Light-first, but not uniformly light** — a wall of
+paper from top to bottom reads as unfinished.
 
-The old dawn → midday → dusk arc is gone. It was a metaphor the visitor had to decode
-before the page made sense — the visual twin of the copy problem — and nobody scrolling
-a marketing site thinks *"ah, a day passing."* Removing it also deleted an entire class
-of bug: **every** contrast failure on this project came from a percentage-stop gradient
-drifting under fixed text when a section's height changed. Flat grounds cannot drift.
+One dark chapter sits in the middle (how we work + the clients), and the footer closes
+on dark. `.tone-dark` in `global.css` does two things:
+
+- carries a **260px fixed-pixel ramp** in and out, with the sections padding past it so
+  no text ever sits on the transition. The ramp has many stops leaning through the brand
+  violet — a straight two-stop paper→ink gradient passes through a muddy neutral and
+  reads as dirt.
+- **redefines the light-ground tokens to their dark equivalents.** `--l1` becomes
+  `--t1`, hairlines flip, and `--violet`/`--rose` are swapped for values legible on ink
+  (they measure 1.6:1 and 3.3:1 there). Components keep one set of rules and work on
+  either ground, which is why moving a section between chapters costs nothing.
+
+The old dawn → midday → dusk arc is still gone, and stays gone. It was a metaphor the
+visitor had to decode before the page made sense. What replaced it is tone used as
+*structure*, not as narrative: light, dark, light. **Every** contrast failure on this
+project came from a percentage-stop gradient drifting under fixed text when a section's
+height changed, which is why the ramps above are in pixels.
 
 ### The gradient is rationed
 
@@ -161,8 +224,14 @@ text element's box as its true background, composites the declared colour over i
 checks the ratio against the AA threshold for that size and weight.
 
 Gradient text (`background-clip: text`) computes to `color: transparent`, so for those
-it measures the painted glyph pixels instead and reports a low percentile — the lightest
-part of the ramp, without being dragged down by the antialiased fringe.
+it measures the painted glyph pixels instead. The glyph-core cutoff is adaptive: it
+keeps only pixels at 65%+ of the element's own maximum distance from its ground. A fixed
+cutoff let partially-covered antialiased pixels through, and their share of the box
+roughly doubles as type gets smaller — so the same colour scored 2.79:1 at 34px and
+passed comfortably at 65px, purely from edge fringe.
+
+Elements carrying `data-contrast-exempt` are skipped and reported by name. That is for
+logotypes only (WCAG 1.4.3); it is not a general-purpose silencer.
 
 Exits non-zero on any failure. Run it on `/`, a service page and `/404` at both
 1440x900 and 390x844 after touching any background.
@@ -176,13 +245,17 @@ Exits non-zero on any failure. Run it on `/`, a service page and `/404` at both
   "3.6M views" are illustrative and must be replaced with real client numbers or
   removed before launch — they are the one place on the site currently showing figures
   we cannot stand behind.
-- **The project wall is a partial list.** `projects` in `src/data/content.ts` holds only
-  the six named clients; the client has ~40–45 delivered and is choosing which he'll
-  name publicly. Append rows and the wall reflows — it's a plain grid with no fixed
-  count, and the "+N more" tile recomputes from `stats.projectsDelivered` and
-  disappears once the list catches up.
+- **Three client names need confirming.** They could not be read off the logo with
+  confidence and are flagged `"verify": true` in `tools/clients.json`: *Silomin*,
+  *Looms in Velvet*, and one still called *Client 27*. Fix the name map and re-run the
+  tool; the tile filenames and the data file follow automatically.
 - **`stats.projectsDelivered` is 40**, the conservative floor of the client's own
-  "around 40–45". Replace with the exact figure when he confirms it.
+  "around 40–45". `stats.brands` is not an estimate — it is the length of the roster.
+  Replace the 40 with the exact figure when he confirms it.
+- **The client's own hero render** (`hero.png` at the repo root) is not in use; the
+  shader hero stands. Note it leans on third-party platform logos as decorative 3D art,
+  which Meta/YouTube/TikTok brand guidelines restrict — worth resolving before it ships
+  anywhere.
 - **No testimonials.** `hasRealTestimonials` is `false`, so the clients section renders
   the value pillars instead. Flip it once real quotes with named businesses exist.
   Nothing invented ships in the meantime.
