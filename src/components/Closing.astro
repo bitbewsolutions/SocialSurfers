@@ -8,7 +8,7 @@ import { site, waLink, telLink } from '../data/site';
 const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
 ---
 
-<section class="close" id="enquire">
+<section class="close to-dark" id="enquire">
   <div class="shell">
     <div class="grid">
       <div class="pitch">
@@ -17,7 +17,7 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
           {industries.map((i) => <li>{i}</li>)}
         </ul>
 
-        <h2 class="h2" data-reveal>Tell us what you&rsquo;re trying to grow.</h2>
+        <h2 class="h2" data-reveal>Tell us what you&rsquo;re <em>trying to grow.</em></h2>
         <p class="lead" data-reveal>
           One call, no pitch deck. We&rsquo;ll tell you what we&rsquo;d actually do for your
           business and what it costs. If we&rsquo;re not the right fit, we&rsquo;ll say so.
@@ -98,8 +98,8 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
      Pinned this way the dawn always completes in 240px and every dark-on-light
      element below it is on actual foam. */
   .close {
-    background: var(--paper);
-    padding-block: var(--section-y);
+    background-color: var(--paper);
+    padding-top: var(--section-y);
     color: var(--l1);
   }
 

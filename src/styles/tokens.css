@@ -63,6 +63,10 @@
    * button label. Coral is beautiful and unusable for this.
    */
   --grad: linear-gradient(102deg, #3f2a86 0%, #8e1c74 45%, #c41b6e 100%);
+  /* the same idea on ink: --grad's dark end measures 1.6:1 there and disappears */
+  --grad-on-dark: linear-gradient(102deg, #a79cf0 0%, #cf8ad4 45%, #ff6fa8 100%);
+  /* accent text picks whichever ramp suits its ground; .tone-dark rebinds this */
+  --grad-text: var(--grad);
 
   /* ——— text on paper ——— */
   --l1: #16102b;                    /* ~16.4:1 */

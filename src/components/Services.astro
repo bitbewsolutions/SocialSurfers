@@ -2,11 +2,11 @@
 import { services } from '../data/services';
 ---
 
-<section class="services" id="services">
+<section class="services to-dark" id="services">
   {/* the dawn ramp lives in Stats now — this section starts on plain foam */}
   <div class="shell head">
     <p class="label" data-reveal>What we do</p>
-    <h2 class="h2" data-reveal>Seven services.<br />Pick one, or take them all.</h2>
+    <h2 class="h2" data-reveal>Seven services.<br />Pick one, or <em>take them all.</em></h2>
     <p class="lead" data-reveal>
       Everything we offer, and exactly what&rsquo;s included in each. Click any service to
       see the full detail.
@@ -50,9 +50,8 @@ import { services } from '../data/services';
 <style>
   .services {
     position: relative;
-    background: var(--paper);
+    background-color: var(--paper);
     color: var(--l1);
-    padding-bottom: var(--section-y);
   }
 
   .head {

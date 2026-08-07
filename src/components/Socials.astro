@@ -33,13 +33,16 @@ const paths: Record<string, string> = {
 };
 ---
 
-<ul class={`socials tone-${tone}`}>
+{/* With a single channel a lone circular icon reads as an orphan, so it carries its
+    handle. If more channels come back, the handle drops and it returns to a row. */}
+<ul class={`socials tone-${tone} ${site.socials.length === 1 ? 'solo' : ''}`}>
   {site.socials.map((s) => (
     <li>
       <a href={s.url} target="_blank" rel="noopener" aria-label={`${site.name} on ${s.name}`}>
         <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <path d={paths[s.icon]} />
         </svg>
+        {site.socials.length === 1 && 'handle' in s && <span class="handle">{s.handle}</span>}
       </a>
     </li>
   ))}
@@ -74,5 +77,20 @@ const paths: Record<string, string> = {
     color: var(--violet);
     border-color: var(--violet);
     background: #fff;
+  }
+
+  /* single channel: pill with the handle rather than a lone circle */
+  .solo a {
+    width: auto;
+    grid-auto-flow: column;
+    gap: 10px;
+    padding: 0 18px 0 14px;
+    border-radius: 999px;
+  }
+  .handle {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
   }
 </style>

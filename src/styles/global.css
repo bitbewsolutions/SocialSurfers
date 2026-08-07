@@ -56,33 +56,52 @@ ul, ol { list-style: none; }
    as unfinished. One dark chapter sits in the middle (how we work + the clients),
    and the footer closes on dark.
 
-   Two things make this safe:
+   A transition STRADDLES the boundary between two sections rather than living
+   inside one of them. The section above spends its last --fade-h reaching the
+   halfway colour; the section below spends its first --fade-h finishing the
+   journey. That gives ~600px of travel and, more importantly, means neither
+   section has a visible edge where a ramp begins.
 
-   1. The handover is a long fixed-pixel ramp, never a percentage. Percentage stops
-      move with section height, which is where every contrast failure on this project
-      came from. 260px in, 260px out, and the sections pad past it so no text ever
-      sits on the ramp.
+   Three things make it read as smooth rather than as a band:
 
-   2. .tone-dark REDEFINES the light-ground tokens to their dark equivalents rather
-      than requiring every component inside it to be rewritten. --l1 becomes --t1,
-      hairlines flip, and accents that are legible on paper are swapped for ones
-      legible on ink. Components keep one set of rules and work on either ground.
+   1. Stop POSITIONS are eased, not evenly spaced — bunched in the middle, sparse
+      at both ends. A linear ramp has a kink in its first derivative where it meets
+      the flat ground, and the eye reads that kink as a hard line even though the
+      colours are perfectly continuous. Easing the ends to a standstill removes it.
+
+   2. The colours arc through the brand violet. A straight paper→ink interpolation
+      in sRGB passes through a dead neutral grey (#817e8d at the midpoint) and reads
+      as dirt.
+
+   3. Everything is in fixed pixels, never percentages. Percentage stops move with
+      section height, which is where every contrast failure on this project came
+      from.
+
+   .tone-dark additionally REDEFINES the light-ground tokens to their dark
+   equivalents, so components inside it keep one set of rules and work on either
+   ground.
+
+   The four fade classes come in PAIRS, one per boundary:
+     .to-dark   (light section, bottom)  +  .from-light (dark section, top)
+     .to-light  (dark section, bottom)   +  .from-dark  (light section, top)
+   Both halves meet at --tone-mid, so mismatching a pair shows as a step at the join.
    ══════════════════════════════════════════════════════════════════ */
-
 :root {
-  --fade-h: 260px;
-  /* many stops, leaning through the brand violet — a straight two-stop paper→ink
-     ramp passes through a muddy neutral grey and reads as dirt */
-  --ramp-down: linear-gradient(
-    180deg,
-    #f6f5f9 0px, #eeecf5 44px, #ddd8ec 92px,
-    #b3abd2 140px, #7168a8 186px, #3a3270 226px, #0c0620 260px
-  );
-  --ramp-up: linear-gradient(
-    0deg,
-    #f6f5f9 0px, #eeecf5 44px, #ddd8ec 92px,
-    #b3abd2 140px, #7168a8 186px, #3a3270 226px, #0c0620 260px
-  );
+  --fade-h: 300px;
+  --tone-mid: #6f66a6;
+
+  --ramp-paper-to-mid: linear-gradient(180deg,
+    #f6f5f9 0px, #f4f2f8 46px, #efedf5 92px, #e7e2f0 134px, #dad3e9 172px,
+    #c8bfe0 208px, #b0a5d3 240px, #918ac0 272px, #6f66a6 300px);
+  --ramp-mid-to-ink: linear-gradient(180deg,
+    #6f66a6 0px, #5d5493 28px, #4e4480 60px, #40376b 96px, #332b57 138px,
+    #262042 180px, #1a152f 220px, #110b25 262px, #0c0620 300px);
+  --ramp-ink-to-mid: linear-gradient(180deg,
+    #0c0620 0px, #110b25 38px, #1a152f 80px, #262042 120px, #332b57 162px,
+    #40376b 204px, #4e4480 240px, #5d5493 272px, #6f66a6 300px);
+  --ramp-mid-to-paper: linear-gradient(180deg,
+    #6f66a6 0px, #918ac0 28px, #b0a5d3 60px, #c8bfe0 92px, #dad3e9 128px,
+    #e7e2f0 166px, #efedf5 208px, #f4f2f8 254px, #f6f5f9 300px);
 }
 
 .tone-dark {
@@ -99,34 +118,46 @@ ul, ol { list-style: none; }
   /* --violet and --rose are tuned for paper; on ink they measure 1.6:1 and 3.3:1 */
   --violet: #a79cf0;
   --rose: #ff6fa8;
+  /* the paper gradient's dark end is invisible here, so accent text swaps ramps */
+  --grad-text: var(--grad-on-dark);
 }
 
-.tone-dark.fade-in,
-.tone-dark.fade-out {
-  background-repeat: no-repeat;
-}
-.tone-dark.fade-in {
-  background-image: var(--ramp-down);
-  background-position: top;
-  background-size: 100% var(--fade-h);
-}
-.tone-dark.fade-out {
-  background-image: var(--ramp-up);
+.to-dark,
+.from-light,
+.to-light,
+.from-dark { background-repeat: no-repeat; }
+
+.to-dark {
+  background-image: var(--ramp-paper-to-mid);
   background-position: bottom;
   background-size: 100% var(--fade-h);
+  /* Content need only clear the STEEP part. Because the stops are eased, a ramp's
+     leading third is still essentially the ground colour, so copy can sit inside it
+     without losing contrast — verified by qa/contrast.mjs, not assumed. Clearing the
+     full 300px on both sides of three boundaries added ~800px of empty page. */
+  padding-bottom: calc(var(--fade-h) * 0.5);
 }
-.tone-dark.fade-in.fade-out {
-  background-image: var(--ramp-down), var(--ramp-up);
-  background-position: top, bottom;
-  background-size: 100% var(--fade-h), 100% var(--fade-h);
+.from-light {
+  background-image: var(--ramp-mid-to-ink);
+  background-position: top;
+  background-size: 100% var(--fade-h);
+  padding-top: calc(var(--fade-h) * 0.75);
 }
-
-/* clear the ramp so no text lands on the transition */
-.fade-in { padding-top: calc(var(--fade-h) + var(--section-y) * 0.35); }
-.fade-out { padding-bottom: calc(var(--fade-h) + var(--section-y) * 0.35); }
+.to-light {
+  background-image: var(--ramp-ink-to-mid);
+  background-position: bottom;
+  background-size: 100% var(--fade-h);
+  padding-bottom: calc(var(--fade-h) * 0.5);
+}
+.from-dark {
+  background-image: var(--ramp-mid-to-paper);
+  background-position: top;
+  background-size: 100% var(--fade-h);
+  padding-top: calc(var(--fade-h) * 0.75);
+}
 
 @media (max-width: 760px) {
-  :root { --fade-h: 190px; }
+  :root { --fade-h: 210px; }
 }
 
 /* ——— shared primitives ——— */
@@ -154,6 +185,25 @@ ul, ol { list-style: none; }
   line-height: 1.04;
   letter-spacing: -0.028em;
   text-wrap: balance;
+}
+
+/*
+ * The accent phrase. One per section heading, always the closing clause, so the
+ * page has a repeating beat rather than a gradient scattered at random.
+ *
+ * --grad-text resolves to the paper ramp or the ink one depending on the ground,
+ * which .tone-dark rebinds. nowrap holds each phrase on a single line: across a
+ * line break every fragment gets its own slice of the ramp and the colour jumps
+ * mid-word.
+ */
+.h2 em,
+h1 em {
+  font-style: normal;
+  white-space: nowrap;
+  background-image: var(--grad-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .lead {

@@ -7,7 +7,7 @@ import { services } from '../data/services';
 const year = new Date().getFullYear();
 ---
 
-<footer class="foot">
+<footer class="foot tone-dark from-light">
   <div class="shell inner">
     <div class="col brandcol">
       <Logo size={38} id="ft" />
@@ -51,15 +51,9 @@ const year = new Date().getFullYear();
   /* The one dark ground on the site. It MUST set its own colour: everything inside
      otherwise inherits --l1 from body and lands dark-on-dark — which is exactly how
      the logo wordmark ended up at 1.08:1 here. */
-  .foot {
-    background-color: var(--ink-deep);
-    color: var(--t1);
-    background-image: var(--ramp-down);
-    background-repeat: no-repeat;
-    background-position: top;
-    background-size: 100% var(--fade-h);
-    padding-top: calc(var(--fade-h) + clamp(24px, 4vh, 56px));
-  }
+  /* .tone-dark carries the ground and the token flip; .from-light finishes the
+     transition that .close starts. Both halves meet at --tone-mid. */
+  .foot { position: relative; }
   .inner {
     display: grid;
     grid-template-columns: 1.4fr 1fr 1fr;

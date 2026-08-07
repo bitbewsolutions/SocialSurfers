@@ -47,16 +47,18 @@ export const site = {
   areaServed: 'Worldwide',
 
   /**
-   * TODO(assets): confirm real handles with the client — these are best guesses.
-   * `icon` keys map to the path data in components/Socials.astro.
+   * Confirmed by the client. Instagram is the only channel he runs, so it is the
+   * only one listed — a row of icons where five lead to 404s costs more trust than
+   * the row buys. components/Socials.astro still carries the path data for the other
+   * five; adding one back is a line here plus nothing else.
    */
   socials: [
-    { name: 'Instagram', icon: 'instagram', url: 'https://instagram.com/socialsurfersmedia' },
-    { name: 'Facebook', icon: 'facebook', url: 'https://facebook.com/socialsurfersmedia' },
-    { name: 'YouTube', icon: 'youtube', url: 'https://youtube.com/@socialsurfersmedia' },
-    { name: 'LinkedIn', icon: 'linkedin', url: 'https://linkedin.com/company/socialsurfersmedia' },
-    { name: 'X', icon: 'x', url: 'https://x.com/socialsurfers' },
-    { name: 'Pinterest', icon: 'pinterest', url: 'https://pinterest.com/socialsurfersmedia' },
+    {
+      name: 'Instagram',
+      icon: 'instagram',
+      handle: '@socialsurfersofficial',
+      url: 'https://www.instagram.com/socialsurfersofficial',
+    },
   ],
 } as const;
 
