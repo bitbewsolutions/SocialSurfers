@@ -1,0 +1,27 @@
+# core.autocrlf is true on this machine. Git's binary heuristic has held so far, but
+# it is a heuristic — a source image it misreads as text would be silently rewritten
+# on checkout, and src/assets is the only copy of the client's original artwork.
+# Mark them explicitly rather than relying on detection.
+*.png   binary
+*.PNG   binary
+*.jpg   binary
+*.jpeg  binary
+*.JPG   binary
+*.JPEG  binary
+*.webp  binary
+*.woff2 binary
+*.mp4   binary
+*.ttf   binary
+*.ico   binary
+
+# Text files normalise to LF in the repo whatever the working tree uses.
+*.astro   text eol=lf
+*.ts      text eol=lf
+*.mjs     text eol=lf
+*.js      text eol=lf
+*.css     text eol=lf
+*.json    text eol=lf
+*.md      text eol=lf
+*.svg     text eol=lf
+*.html    text eol=lf
+*.py      text eol=lf
