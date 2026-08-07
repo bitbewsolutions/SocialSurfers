@@ -53,28 +53,28 @@
     "industry": "Automobile",
     "logo": "/clients/detailing-devils.webp",
     "from": "IMG_6327.PNG",
-    "bg": "#e3e2e7"
+    "bg": "#efefef"
   },
   {
     "name": "M.R. Metal",
     "industry": "Manufacturing",
     "logo": "/clients/m-r-metal.webp",
     "from": "IMG_6328.PNG",
-    "bg": "#eaebed"
+    "bg": "#eaeaeb"
   },
   {
     "name": "Gambhir Optics",
     "industry": "Retail",
     "logo": "/clients/gambhir-optics.webp",
     "from": "IMG_6329.PNG",
-    "bg": "#d0cecd"
+    "bg": "#ededee"
   },
   {
     "name": "Creative Kitchens",
     "industry": "Modular Interiors",
     "logo": "/clients/creative-kitchens.webp",
     "from": "IMG_6330.PNG",
-    "bg": "#edeeed"
+    "bg": "#eeeeee"
   },
   {
     "name": "Silomin",
@@ -82,14 +82,14 @@
     "logo": "/clients/silomin.webp",
     "verify": true,
     "from": "IMG_6331.PNG",
-    "bg": "#e0e1e2"
+    "bg": "#e0e1e1"
   },
   {
     "name": "The Elite Club",
     "industry": "Gym & Fitness",
     "logo": "/clients/the-elite-club.webp",
     "from": "IMG_6332.PNG",
-    "bg": "#f4f5f4"
+    "bg": "#f4f4f4"
   },
   {
     "name": "PRO Ultimate Gyms",
@@ -162,9 +162,9 @@
     "bg": "#ffffff"
   },
   {
-    "name": "Looms in Velvet",
+    "name": "Vows in Velvet",
     "industry": "Fashion",
-    "logo": "/clients/looms-in-velvet.webp",
+    "logo": "/clients/vows-in-velvet.webp",
     "verify": true,
     "from": "WhatsApp Image 2026-08-07 at 3.40.46 PM (1).jpeg",
     "bg": "#2b2e30"
