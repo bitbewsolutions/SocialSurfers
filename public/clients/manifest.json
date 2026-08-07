@@ -80,7 +80,6 @@
     "name": "Silomin",
     "industry": "Retail",
     "logo": "/clients/silomin.webp",
-    "verify": true,
     "from": "IMG_6331.PNG",
     "bg": "#e0e1e1"
   },
@@ -96,14 +95,14 @@
     "industry": "Gym & Fitness",
     "logo": "/clients/pro-ultimate-gyms.webp",
     "from": "IMG_6333.PNG",
-    "bg": "#ececec"
+    "bg": "#e8e7e7"
   },
   {
     "name": "Sanders Bagzee",
     "industry": "Fashion & Bags",
     "logo": "/clients/sanders-bagzee.webp",
     "from": "IMG_6334.PNG",
-    "bg": "#e3e3e3"
+    "bg": "#e2e2e2"
   },
   {
     "name": "Mahak Makeover",
@@ -117,14 +116,14 @@
     "industry": "Retail",
     "logo": "/clients/sqdc.webp",
     "from": "IMG_6336.PNG",
-    "bg": "#e6e7ea"
+    "bg": "#e2e2e2"
   },
   {
     "name": "Caballo Verticals",
     "industry": "Architecture",
     "logo": "/clients/caballo-verticals.webp",
     "from": "IMG_6337.PNG",
-    "bg": "#dddbd8"
+    "bg": "#efeeed"
   },
   {
     "name": "Reborn Gym",
@@ -165,9 +164,8 @@
     "name": "Vows in Velvet",
     "industry": "Fashion",
     "logo": "/clients/vows-in-velvet.webp",
-    "verify": true,
     "from": "WhatsApp Image 2026-08-07 at 3.40.46 PM (1).jpeg",
-    "bg": "#2b2e30"
+    "bg": "#2e3133"
   },
   {
     "name": "Toyz World",
@@ -182,7 +180,7 @@
     "logo": "/clients/client-27.webp",
     "verify": true,
     "from": "WhatsApp Image 2026-08-07 at 3.40.46 PM.jpeg",
-    "bg": "#313234"
+    "bg": "#3d3c3c"
   },
   {
     "name": "Romeo Lane",

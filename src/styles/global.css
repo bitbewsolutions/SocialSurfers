@@ -73,9 +73,17 @@ ul, ol { list-style: none; }
       in sRGB passes through a dead neutral grey (#817e8d at the midpoint) and reads
       as dirt.
 
-   3. Everything is in fixed pixels, never percentages. Percentage stops move with
-      section height, which is where every contrast failure on this project came
-      from.
+   3. The gradient BOX is a fixed pixel height (via background-size), so it cannot
+      drift with section height — that drift is where every contrast failure on this
+      project came from. Stop positions INSIDE that box are percentages, which is a
+      different thing entirely and is what lets one ramp definition serve every
+      value of --fade-h.
+
+      They were pixels at first, and that was a bug: --fade-h drops to 210px on
+      small screens while the stops still ran to 300px, so the last 90px of every
+      ramp was clipped. The light half ended on pale lavender instead of reaching
+      the midpoint and the dark half began at the midpoint — a hard step, on phones
+      only. Percentages of the box are the correct unit here.
 
    .tone-dark additionally REDEFINES the light-ground tokens to their dark
    equivalents, so components inside it keep one set of rules and work on either
@@ -91,17 +99,17 @@ ul, ol { list-style: none; }
   --tone-mid: #6f66a6;
 
   --ramp-paper-to-mid: linear-gradient(180deg,
-    #f6f5f9 0px, #f4f2f8 46px, #efedf5 92px, #e7e2f0 134px, #dad3e9 172px,
-    #c8bfe0 208px, #b0a5d3 240px, #918ac0 272px, #6f66a6 300px);
+    #f6f5f9 0%, #f4f2f8 15.3%, #efedf5 30.7%, #e7e2f0 44.7%, #dad3e9 57.3%,
+    #c8bfe0 69.3%, #b0a5d3 80%, #918ac0 90.7%, #6f66a6 100%);
   --ramp-mid-to-ink: linear-gradient(180deg,
-    #6f66a6 0px, #5d5493 28px, #4e4480 60px, #40376b 96px, #332b57 138px,
-    #262042 180px, #1a152f 220px, #110b25 262px, #0c0620 300px);
+    #6f66a6 0%, #5d5493 9.3%, #4e4480 20%, #40376b 32%, #332b57 46%,
+    #262042 60%, #1a152f 73.3%, #110b25 87.3%, #0c0620 100%);
   --ramp-ink-to-mid: linear-gradient(180deg,
-    #0c0620 0px, #110b25 38px, #1a152f 80px, #262042 120px, #332b57 162px,
-    #40376b 204px, #4e4480 240px, #5d5493 272px, #6f66a6 300px);
+    #0c0620 0%, #110b25 12.7%, #1a152f 26.7%, #262042 40%, #332b57 54%,
+    #40376b 68%, #4e4480 80%, #5d5493 90.7%, #6f66a6 100%);
   --ramp-mid-to-paper: linear-gradient(180deg,
-    #6f66a6 0px, #918ac0 28px, #b0a5d3 60px, #c8bfe0 92px, #dad3e9 128px,
-    #e7e2f0 166px, #efedf5 208px, #f4f2f8 254px, #f6f5f9 300px);
+    #6f66a6 0%, #918ac0 9.3%, #b0a5d3 20%, #c8bfe0 30.7%, #dad3e9 42.7%,
+    #e7e2f0 55.3%, #efedf5 69.3%, #f4f2f8 84.7%, #f6f5f9 100%);
 }
 
 .tone-dark {

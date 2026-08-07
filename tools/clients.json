@@ -12,7 +12,7 @@
   "IMG_6328.PNG":                                      { "name": "M.R. Metal",           "industry": "Manufacturing" },
   "IMG_6329.PNG":                                      { "name": "Gambhir Optics",       "industry": "Retail" },
   "IMG_6330.PNG":                                      { "name": "Creative Kitchens",    "industry": "Modular Interiors" },
-  "IMG_6331.PNG":                                      { "name": "Silomin",              "industry": "Retail", "verify": true },
+  "IMG_6331.PNG":                                      { "name": "Silomin",              "industry": "Retail"},
   "IMG_6332.PNG":                                      { "name": "The Elite Club",       "industry": "Gym & Fitness" },
   "IMG_6333.PNG":                                      { "name": "PRO Ultimate Gyms",    "industry": "Gym & Fitness" },
   "IMG_6334.PNG":                                      { "name": "Sanders Bagzee",       "industry": "Fashion & Bags" },
@@ -24,7 +24,7 @@
   "WhatsApp Image 2026-08-07 at 3.40.44 PM.jpeg":      { "name": "JD Dream Decor",       "industry": "Event Decor" },
   "WhatsApp Image 2026-08-07 at 3.40.45 PM (1).jpeg":  { "name": "Exotic Party Ideas",   "industry": "Event Decor" },
   "WhatsApp Image 2026-08-07 at 3.40.45 PM.jpeg":      { "name": "La Vanilla Coffee",    "industry": "Cafe" },
-  "WhatsApp Image 2026-08-07 at 3.40.46 PM (1).jpeg":  { "name": "Vows in Velvet",      "industry": "Fashion", "verify": true },
+  "WhatsApp Image 2026-08-07 at 3.40.46 PM (1).jpeg":  { "name": "Vows in Velvet",      "industry": "Fashion"},
   "WhatsApp Image 2026-08-07 at 3.40.46 PM (2).jpeg":  { "name": "Toyz World",           "industry": "Retail" },
   "WhatsApp Image 2026-08-07 at 3.40.46 PM.jpeg":      { "name": "Client 27",            "industry": "Unknown", "verify": true },
   "romeolane logo.png":                                { "name": "Romeo Lane",           "industry": "Hospitality" }

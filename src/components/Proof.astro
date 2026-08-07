@@ -128,19 +128,30 @@ const SECONDS_PER_TILE = 3.6;
   .tile img { width: 100%; height: 100%; object-fit: cover; }
   .tile:hover { transform: translateY(-4px); border-color: var(--rose); }
 
+  /* Borders on the cells, no fills anywhere.
+     The usual 1px-gap trick paints the container and lets opaque cells cover it —
+     but an opaque cell also covers the section's fade, and this block sits inside
+     it, so its edges became hard steps from flat ink to the ramp. Making the cells
+     transparent then let the container's own fill tint the whole block instead.
+     Hairlines per cell is the only version with nothing painted behind the text. */
   .pillars {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    background: var(--hair);
-    border-block: 1px solid var(--hair);
+    border-top: 1px solid var(--hair);
     margin-top: clamp(48px, 8vh, 88px);
   }
+  /* Deliberately NOT filled. The 1px-gap trick works because the container paints a
+     translucent hairline colour and the cells cover it — but an OPAQUE cell also
+     covers the section's fade, so where this block ended you got a hard step from
+     flat ink to whatever colour the ramp had reached. Transparent cells let the ramp
+     through and the translucent container still draws the gaps. */
   .pillars li {
-    background: var(--paper);
     padding: 26px 20px;
     text-align: center;
+    border-bottom: 1px solid var(--hair);
+    border-right: 1px solid var(--hair);
   }
+  .pillars li:nth-child(4n) { border-right: 0; }
   .pillars .k {
     font-family: var(--mono);
     font-size: clamp(10px, 1.6vw, 12px);
@@ -171,6 +182,8 @@ const SECONDS_PER_TILE = 3.6;
 
   @media (max-width: 860px) {
     .pillars { grid-template-columns: repeat(2, 1fr); }
+    .pillars li:nth-child(4n) { border-right: 1px solid var(--hair); }
+    .pillars li:nth-child(2n) { border-right: 0; }
   }
 
   @media (prefers-reduced-motion: reduce) {
