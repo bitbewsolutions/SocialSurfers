@@ -1,16 +1,23 @@
 /* ═══════════════════════════════════════════════════════════════════
    Social Surfers — design tokens
-   Palette is night-ocean / bioluminescence, not a generic SaaS gradient.
-   Contrast values below are measured, not estimated — see AUDIT notes.
+
+   Light-first. The page is one light ground with darkness rationed to the
+   footer; the old dawn→midday→dusk arc is gone. It was a metaphor the visitor
+   had to decode before the page made sense, which is the same problem the
+   copy had. One ground, one reading.
+
+   Contrast values are measured against rendered pixels by qa/contrast.mjs,
+   not estimated. Run it after touching anything in here.
    ═══════════════════════════════════════════════════════════════════ */
 
 @font-face {
-  font-family: 'Fraunces';
-  src: url('/fonts/fraunces-sub.woff2') format('woff2');
-  font-weight: 100 900;
+  font-family: 'Grotesk';
+  src: url('/fonts/grotesk-sub.woff2') format('woff2');
+  font-weight: 300 700;
   font-style: normal;
   font-display: swap;
-  /* subset to latin basic; opsz pinned to 144, SOFT 0, WONK 1 */
+  /* Space Grotesk, subset to latin + the punctuation the copy uses.
+     One file covers display and body — 14.8 KB for both. */
 }
 
 @font-face {
@@ -22,60 +29,70 @@
 }
 
 :root {
-  /* ——— ground ——— */
-  --ink-deep: #100722;   /* deepest night water */
-  --ink: #1B0E33;        /* primary dark background */
-  --violet: #4A1B72;     /* structural purple, the brand's own, deepened */
-  --slate: #241C33;      /* body copy on light grounds — never pure black */
-  --foam: #FAF7FB;       /* sea foam, light section background */
+  /* ——— grounds ——— */
+  --paper: #f6f5f9;      /* the page */
+  --paper-2: #ffffff;    /* raised: cards, form fields on cards */
+  --ink-deep: #0c0620;   /* the one dark ground — footer */
+  --ink: #17102f;
 
-  /* ——— accents ——— */
-  --bio: #EA1C82;        /* bioluminescence: GLOW, never a flat fill */
-  --bio-lift: #FF4E8E;   /* lighter pink, for gradient stops only */
-  --coral: #FF6A4D;      /* buoy marker — rationed to the ONE primary action */
+  /* ——— brand ——— */
+  --violet: #4a1b72;
+  --magenta: #8e1c74;
+  --rose: #c41b6e;
+  --bio: #ea1c82;        /* glow and the hero shader ONLY — 3.8:1 on paper */
+  --coral: #ff6a4d;      /* shader only — 2.55:1 on paper, never carries text */
 
-  /* ——— text ramps ———
-     Alphas are set by measured contrast against the ground each ramp is used on,
-     not by eye. The de-emphasis steps (t3 / l3) carry real copy — eyebrow labels,
-     notes, breadcrumbs, the copyright line — so they have to clear 4.5:1 like any
-     other body text. The earlier values (t3 .46, l3 .50) measured 3.65:1 and
-     3.16:1 and were failing AA everywhere they appeared.
-     t4 is the ONLY decorative step: separators and rules, never text. */
+  /*
+   * THE gradient. Singular, deliberately.
+   *
+   * Gradients read as AI-generated the moment they're everywhere, so this one is
+   * rationed to exactly two places: the hero's accent phrase, and the primary
+   * button. Nothing else on the site gets a gradient fill.
+   *
+   * Stops are capped at --rose rather than running out to coral, so white text
+   * stays >=5.6:1 across the whole sweep and the gradient can safely carry a
+   * button label. Coral is beautiful and unusable for this.
+   */
+  --grad: linear-gradient(102deg, #4a1b72 0%, #8e1c74 45%, #c41b6e 100%);
+  --grad-soft: linear-gradient(102deg, rgba(74, 27, 114, 0.1), rgba(196, 27, 110, 0.1));
 
-  /* on dark (--ink-deep #100722) */
-  --t1: #FAF7FB;              /*  ~17.6:1  */
-  --t2: rgba(250, 247, 251, 0.68);  /*  ~7.3:1  */
-  --t3: rgba(250, 247, 251, 0.56);  /*  ~5.1:1  */
-  --t4: rgba(250, 247, 251, 0.28);  /*  decorative only — fails as text  */
+  /* ——— text on paper ——— */
+  --l1: #16102b;                    /* ~16.4:1 */
+  --l2: rgba(22, 16, 43, 0.74);     /*  ~7.0:1 */
+  --l3: rgba(22, 16, 43, 0.62);     /*  ~4.7:1 — still real copy, still AA */
 
-  /* on light (--foam #FAF7FB) */
-  --l1: #241C33;              /*  ~15.0:1  */
-  --l2: rgba(36, 28, 51, 0.76);     /*  ~6.8:1  */
-  --l3: rgba(36, 28, 51, 0.64);     /*  ~4.7:1  */
+  /* ——— text on ink (footer only) ——— */
+  --t1: #f6f5f9;
+  --t2: rgba(246, 245, 249, 0.72);
+  --t3: rgba(246, 245, 249, 0.58);
+  --t4: rgba(246, 245, 249, 0.28);  /* decorative: separators, never text */
 
   /* ——— hairlines ——— */
-  --rule: rgba(250, 247, 251, 0.13);
-  --rule-strong: rgba(250, 247, 251, 0.26);
-  --rule-light: rgba(36, 28, 51, 0.14);
+  --hair: rgba(22, 16, 43, 0.12);
+  --hair-2: rgba(22, 16, 43, 0.22);
+  --hair-ink: rgba(246, 245, 249, 0.14);
+  --hair-ink-2: rgba(246, 245, 249, 0.26);
 
   /* ——— type ——— */
-  --display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --display: 'Grotesk', 'Segoe UI', system-ui, sans-serif;
+  --body: 'Grotesk', 'Segoe UI', system-ui, sans-serif;
   --mono: 'JBMono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  --body: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
 
   /* fluid scale, 390 → 1440 */
-  --fs-display: clamp(2.65rem, 7.4vw, 6.4rem);
-  --fs-h2: clamp(2rem, 5vw, 3.9rem);
-  --fs-h3: clamp(1.3rem, 2.6vw, 1.85rem);
-  --fs-lead: clamp(1rem, 1.9vw, 1.2rem);
-  --fs-body: clamp(0.95rem, 1.6vw, 1.05rem);
+  --fs-display: clamp(2.5rem, 6.6vw, 5.5rem);
+  --fs-h2: clamp(1.9rem, 4.4vw, 3.4rem);
+  --fs-h3: clamp(1.2rem, 2.3vw, 1.65rem);
+  --fs-lead: clamp(1rem, 1.8vw, 1.15rem);
+  --fs-body: clamp(0.95rem, 1.5vw, 1.02rem);
   --fs-small: 0.86rem;
   --fs-label: clamp(9px, 1.4vw, 10.5px);
 
   /* ——— rhythm ——— */
   --gut: clamp(20px, 5vw, 72px);
   --maxw: 1320px;
-  --section-y: clamp(84px, 12vh, 168px);
+  --section-y: clamp(76px, 11vh, 150px);
+  --radius: 14px;
+  --radius-sm: 8px;
 
   /* ——— motion ——— */
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -84,7 +101,3 @@
   --dur: 0.4s;
   --dur-slow: 0.9s;
 }
-
-/* The page commits to one visual world (night ocean shifting through a day).
-   A light/dark toggle would fight the diurnal arc, which IS the page structure —
-   so the sections carry their own grounds instead. This is a choice, not an omission. */

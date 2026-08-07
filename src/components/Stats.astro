@@ -27,14 +27,11 @@ const figures = [
 </section>
 
 <style>
+  /* No gradient handover any more — the hero and this section share one ground,
+     so the band is just a ruled row of figures. */
   .stats {
-    /* fixed-pixel dawn, for the same reason as every other band on this site:
-       percentage stops move with section height and drag text onto the wrong ground */
-    background:
-      linear-gradient(180deg, #7a2f6b 0px, #96487c 62px, #c99ab5 134px, var(--foam) 200px)
-      no-repeat;
-    background-color: var(--foam);
-    padding-block: 200px clamp(20px, 4vh, 44px);
+    background: var(--paper);
+    padding-block: clamp(8px, 2vh, 24px) clamp(20px, 4vh, 44px);
     color: var(--l1);
   }
 
@@ -42,11 +39,11 @@ const figures = [
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1px;
-    background: var(--rule-light);
-    border-block: 1px solid var(--rule-light);
+    background: var(--hair);
+    border-block: 1px solid var(--hair);
   }
   .fig {
-    background: var(--foam);
+    background: var(--paper);
     padding: 24px 22px 26px;
     display: grid;
     gap: 8px;
@@ -72,7 +69,7 @@ const figures = [
   }
 
   @media (max-width: 760px) {
-    .stats { padding-block: 170px clamp(16px, 3vh, 32px); }
+    .stats { padding-block: 0 clamp(16px, 3vh, 32px); }
     dl { grid-template-columns: repeat(2, 1fr); }
     .fig { padding: 18px 16px 20px; }
   }

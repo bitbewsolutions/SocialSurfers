@@ -132,11 +132,15 @@ const { result: nodes } = await send('Runtime.evaluate', {
       if (r.width < 4 || r.height < 4) continue;
       // skip anything parked offscreen (honeypot, skip link)
       if (r.left + scrollX < -500 || r.top + scrollY < -500) continue;
+      // Gradient text (background-clip:text) computes to color:transparent, so the
+      // declared colour tells us nothing — those get measured off the glyph pixels.
+      const clipText = cs.webkitBackgroundClip === 'text' || cs.backgroundClip === 'text';
       out.push({
         sel: el.tagName.toLowerCase() + (el.className && typeof el.className === 'string'
           ? '.' + el.className.trim().split(/\\s+/).slice(0, 2).join('.') : ''),
         text: own.slice(0, 42),
         color: cs.color,
+        clipText,
         size: parseFloat(cs.fontSize),
         weight: parseInt(cs.fontWeight, 10) || 400,
         x: Math.round(r.left + scrollX), y: Math.round(r.top + scrollY),
@@ -191,15 +195,48 @@ function modalBg(x, y, bw, bh) {
   };
 }
 
+/**
+ * Worst realistic contrast of painted glyphs against their ground.
+ *
+ * For gradient text there is no single declared colour to composite — the fill varies
+ * across the glyphs — so measure the pixels. Everything far enough from the modal
+ * background is glyph; take a low percentile of those ratios so the answer reflects
+ * the lightest part of the ramp without being dragged to zero by the antialiased
+ * fringe, which is genuinely mid-way between fg and bg and is not what anyone reads.
+ */
+function glyphRatio(x, y, bw, bh, bgRgb) {
+  const bgL = lum(bgRgb);
+  const ratios = [];
+  const x1 = Math.min(info.width, x + bw), y1 = Math.min(info.height, y + bh);
+  for (let py = Math.max(0, y); py < y1; py++) {
+    for (let px = Math.max(0, x); px < x1; px++) {
+      const i = (py * info.width + px) * ch;
+      const d =
+        Math.abs(raw[i] - bgRgb[0]) + Math.abs(raw[i + 1] - bgRgb[1]) + Math.abs(raw[i + 2] - bgRgb[2]);
+      if (d < 90) continue; // background or near it
+      ratios.push(ratio(lum([raw[i], raw[i + 1], raw[i + 2]]), bgL));
+    }
+  }
+  if (ratios.length < 40) return null;
+  ratios.sort((a, b) => a - b);
+  return ratios[Math.floor(ratios.length * 0.2)];
+}
+
 const rows = [];
 for (const e of els) {
   const fg = parseColor(e.color);
-  if (!fg) continue;
+  if (!fg && !e.clipText) continue;
   const bg = modalBg(e.x, e.y, e.w, e.h);
   if (!bg || bg.share < 0.25) continue; // too busy to judge (images, dense chips)
 
-  const composited = fg.rgb.map((v, i) => v * fg.a + bg.rgb[i] * (1 - fg.a));
-  const r = ratio(lum(composited), lum(bg.rgb));
+  let r;
+  if (e.clipText) {
+    r = glyphRatio(e.x, e.y, e.w, e.h, bg.rgb);
+    if (r === null) continue;
+  } else {
+    const composited = fg.rgb.map((v, i) => v * fg.a + bg.rgb[i] * (1 - fg.a));
+    r = ratio(lum(composited), lum(bg.rgb));
+  }
 
   // WCAG "large text": >=24px, or >=18.66px when bold
   const large = e.size >= 24 || (e.size >= 18.66 && e.weight >= 700);

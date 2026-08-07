@@ -25,8 +25,8 @@ html {
 [id] { scroll-margin-top: clamp(76px, 11vh, 96px); }
 
 body {
-  background: var(--ink-deep);
-  color: var(--t1);
+  background: var(--paper);
+  color: var(--l1);
   font-family: var(--body);
   font-size: var(--fs-body);
   line-height: 1.6;
@@ -37,16 +37,16 @@ body {
 
 ::selection {
   background: var(--bio);
-  color: var(--foam);
+  color: #fff;
 }
 
 a { color: inherit; text-decoration: none; }
-img, svg, video { display: block; max-width: 100%; }
+img, svg, video, canvas { display: block; max-width: 100%; }
 button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
 ul, ol { list-style: none; }
 
 :focus-visible {
-  outline: 2px solid var(--coral);
+  outline: 2px solid var(--rose);
   outline-offset: 3px;
   border-radius: 2px;
 }
@@ -63,30 +63,33 @@ ul, ol { list-style: none; }
 .label {
   font-family: var(--mono);
   font-size: var(--fs-label);
-  font-weight: 500;
-  letter-spacing: 0.22em;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--t3);
+  color: var(--l3);
 }
 
 .h2 {
   font-family: var(--display);
-  font-weight: 800;
+  font-weight: 700;
   font-size: var(--fs-h2);
-  line-height: 0.98;
-  letter-spacing: -0.03em;
+  line-height: 1.04;
+  letter-spacing: -0.028em;
   text-wrap: balance;
 }
 
 .lead {
   font-size: var(--fs-lead);
-  line-height: 1.6;
-  color: var(--t2);
-  max-width: 52ch;
+  line-height: 1.65;
+  color: var(--l2);
+  max-width: 54ch;
 }
 
-/* THE primary action. Ink on coral = 6.41:1.
-   White on coral would be 2.83:1 and fail AA — never do it. */
+/*
+ * THE primary action — one of only two gradient fills on the site.
+ * White on the gradient measures >=5.6:1 at every stop; that is why the ramp
+ * stops at --rose instead of running out to coral.
+ */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -94,16 +97,16 @@ ul, ol { list-style: none; }
   font-family: var(--mono);
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.11em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--ink);
-  background: var(--coral);
-  padding: 16px 26px;
+  color: #fff;
+  background: var(--grad);
+  padding: 16px 28px;
   border-radius: 999px;
-  box-shadow: 0 10px 34px -10px rgba(255, 106, 77, 0.75);
-  transition: transform var(--dur) var(--ease-out), box-shadow var(--dur);
+  box-shadow: 0 10px 30px -12px rgba(74, 27, 114, 0.7);
+  transition: transform var(--dur) var(--ease-out), box-shadow var(--dur), filter var(--dur-fast);
 }
-.btn:hover { transform: translateY(-2px); box-shadow: 0 16px 42px -10px rgba(255, 106, 77, 0.9); }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -14px rgba(140, 28, 116, 0.75); filter: saturate(1.1); }
 .btn:active { transform: translateY(0); }
 .btn .arw { transition: transform var(--dur) var(--ease-out); }
 .btn:hover .arw { transform: translateX(4px); }
@@ -115,18 +118,18 @@ ul, ol { list-style: none; }
   font-family: var(--mono);
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.11em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--t1);
-  padding: 16px 24px;
+  color: var(--l1);
+  padding: 16px 26px;
   border-radius: 999px;
-  border: 1px solid var(--rule-strong);
-  background: rgba(250, 247, 251, 0.045);
+  border: 1px solid var(--hair-2);
+  background: rgba(255, 255, 255, 0.6);
   transition: background var(--dur), border-color var(--dur), transform var(--dur) var(--ease-out);
 }
 .btn-ghost:hover {
-  background: rgba(250, 247, 251, 0.1);
-  border-color: rgba(250, 247, 251, 0.4);
+  background: #fff;
+  border-color: var(--violet);
   transform: translateY(-2px);
 }
 
@@ -135,8 +138,8 @@ ul, ol { list-style: none; }
   left: -9999px;
   top: 0;
   z-index: 200;
-  background: var(--coral);
-  color: var(--ink);
+  background: var(--violet);
+  color: #fff;
   font-family: var(--mono);
   font-size: 12px;
   letter-spacing: 0.1em;

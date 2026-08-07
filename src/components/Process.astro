@@ -22,22 +22,16 @@ process.forEach((_, i) => {
 ---
 
 <section class="process" id="process">
-  {/* Two background bands rather than one section-wide gradient. A percentage-based
-      gradient shifts with section height, so on mobile (where the steps stack and the
-      section is ~2x taller) the first steps landed on the light half — white-on-pink,
-      well under AA. Banding pins the handover to the head/chart boundary. */}
-  <div class="upper">
-    <div class="shell head">
-      <p class="label" data-reveal>How we work</p>
-      <h2 class="h2" data-reveal>The same seven steps,<br />every single month.</h2>
-      <p class="lead" data-reveal>
-        You always know what we&rsquo;re doing, when we&rsquo;re doing it, and what you get at
-        the end of the month.
-      </p>
-    </div>
+  <div class="shell head">
+    <p class="label" data-reveal>How we work</p>
+    <h2 class="h2" data-reveal>The same seven steps,<br />every single month.</h2>
+    <p class="lead" data-reveal>
+      You always know what we&rsquo;re doing, when we&rsquo;re doing it, and what you get at
+      the end of the month.
+    </p>
   </div>
 
-  <div class="lower shell">
+  <div class="shell">
     {/* --p is measured on the CHART, not the whole section, and anchored to 62% of the
         viewport. Measuring the section meant the tall heading block ate most of the
         range and the line ran ~40% behind the reader. Anchored this way, the drawn tip
@@ -71,10 +65,11 @@ process.forEach((_, i) => {
         <div class="wet">
           <svg class="lay" viewBox={`0 0 ${VB_W} ${H}`} preserveAspectRatio="none">
             <defs>
+              {/* the same ramp as --grad; coral is too pale to read as a line on paper */}
               <linearGradient id="tideGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#FF6A4D" />
-                <stop offset=".4" stop-color="#FF4E8E" />
-                <stop offset="1" stop-color="#EA1C82" />
+                <stop offset="0" stop-color="#4A1B72" />
+                <stop offset=".5" stop-color="#8E1C74" />
+                <stop offset="1" stop-color="#C41B6E" />
               </linearGradient>
             </defs>
             <path class="live" d={d} />
@@ -108,28 +103,16 @@ process.forEach((_, i) => {
 </section>
 
 <style>
-  /* Golden hour resolving to dusk, in two pinned bands. */
+  /* One ground. The old version was two pinned bands ramping golden-hour into dusk,
+     which is exactly the arc that has been removed — and it was also the section
+     that first exposed the percentage-gradient contrast bug. Flat paper cannot
+     drift, so that whole class of failure is gone with it. */
   .process {
     position: relative;
-    color: var(--t1);
+    background: var(--paper);
+    color: var(--l1);
     overflow: hidden;
-    background: #2a1240;
-  }
-
-  .upper {
-    padding-block: var(--section-y) clamp(56px, 8vh, 100px);
-    background: linear-gradient(180deg, var(--foam) 0%, #f5e3d4 42%, #e0b3ac 78%, #c07f8c 100%);
-  }
-
-  /* fixed-pixel stops: the handover always completes in the same distance,
-     whatever the section ends up being */
-  .lower {
-    padding-top: 150px;
-    padding-bottom: var(--section-y);
-    background:
-      linear-gradient(180deg, #c07f8c 0px, #8a4470 50px, #3d1a52 105px, #2a1240 148px)
-      no-repeat;
-    background-color: #2a1240;
+    padding-block: var(--section-y);
   }
 
   .head { display: grid; gap: 20px; }
@@ -139,6 +122,7 @@ process.forEach((_, i) => {
 
   .chart {
     position: relative;
+    margin-top: clamp(56px, 9vh, 110px);
     --step-h: clamp(160px, 19vh, 200px);
   }
 
@@ -160,12 +144,17 @@ process.forEach((_, i) => {
   }
   .tide .track {
     fill: none;
-    stroke: rgba(250, 247, 251, 0.14);
+    stroke: var(--hair);
     stroke-width: 1.5;
     vector-effect: non-scaling-stroke;
   }
 
-  /* drawn by scroll position, not by a pinned scrub — see initSectionProgress() */
+  /* Drawn by scroll position via a vertical clip, not a stroke-dasharray.
+     preserveAspectRatio="none" stretches this viewBox ~3x horizontally, and
+     vector-effect makes the browser measure dashes against the STRETCHED path while
+     pathLength normalises against the unstretched one — the two disagree, so the gap
+     ran out before the path did and a phantom second stroke appeared near step 5.
+     A clip has no length arithmetic in it at all. */
   .wet {
     position: absolute;
     inset: 0;
@@ -177,7 +166,6 @@ process.forEach((_, i) => {
     stroke-width: 2.5;
     vector-effect: non-scaling-stroke;
     stroke-linecap: round;
-    filter: drop-shadow(0 0 7px rgba(234, 28, 130, 0.55));
   }
 
   .pin {
@@ -188,13 +176,13 @@ process.forEach((_, i) => {
     height: 11px;
     margin: -5.5px 0 0 -5.5px;
     border-radius: 50%;
-    background: #2a1240;
-    border: 2px solid rgba(250, 247, 251, 0.22);
+    background: var(--paper);
+    border: 2px solid var(--hair-2);
   }
   .pin.lit {
-    border-color: var(--bio);
-    background: #3a0f2c;
-    box-shadow: 0 0 14px rgba(234, 28, 130, 0.75);
+    border-color: var(--rose);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(196, 27, 110, 0.12);
   }
 
   .steps {
@@ -216,7 +204,7 @@ process.forEach((_, i) => {
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.24em;
-    color: var(--coral);
+    color: var(--rose);
     display: block;
     margin-bottom: 10px;
   }
@@ -224,14 +212,15 @@ process.forEach((_, i) => {
     font-family: var(--display);
     font-size: var(--fs-h3);
     font-weight: 700;
-    line-height: 1.05;
+    line-height: 1.08;
     letter-spacing: -0.022em;
+    color: var(--l1);
   }
   .step p {
     margin-top: 9px;
     font-size: 0.95rem;
     line-height: 1.55;
-    color: var(--t2);
+    color: var(--l2);
   }
 
   @media (max-width: 900px) {
@@ -240,7 +229,7 @@ process.forEach((_, i) => {
     .steps {
       grid-auto-rows: auto;
       gap: 32px;
-      border-left: 1px solid rgba(250, 247, 251, 0.18);
+      border-left: 1px solid var(--hair);
       padding-left: 24px;
     }
     /* the same --p drives a filling rail, so the phone gets the effect too —
@@ -252,8 +241,7 @@ process.forEach((_, i) => {
       top: 0;
       width: 2px;
       height: 100%;
-      background: linear-gradient(180deg, var(--coral), var(--bio-lift) 42%, var(--bio));
-      box-shadow: 0 0 9px rgba(234, 28, 130, 0.55);
+      background: linear-gradient(180deg, var(--violet), var(--rose));
       transform: scaleY(var(--p, 0));
       transform-origin: top;
     }
@@ -272,8 +260,8 @@ process.forEach((_, i) => {
       width: 9px;
       height: 9px;
       border-radius: 50%;
-      background: #2a1240;
-      border: 2px solid var(--bio);
+      background: var(--paper);
+      border: 2px solid var(--rose);
     }
   }
 

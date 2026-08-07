@@ -76,10 +76,10 @@ const breadcrumbLd = breadcrumbs && {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
 
-    <!-- the display face is in the LCP element, so it gets a head start -->
+    <!-- one face for display and body, and it is in the LCP element — preload it -->
     <link
       rel="preload"
-      href="/fonts/fraunces-sub.woff2"
+      href="/fonts/grotesk-sub.woff2"
       as="font"
       type="font/woff2"
       crossorigin
@@ -97,7 +97,7 @@ const breadcrumbLd = breadcrumbs && {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogUrl} />
 
-    <meta name="theme-color" content="#100722" />
+    <meta name="theme-color" content="#f6f5f9" />
     <meta name="format-detection" content="telephone=no" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

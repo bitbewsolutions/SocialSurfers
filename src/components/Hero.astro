@@ -1,83 +1,80 @@
 ---
 import { waLink } from '../data/site';
 
-/* Full bleed and nothing else. The counts that used to sit along the bottom edge
-   are their own band now (components/Stats.astro) — they were competing with the
-   swell line for the one screen the hero gets. */
+/* Light ground, one dense focal element, type on the left.
+   The surfer-on-a-line is gone: it was decoration pretending to be a diagram, and
+   it said nothing about the business. What replaces it is a flowing current — the
+   atmosphere — which on its own would say no more than the surfer did. The meaning
+   comes from the artifacts riding it: a post, a reel, a metric climbing. Those are
+   placeholders until the client's work lands, and they are built to be swapped. */
 ---
 
 <section class="hero" data-hero>
-  <div class="sky sky-dawn" aria-hidden="true"></div>
-  <div class="sky sky-day" data-sky-day aria-hidden="true"></div>
-  <div class="caustic c1" aria-hidden="true"></div>
-  <div class="caustic c2" aria-hidden="true"></div>
-  <canvas data-swell-particles aria-hidden="true"></canvas>
-  <div class="glow" data-swell-glow aria-hidden="true"></div>
+  {/* Static gradient underneath. This is what a visitor sees with no WebGL, a lost
+      context, a 2-core device or reduced motion — the canvas simply never paints
+      over it, so there is no blank rectangle in any failure mode. */}
+  <div class="fallback" aria-hidden="true"></div>
+  <canvas class="current" data-fluid aria-hidden="true"></canvas>
 
-  <svg class="swell" data-swell-svg aria-hidden="true" preserveAspectRatio="none">
-    <defs>
-      <linearGradient id="swellGrad" x1="0" y1="0" x2="1" y2="0" gradientUnits="objectBoundingBox">
-        <stop offset="0" stop-color="#4A1B72" />
-        <stop offset=".34" stop-color="#8B2A9E" />
-        <stop offset=".62" stop-color="#EA1C82" />
-        <stop offset=".82" stop-color="#FF4E8E" />
-        <stop offset="1" stop-color="#4A1B72" />
-      </linearGradient>
-      <path id="swellPath" data-swell-path fill="none" />
-      <radialGradient id="riderGlow">
-        <stop offset="0" stop-color="#EA1C82" stop-opacity=".5" />
-        <stop offset="1" stop-color="#EA1C82" stop-opacity="0" />
-      </radialGradient>
-    </defs>
+  <div class="shell inner">
+    <div class="copy">
+      <p class="eyebrow" data-reveal>Strategy. Creativity. Technology. Results.</p>
 
-    {/* three stacked strokes fake the glow at zero filter cost — a blur filter on a
-        path that changes every frame forces a full re-raster every frame */}
-    <use href="#swellPath" class="draw" stroke="url(#swellGrad)" stroke-width="14" opacity=".07" stroke-linecap="round" stroke-linejoin="round" />
-    <use href="#swellPath" class="draw" stroke="url(#swellGrad)" stroke-width="6" opacity=".2" stroke-linecap="round" stroke-linejoin="round" />
-    <use href="#swellPath" class="draw" stroke="url(#swellGrad)" stroke-width="2" opacity="1" stroke-linecap="round" stroke-linejoin="round" />
+      <h1 data-reveal>
+        We don&rsquo;t just manage social media.
+        <em>We grow brands.</em>
+      </h1>
 
-    <g class="rider" data-swell-rider>
-      <circle cx="0" cy="-13" r="34" fill="url(#riderGlow)" />
-      <path d="M-17 0 Q0 -4.6 17 0 Q0 4.6 -17 0 Z" fill="#FAF7FB" opacity=".92" />
-      <g fill="none" stroke="#FAF7FB" stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M-5.5 -1.5 L-2.5 -10 L2.5 -13.5" />
-        <path d="M5.5 -1.5 L5 -9.5 L2.5 -13.5" />
-      </g>
-      <path d="M2.5 -13.5 L1 -21.5" stroke="#FAF7FB" stroke-width="4.1" stroke-linecap="round" />
-      <g fill="none" stroke="#FAF7FB" stroke-width="2.5" stroke-linecap="round">
-        <path d="M1.4 -19.5 L-6.5 -23.5" />
-        <path d="M1.4 -19.5 L9 -16.5" />
-      </g>
-      <circle cx="0.4" cy="-25" r="3.4" fill="#FAF7FB" />
-    </g>
-  </svg>
+      <p class="sub" data-reveal>
+        We plan it, create the content, run the ads and send you a clear report every
+        month. One team for all of it.
+      </p>
 
-  <div class="wrap">
-    <div class="scrim" aria-hidden="true"></div>
+      <div class="ctas" data-reveal>
+        <a class="btn" href="#enquire">
+          Book a discovery call
+          <svg class="arw" width="15" height="10" viewBox="0 0 15 10" fill="none" aria-hidden="true">
+            <path d="M0 5h13M9 1l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="btn-ghost" href={waLink()} target="_blank" rel="noopener">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.91C21.95 6.45 17.5 2 12.04 2zm5.8 14.16c-.24.68-1.2 1.26-1.97 1.42-.53.11-1.21.2-3.51-.75-2.95-1.22-4.84-4.21-4.99-4.4-.14-.2-1.19-1.58-1.19-3.02s.76-2.14 1.03-2.43c.27-.29.58-.37.78-.37.19 0 .39 0 .56.01.18.01.42-.07.66.5.24.58.82 2.01.89 2.16.07.14.12.31.02.51-.1.19-.15.31-.29.48-.15.17-.31.38-.44.51-.15.14-.3.3-.13.59.17.29.76 1.25 1.63 2.02 1.12.99 2.06 1.3 2.35 1.45.29.14.46.12.63-.07.17-.2.73-.85.92-1.14.19-.29.39-.24.65-.15.27.1 1.69.8 1.98.94.29.15.48.22.55.34.07.12.07.7-.17 1.39z" />
+          </svg>
+          WhatsApp us
+        </a>
+      </div>
+    </div>
 
-    <h1>
-      <span class="ln"><span>Let&rsquo;s <em>Surf</em> Your Brand</span></span>
-      <span class="ln"><span>to the Social Waves.</span></span>
-    </h1>
-
-    <p class="sub" data-swell-anchor>
-      We plan your social media, create the content, run the ads and send you a clear
-      report every month. One team for all of it.
-    </p>
-
-    <div class="ctas">
-      <a class="btn" href="#enquire">
-        Book a Discovery Call
-        <svg class="arw" width="15" height="10" viewBox="0 0 15 10" fill="none" aria-hidden="true">
-          <path d="M0 5h13M9 1l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    {/* The artifacts. TODO(assets): swap for real client work — each card is a plain
+        div, so a screenshot drops straight in without touching the layout. */}
+    <div class="stage" aria-hidden="true">
+      <div class="card metric" style="--d:.1s">
+        <span class="k">Total reach</span>
+        <b>1.2M</b>
+        <svg viewBox="0 0 120 34" preserveAspectRatio="none">
+          <path d="M0 30 L18 26 L36 27 L54 18 L72 20 L90 9 L120 3" fill="none"
+                stroke="url(#hgrad)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+          <defs>
+            <linearGradient id="hgrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#4A1B72" /><stop offset="1" stop-color="#C41B6E" />
+            </linearGradient>
+          </defs>
         </svg>
-      </a>
-      <a class="btn-ghost" href={waLink()} target="_blank" rel="noopener">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.91C21.95 6.45 17.5 2 12.04 2zm5.8 14.16c-.24.68-1.2 1.26-1.97 1.42-.53.11-1.21.2-3.51-.75-2.95-1.22-4.84-4.21-4.99-4.4-.14-.2-1.19-1.58-1.19-3.02s.76-2.14 1.03-2.43c.27-.29.58-.37.78-.37.19 0 .39 0 .56.01.18.01.42-.07.66.5.24.58.82 2.01.89 2.16.07.14.12.31.02.51-.1.19-.15.31-.29.48-.15.17-.31.38-.44.51-.15.14-.3.3-.13.59.17.29.76 1.25 1.63 2.02 1.12.99 2.06 1.3 2.35 1.45.29.14.46.12.63-.07.17-.2.73-.85.92-1.14.19-.29.39-.24.65-.15.27.1 1.69.8 1.98.94.29.15.48.22.55.34.07.12.07.7-.17 1.39z" />
-        </svg>
-        WhatsApp Us
-      </a>
+        <span class="delta">+12.5%</span>
+      </div>
+
+      <div class="card post" style="--d:.22s">
+        <div class="ph"></div>
+        <div class="rows"><i></i><i></i></div>
+      </div>
+
+      <div class="card reel" style="--d:.34s">
+        <span class="play">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+        </span>
+        <span class="tag">Reel &middot; 3.6M views</span>
+      </div>
     </div>
   </div>
 </section>
@@ -86,168 +83,217 @@ import { waLink } from '../data/site';
   .hero {
     position: relative;
     isolation: isolate;
-    min-height: 100vh;
     min-height: 100svh;
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding: 120px var(--gut) 88px;
+    align-items: center;
+    padding: 132px 0 92px;
     overflow: hidden;
+    background: var(--paper);
   }
 
-  /* two stacked skies; only OPACITY cross-fades, which stays on the compositor */
-  .sky { position: absolute; inset: 0; z-index: -3; pointer-events: none; }
-  .sky-dawn {
-    background:
-      radial-gradient(120% 80% at 72% 68%, rgba(74, 27, 114, 0.62), transparent 62%),
-      radial-gradient(90% 60% at 12% 8%, rgba(234, 28, 130, 0.15), transparent 60%),
-      linear-gradient(178deg, var(--ink-deep) 0%, var(--ink) 46%, #25113f 100%);
-  }
-  .sky-day {
-    opacity: var(--day, 0);
-    background:
-      radial-gradient(120% 80% at 72% 62%, rgba(255, 106, 77, 0.34), transparent 60%),
-      linear-gradient(178deg, #2b1350 0%, #48206f 55%, #7a2f6b 100%);
-  }
-
-  .caustic {
+  /* the no-WebGL ground; the live canvas covers it when it starts painting */
+  .fallback {
     position: absolute;
+    inset: 0;
     z-index: -2;
-    border-radius: 50%;
-    pointer-events: none;
-    filter: blur(70px);
-    opacity: 0.5;
-    will-change: transform;
+    background:
+      radial-gradient(58% 62% at 78% 44%, rgba(196, 27, 110, 0.5), transparent 68%),
+      radial-gradient(46% 54% at 92% 74%, rgba(255, 106, 77, 0.34), transparent 66%),
+      radial-gradient(52% 60% at 62% 22%, rgba(74, 27, 114, 0.42), transparent 70%);
+    filter: blur(6px);
   }
-  .c1 { width: 46vw; height: 46vw; left: -8vw; top: 8%; background: rgba(74, 27, 114, 0.85); animation: drift1 26s ease-in-out infinite; }
-  .c2 { width: 34vw; height: 34vw; right: -4vw; bottom: 2%; background: rgba(234, 28, 130, 0.42); animation: drift2 21s ease-in-out infinite; }
-  @keyframes drift1 { 0%, 100% { transform: translate3d(0,0,0) scale(1); } 50% { transform: translate3d(6vw,-4vh,0) scale(1.14); } }
-  @keyframes drift2 { 0%, 100% { transform: translate3d(0,0,0) scale(1.06); } 50% { transform: translate3d(-5vw,3vh,0) scale(.9); } }
-
-  canvas { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
-
-  .glow {
+  .current {
     position: absolute;
+    inset: 0;
     z-index: -1;
-    width: 560px; height: 560px;
-    margin: -280px 0 0 -280px;
-    border-radius: 50%;
-    pointer-events: none;
-    opacity: 0;
-    display: none;
-    background: radial-gradient(circle, rgba(234,28,130,.17), rgba(74,27,114,.09) 42%, transparent 68%);
-    transition: opacity 0.5s;
-    will-change: transform;
-  }
-  @media (hover: hover) and (pointer: fine) and (min-width: 1024px) {
-    .glow { display: block; }
-  }
-
-  .swell { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; overflow: visible; }
-  .swell .draw {
-    stroke-dasharray: var(--len, 4000);
-    stroke-dashoffset: var(--len, 4000);
-    animation: drawIn 2.1s var(--ease-tide) 0.15s forwards;
-  }
-  @keyframes drawIn { to { stroke-dashoffset: 0; } }
-  .rider { opacity: 0; animation: riderIn 0.7s ease 1.95s forwards; }
-  @keyframes riderIn { to { opacity: 1; } }
-
-  .wrap {
-    position: relative;
     width: 100%;
-    max-width: var(--maxw);
-    margin: auto auto;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1.1s ease 0.15s;
   }
-  .scrim {
-    position: absolute;
-    z-index: -1;
-    left: -8%; top: -24%;
-    width: 88%; height: 150%;
-    background: radial-gradient(60% 50% at 34% 50%, rgba(16, 7, 34, 0.82), transparent 72%);
-    pointer-events: none;
+  .current[data-live] { opacity: 1; }
+  /* Once the real field is painting, the crude radial fallback underneath would only
+     muddy it — the canvas has alpha, so it does not hide it on its own. Browsers
+     without :has() keep the fallback, which is exactly the graceful outcome. */
+  .hero:has(.current[data-live]) .fallback { opacity: 0; transition: opacity 0.9s ease; }
+
+  .inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+    gap: clamp(24px, 4vw, 64px);
+    align-items: center;
+    width: 100%;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: clamp(9.5px, 1.2vw, 11px);
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--l2);
+    margin-bottom: clamp(18px, 2.6vh, 26px);
   }
 
   h1 {
     font-family: var(--display);
-    font-weight: 800;
+    font-weight: 700;
     font-size: var(--fs-display);
-    line-height: 0.94;
-    letter-spacing: -0.032em;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
     max-width: 15ch;
+    color: var(--l1);
   }
-  .ln { display: block; }
-  /* negative top/bottom keeps the glow on "Surf" from being clipped at rest */
-  .ln > span {
-    display: block;
-    clip-path: inset(-32% 100% -32% 0);
-    animation: tide 1.15s var(--ease-tide) forwards;
-  }
-  .ln:nth-child(1) > span { animation-delay: 0.25s; }
-  .ln:nth-child(2) > span { animation-delay: 0.42s; }
-  @keyframes tide { to { clip-path: inset(-32% -8% -32% 0); } }
-
+  /* One of exactly two gradient fills on the site. Large bold type, so 3:1 applies;
+     this ramp measures 5.1:1 at its lightest stop. */
   h1 em {
     font-style: normal;
-    color: var(--bio);
-    text-shadow: 0 0 34px rgba(234, 28, 130, 0.55), 0 0 76px rgba(234, 28, 130, 0.28);
+    display: block;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
   .sub {
     margin-top: clamp(18px, 2.6vh, 26px);
     font-size: var(--fs-lead);
-    line-height: 1.6;
-    max-width: 46ch;
-    color: var(--t2);
-    opacity: 0;
-    animation: rise 0.9s ease 0.85s forwards;
+    line-height: 1.62;
+    max-width: 42ch;
+    color: var(--l2);
   }
-  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 
   .ctas {
     display: flex;
     flex-wrap: wrap;
     gap: 13px;
     margin-top: clamp(26px, 4vh, 40px);
-    opacity: 0;
-    animation: rise 0.9s ease 1.02s forwards;
   }
 
-  @media (max-width: 760px) {
-    .hero { padding: 92px var(--gut) 54px; }
-    h1 { max-width: 12ch; font-size: clamp(2.35rem, 8.6vw, 3rem); }
-    .sub { margin-top: 15px; font-size: 0.97rem; line-height: 1.55; }
-    .scrim {
-      left: -14%; top: -18%; width: 128%; height: 132%;
-      background: radial-gradient(64% 46% at 42% 44%, rgba(16, 7, 34, 0.86), transparent 74%);
-    }
-    /* reserves the empty band the swell line lives in — see tune() in swell.ts */
-    .ctas { width: 100%; margin-top: 172px; }
-    .ctas > * { flex: 1 1 100%; justify-content: center; padding: 15px 22px; }
-    .c1 { width: 80vw; height: 80vw; }
-    .c2 { width: 66vw; height: 66vw; }
+  /* ——— the artifacts ——— */
+  .stage {
+    position: relative;
+    height: clamp(340px, 46vh, 460px);
   }
-  @media (max-width: 400px) {
-    .ctas { margin-top: 158px; }
+  .card {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(14px) saturate(1.2);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 60px -24px rgba(30, 12, 60, 0.45), 0 2px 8px -4px rgba(30, 12, 60, 0.25);
+    animation: bob 9s var(--ease-tide) infinite;
+    animation-delay: var(--d);
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(-0.6deg); }
+    50%      { transform: translateY(-14px) rotate(0.6deg); }
+  }
+
+  .metric {
+    top: 4%;
+    right: 2%;
+    width: min(232px, 62%);
+    padding: 16px 18px 14px;
+    display: grid;
+    gap: 4px;
+  }
+  .metric .k {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--l3);
+  }
+  .metric b {
+    font-family: var(--display);
+    font-size: 1.85rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--l1);
+  }
+  .metric svg { width: 100%; height: 34px; margin-top: 6px; }
+  .metric .delta {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #0f7a4a;
+  }
+
+  .post {
+    top: 40%;
+    left: 0;
+    width: min(190px, 54%);
+    padding: 12px;
+    display: grid;
+    gap: 10px;
+  }
+  .post .ph {
+    height: 96px;
+    border-radius: var(--radius-sm);
+    background: var(--violet);
+  }
+  .post .rows { display: grid; gap: 6px; }
+  .post .rows i { height: 7px; border-radius: 99px; background: var(--hair-2); }
+  .post .rows i:last-child { width: 62%; }
+
+  .reel {
+    bottom: 2%;
+    right: 12%;
+    width: min(206px, 58%);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .reel .play {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--violet);
+    color: #fff;
+  }
+  .reel .play svg { width: 15px; height: 15px; }
+  .reel .tag {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--l2);
+    line-height: 1.4;
+  }
+
+  @media (max-width: 900px) {
+    .hero { padding: 116px 0 72px; min-height: auto; }
+    .inner { grid-template-columns: 1fr; gap: 44px; }
+    h1 { max-width: 14ch; }
+    .stage { height: 300px; }
+    .metric { right: 0; width: 218px; }
+    .post { top: 42%; left: 2%; width: 168px; }
+    .reel { right: 4%; width: 194px; }
+  }
+  @media (max-width: 520px) {
+    .ctas > * { flex: 1 1 100%; justify-content: center; }
+    .stage { height: 268px; }
+    .metric { width: 196px; }
+    .post { width: 148px; }
+    .reel { width: 178px; bottom: 0; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .ln > span { clip-path: none; animation: none; }
-    .sub, .ctas, .readouts, .rider { opacity: 1; animation: none; }
-    .swell .draw { stroke-dasharray: none; stroke-dashoffset: 0; animation: none; }
-    .glow { display: none; }
+    .card { animation: none; }
   }
 </style>
 
 <script>
-  import { initSwell, initPointerGlow } from '../scripts/swell';
-
-  const hero = document.querySelector<HTMLElement>('[data-hero]');
-  if (hero) {
-    initSwell(hero);
-    initPointerGlow(hero);
-  }
+  import { initFluid } from '../scripts/fluid';
+  const c = document.querySelector<HTMLCanvasElement>('[data-fluid]');
+  if (c) initFluid(c);
 </script>

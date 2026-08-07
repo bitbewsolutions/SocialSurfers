@@ -9,3 +9,7 @@ npm-debug.log*
 
 # build/QA artifacts
 qa-shots/
+
+# font sources (subset output is committed in public/fonts)
+.fontsrc/*.ttf
+.fontsrc/*.css

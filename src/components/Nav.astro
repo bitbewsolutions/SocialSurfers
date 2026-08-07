@@ -57,7 +57,7 @@ const links = [
     position: fixed;
     left: 0; top: 0; bottom: 0;
     width: 2px;
-    background: rgba(250, 247, 251, 0.07);
+    background: rgba(22, 16, 43, 0.07);
     z-index: 60;
     pointer-events: none;
   }
@@ -67,8 +67,7 @@ const links = [
     display: block;
     transform-origin: top;
     transform: scaleY(var(--sp, 0));
-    background: linear-gradient(180deg, var(--violet), var(--bio) 60%, var(--coral));
-    box-shadow: 0 0 12px rgba(234, 28, 130, 0.65);
+    background: linear-gradient(180deg, var(--violet), var(--rose));
   }
 
   .nav {
@@ -84,19 +83,19 @@ const links = [
     transition: background var(--dur) ease, backdrop-filter var(--dur) ease, border-color var(--dur) ease;
   }
   .nav.is-stuck {
-    background: rgba(16, 7, 34, 0.72);
-    backdrop-filter: blur(14px) saturate(1.3);
-    border-bottom-color: rgba(250, 247, 251, 0.09);
+    background: rgba(246, 245, 249, 0.78);
+    backdrop-filter: blur(16px) saturate(1.4);
+    border-bottom-color: var(--hair);
   }
 
   .links { display: flex; gap: 30px; align-items: center; }
   .links a {
     font-family: var(--mono);
     font-size: 10.5px;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--t2);
+    color: var(--l2);
     position: relative;
     padding: 6px 0;
     transition: color var(--dur-fast);
@@ -106,47 +105,49 @@ const links = [
     position: absolute;
     left: 0; right: 0; bottom: 0;
     height: 1px;
-    background: var(--bio);
+    background: var(--rose);
     transform: scaleX(0);
     transform-origin: right;
     transition: transform 0.35s var(--ease-out);
   }
-  .links a:hover { color: var(--t1); }
+  .links a:hover { color: var(--l1); }
   .links a:hover::after { transform: scaleX(1); transform-origin: left; }
 
-  /* nav CTA stays outline — coral is rationed for the one primary action */
+  /* nav CTA stays an outline — the gradient fill is rationed to the page's one
+     primary action, and the nav is not it */
   .cta {
     font-family: var(--mono);
     font-size: 10.5px;
-    font-weight: 600;
-    letter-spacing: 0.14em;
+    font-weight: 700;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    padding: 10px 17px;
+    padding: 11px 18px;
     border-radius: 999px;
-    border: 1px solid rgba(234, 28, 130, 0.55);
-    color: var(--t1);
-    background: rgba(234, 28, 130, 0.09);
+    border: 1px solid var(--hair-2);
+    color: var(--l1);
+    background: rgba(255, 255, 255, 0.7);
     white-space: nowrap;
-    transition: background var(--dur-fast), border-color var(--dur-fast), box-shadow var(--dur-fast);
+    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast);
   }
   .cta:hover {
-    background: rgba(234, 28, 130, 0.2);
-    border-color: var(--bio);
-    box-shadow: 0 0 22px -4px rgba(234, 28, 130, 0.6);
+    background: #fff;
+    border-color: var(--violet);
+    color: var(--violet);
   }
 
   .burger {
     display: none;
     width: 42px; height: 42px;
     border-radius: 999px;
-    border: 1px solid var(--rule-strong);
+    border: 1px solid var(--hair-2);
+    background: rgba(255, 255, 255, 0.7);
     position: relative;
   }
   .burger span {
     position: absolute;
     left: 50%; top: 50%;
     width: 16px; height: 1.5px;
-    background: var(--t1);
+    background: var(--l1);
     border-radius: 2px;
     transition: transform 0.35s var(--ease-out), opacity 0.2s;
   }
@@ -159,7 +160,7 @@ const links = [
     position: fixed;
     inset: 0;
     z-index: 49;
-    background: rgba(16, 7, 34, 0.97);
+    background: rgba(246, 245, 249, 0.98);
     backdrop-filter: blur(20px);
     padding: 104px var(--gut) 40px;
     overflow-y: auto;
@@ -180,16 +181,17 @@ const links = [
   .sheet .sub {
     margin: 2px 0 16px;
     padding-left: 14px;
-    border-left: 1px solid var(--rule);
+    border-left: 1px solid var(--hair);
     display: grid;
     gap: 7px;
   }
   .sheet .sub a {
     font-family: var(--mono);
     font-size: 11px;
+    font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--t2);
+    color: var(--l2);
   }
   .sheet-cta { justify-content: center; }
 
