@@ -1,0 +1,320 @@
+---
+import { industries, whyUs } from '../data/content';
+import { site, waLink, telLink } from '../data/site';
+
+/* Set PUBLIC_FORM_ENDPOINT (Formspree, Web3Forms, or your own handler) to enable
+   AJAX submission. Until it's set the form degrades to a prefilled mail client,
+   so the page never has a button that silently does nothing. */
+const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
+---
+
+<section class="close" id="enquire">
+  <div class="shell">
+    <div class="grid">
+      <div class="pitch">
+        <p class="label" data-reveal>Who we work with</p>
+        <ul class="inds" data-reveal>
+          {industries.map((i) => <li>{i}</li>)}
+        </ul>
+
+        <h2 class="h2" data-reveal>Tell us what you&rsquo;re trying to grow.</h2>
+        <p class="lead" data-reveal>
+          One call, no pitch deck. We&rsquo;ll tell you what we&rsquo;d actually do for your
+          business and what it costs. If we&rsquo;re not the right fit, we&rsquo;ll say so.
+        </p>
+
+        <ul class="checks" data-reveal>
+          {whyUs.map((w) => (
+            <li>
+              <svg width="12" height="10" viewBox="0 0 12 10" fill="none" aria-hidden="true">
+                <path d="M1 5.2 4.2 8.4 11 1.6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              {w}
+            </li>
+          ))}
+        </ul>
+
+        <div class="direct" data-reveal>
+          <a class="btn-ghost" href={waLink()} target="_blank" rel="noopener">WhatsApp Us</a>
+          <a class="btn-ghost" href={telLink}>{site.phoneDisplay}</a>
+        </div>
+      </div>
+
+      <div class="formcard" data-reveal>
+        <form data-form data-endpoint={endpoint} novalidate>
+          <h3>Book a discovery call</h3>
+
+          <label>
+            <span>Your name</span>
+            <input name="name" type="text" required autocomplete="name" placeholder="Rahul Sharma" />
+          </label>
+
+          <label>
+            <span>Business name</span>
+            <input name="business" type="text" required placeholder="BEES Fitness+" />
+          </label>
+
+          <label>
+            <span>Phone / WhatsApp</span>
+            <input name="phone" type="tel" required inputmode="tel" autocomplete="tel" placeholder="+91 98765 43210" />
+          </label>
+
+          <label>
+            <span>Email <i>(optional)</i></span>
+            <input name="email" type="email" autocomplete="email" placeholder="you@business.com" />
+          </label>
+
+          <label>
+            <span>What do you need?</span>
+            <textarea name="message" rows="3" placeholder="Instagram + reels for a new gym branch…"></textarea>
+          </label>
+
+          {/* honeypot: real people never fill this, bots usually do */}
+          <div class="hp" aria-hidden="true">
+            <label>Company website<input name="website" type="text" tabindex="-1" autocomplete="off" /></label>
+          </div>
+
+          <button class="btn" type="submit">
+            <span data-submit-label>Send enquiry</span>
+            <svg class="arw" width="15" height="10" viewBox="0 0 15 10" fill="none" aria-hidden="true">
+              <path d="M0 5h13M9 1l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+
+          <p class="status" data-status role="status" aria-live="polite"></p>
+          <p class="fine">We reply within one working day. No mailing list, no spam.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* The resolution beat: the water goes calm and the ground goes light again.
+     Fixed-pixel stops, for the same reason as the process section's bands. This
+     used to ramp dark→foam across 100% of the section, and the section is ~1400px
+     tall — so the ground was still mid-purple where the ink-coloured heading, lead
+     and checklist sit. Measured 1.76:1 on the h2, 2.40:1 on the lead.
+     Pinned this way the dawn always completes in 240px and every dark-on-light
+     element below it is on actual foam. */
+  .close {
+    background:
+      linear-gradient(
+        180deg,
+        var(--ink-deep) 0px,
+        #341850 60px,
+        #7d5b8d 130px,
+        #d9c9d9 195px,
+        var(--foam) 240px
+      )
+      no-repeat;
+    background-color: var(--foam);
+    padding-block: 240px var(--section-y);
+    color: var(--l1);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: clamp(32px, 5vw, 80px);
+    align-items: start;
+  }
+
+  /* everything in this column now sits on foam, so it takes the light-ground ramp */
+  .pitch .label { color: var(--l3); }
+  .inds {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin: 16px 0 clamp(36px, 6vh, 64px);
+  }
+  .inds li {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--l2);
+    border: 1px solid var(--rule-light);
+    border-radius: 999px;
+    padding: 6px 11px;
+  }
+
+  .pitch .h2 { color: var(--l1); max-width: 16ch; }
+  .pitch .lead { color: var(--l2); margin-top: 18px; }
+
+  .checks {
+    margin-top: clamp(28px, 4vh, 44px);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 11px 24px;
+  }
+  .checks li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.93rem;
+    line-height: 1.45;
+    color: var(--l2);
+  }
+  .checks svg { color: var(--violet); flex: none; margin-top: 5px; }
+
+  .direct { display: flex; flex-wrap: wrap; gap: 11px; margin-top: clamp(28px, 4vh, 42px); }
+  .direct .btn-ghost { color: var(--l1); border-color: var(--rule-light); background: rgba(36, 28, 51, 0.03); }
+  .direct .btn-ghost:hover { background: rgba(36, 28, 51, 0.07); border-color: rgba(36, 28, 51, 0.32); }
+
+  /* The card used to sit on the mid-purple part of the old gradient, so foam was
+     enough to lift it. On actual foam it needs to be a step lighter than the page,
+     and the fields a step darker than the card, or the whole thing goes flat. */
+  .formcard {
+    background: #fff;
+    border: 1px solid var(--rule-light);
+    border-radius: 4px;
+    padding: clamp(22px, 3vw, 34px);
+    box-shadow: 0 30px 70px -40px rgba(36, 28, 51, 0.55);
+    position: sticky;
+    top: 100px;
+  }
+  form { display: grid; gap: 14px; }
+  form h3 {
+    font-family: var(--display);
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 2px;
+  }
+  label { display: grid; gap: 6px; }
+  label > span {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--l3);
+  }
+  label > span i { font-style: normal; text-transform: none; letter-spacing: 0.04em; }
+  input, textarea {
+    font: inherit;
+    font-size: 0.95rem;
+    color: var(--l1);
+    background: var(--foam);
+    border: 1px solid var(--rule-light);
+    border-radius: 3px;
+    padding: 11px 13px;
+    width: 100%;
+    transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+  }
+  input::placeholder, textarea::placeholder { color: rgba(36, 28, 51, 0.52); }
+  input:focus, textarea:focus {
+    outline: none;
+    background: #fff;
+    border-color: var(--violet);
+    box-shadow: 0 0 0 3px rgba(74, 27, 114, 0.13);
+  }
+  input[aria-invalid='true'], textarea[aria-invalid='true'] {
+    border-color: #c2321f;
+    box-shadow: 0 0 0 3px rgba(194, 50, 31, 0.12);
+  }
+  textarea { resize: vertical; min-height: 78px; }
+
+  form .btn { justify-content: center; margin-top: 4px; }
+  form .btn[disabled] { opacity: 0.6; pointer-events: none; }
+
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+  .status:empty { display: none; }
+  .status {
+    font-size: 0.88rem;
+    line-height: 1.45;
+    padding: 10px 12px;
+    border-radius: 3px;
+    border-left: 2px solid;
+  }
+  .status[data-kind='ok'] { color: #1d6b3f; background: rgba(29, 107, 63, 0.08); border-color: #1d6b3f; }
+  .status[data-kind='err'] { color: #a52a1a; background: rgba(165, 42, 26, 0.08); border-color: #a52a1a; }
+
+  .fine { font-size: 0.78rem; color: var(--l3); line-height: 1.5; }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+    .formcard { position: static; }
+  }
+</style>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-form]');
+  const status = document.querySelector<HTMLElement>('[data-status]');
+  const label = document.querySelector<HTMLElement>('[data-submit-label]');
+
+  if (form && status && label) {
+    const endpoint = form.dataset.endpoint || '';
+    const btn = form.querySelector('button[type=submit]') as HTMLButtonElement;
+
+    const say = (msg: string, kind: 'ok' | 'err') => {
+      status.textContent = msg;
+      status.dataset.kind = kind;
+    };
+
+    const validate = () => {
+      let firstBad: HTMLInputElement | null = null;
+      form.querySelectorAll<HTMLInputElement>('[required]').forEach((el) => {
+        const bad = !el.value.trim();
+        el.setAttribute('aria-invalid', String(bad));
+        if (bad && !firstBad) firstBad = el;
+      });
+      return firstBad;
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.textContent = '';
+
+      const bad = validate();
+      if (bad) {
+        say('Please fill in your name, business and phone number so we can call you back.', 'err');
+        (bad as HTMLInputElement).focus();
+        return;
+      }
+
+      const data = new FormData(form);
+      if (data.get('website')) return; // honeypot tripped — pretend nothing happened
+
+      // No endpoint configured yet: hand off to the visitor's mail client rather
+      // than showing a button that appears to work and doesn't.
+      if (!endpoint) {
+        const body = [...data.entries()]
+          .filter(([k, v]) => k !== 'website' && v)
+          .map(([k, v]) => `${k}: ${v}`)
+          .join('\n');
+        location.href =
+          `mailto:socialsurfersmedia@gmail.com?subject=${encodeURIComponent('Discovery call enquiry')}` +
+          `&body=${encodeURIComponent(body)}`;
+        say('Opening your email app with the details filled in.', 'ok');
+        return;
+      }
+
+      btn.disabled = true;
+      label.textContent = 'Sending…';
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          body: data,
+          headers: { Accept: 'application/json' },
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        form.reset();
+        say('Got it. We’ll call you back within one working day.', 'ok');
+        label.textContent = 'Sent';
+      } catch {
+        say('That didn’t send. Please WhatsApp us on +91 8684-010403 instead — fastest way to reach us.', 'err');
+        label.textContent = 'Send enquiry';
+        btn.disabled = false;
+      }
+    });
+
+    form.querySelectorAll<HTMLInputElement>('[required]').forEach((el) => {
+      el.addEventListener('input', () => {
+        if (el.value.trim()) el.setAttribute('aria-invalid', 'false');
+      });
+    });
+  }
+</script>

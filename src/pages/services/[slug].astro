@@ -1,0 +1,180 @@
+---
+import Base from '../../layouts/Base.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import PageHead from '../../components/PageHead.astro';
+import { services } from '../../data/services';
+import { process } from '../../data/content';
+import { site, waLink } from '../../data/site';
+
+export function getStaticPaths() {
+  return services.map((s) => ({ params: { slug: s.slug }, props: { service: s } }));
+}
+
+const { service } = Astro.props;
+const others = services.filter((s) => s.slug !== service.slug);
+
+/* Two crumbs, not three. The services index is a section of the homepage now, so a
+   middle "Services" crumb would point at the same document as "Home" — a duplicate
+   item in the BreadcrumbList. The visible "See all services" link below covers the
+   navigation need without lying to the graph. */
+const crumbs = [
+  { name: 'Home', url: '/' },
+  { name: service.name, url: `/services/${service.slug}` },
+];
+
+const serviceLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: service.name,
+  serviceType: service.name,
+  description: service.seo.description,
+  provider: { '@type': 'ProfessionalService', name: site.name, '@id': `${site.url}/#business` },
+  areaServed: site.areaServed,
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: `${service.name} deliverables`,
+    itemListElement: service.items.map((i) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: i } })),
+  },
+};
+---
+
+<Base
+  title={service.seo.title}
+  description={service.seo.description}
+  breadcrumbs={crumbs}
+  extraLd={serviceLd}
+>
+  <Nav />
+
+  <main id="main">
+    <PageHead eyebrow="Service" title={service.name} intro={service.intro} crumbs={crumbs} />
+
+    <section class="body">
+      <div class="shell grid">
+        <div class="col">
+          <h2 class="label">What&rsquo;s included</h2>
+          <ul class="items">
+            {service.items.map((i) => (
+              <li data-reveal data-reveal-group="itm">
+                <span class="tick" aria-hidden="true"></span>
+                {i}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <aside class="col">
+          <h2 class="label">How we work</h2>
+          <ol class="mini">
+            {process.map((p) => (
+              <li>
+                <span class="n">{String(p.n).padStart(2, '0')}</span>
+                <span>{p.title}</span>
+              </li>
+            ))}
+          </ol>
+
+          <div class="cta">
+            <p>Want this running for your brand?</p>
+            <a class="btn" href="/#enquire">
+              Book a discovery call
+              <svg class="arw" width="15" height="10" viewBox="0 0 15 10" fill="none" aria-hidden="true">
+                <path d="M0 5h13M9 1l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </a>
+            <a class="wa" href={waLink(`Hi Social Surfers! I'm interested in ${service.name}.`)} target="_blank" rel="noopener">
+              or message us on WhatsApp
+            </a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="more">
+      <div class="shell">
+        <div class="morehead">
+          <h2 class="label">Our other services</h2>
+          <a class="all" href="/#services">See all services &rarr;</a>
+        </div>
+        <ul class="others">
+          {others.map((o) => (
+            <li>
+              <a href={`/services/${o.slug}`}>
+                <h3>{o.name}</h3>
+                <p>{o.blurb}</p>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Base>
+
+<script>
+  import { initScroll, initReveals } from '../../scripts/scroll';
+  initScroll();
+  initReveals();
+</script>
+
+<style>
+  .body { background: var(--foam); color: var(--l1); padding-block: clamp(56px, 9vh, 104px); }
+  .grid { display: grid; grid-template-columns: 1.35fr 0.95fr; gap: clamp(34px, 5vw, 80px); align-items: start; }
+  .body .label { color: var(--l3); margin-bottom: 20px; }
+
+  .items { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 2px; }
+  .items li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 4px;
+    border-bottom: 1px solid var(--rule-light);
+    font-size: 1rem;
+    color: var(--l1);
+  }
+  .tick { width: 6px; height: 6px; border-radius: 50%; background: var(--bio); flex: none; }
+
+  .mini { display: grid; gap: 1px; background: var(--rule-light); border: 1px solid var(--rule-light); }
+  .mini li { background: var(--foam); display: flex; gap: 12px; padding: 11px 14px; font-size: 0.92rem; color: var(--l2); }
+  .mini .n { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; color: var(--violet); padding-top: 3px; }
+
+  .cta { margin-top: 26px; padding: 24px; background: var(--ink); color: var(--t1); border-radius: 4px; }
+  .cta p { font-family: var(--display); font-size: 1.2rem; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 18px; }
+  .cta .wa { display: block; margin-top: 14px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--t3); }
+  .cta .wa:hover { color: var(--bio-lift); }
+
+  .more { background: var(--foam); color: var(--l1); padding-bottom: clamp(64px, 10vh, 120px); }
+  .morehead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px 24px;
+    margin-bottom: 20px;
+  }
+  .more .label { color: var(--l3); }
+  .all {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--violet);
+    transition: color var(--dur-fast);
+  }
+  .all:hover { color: var(--bio-lift); }
+  /* borders on the cells, not a background showing through 1px gaps — with 6 items
+     in a 4-up grid the last row is partial, and the gap trick paints the empties */
+  .others { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); border-top: 1px solid var(--rule-light); }
+  .others li { background: var(--foam); border-right: 1px solid var(--rule-light); border-bottom: 1px solid var(--rule-light); }
+  .others a { display: block; padding: 22px 20px; height: 100%; transition: background var(--dur-fast); }
+  .others a:hover { background: #fff; }
+  .others h3 { font-family: var(--display); font-size: 1.12rem; font-weight: 700; letter-spacing: -0.02em; }
+  .others p { margin-top: 7px; font-size: 0.9rem; line-height: 1.5; color: var(--l2); }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>

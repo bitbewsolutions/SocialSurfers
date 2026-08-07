@@ -1,0 +1,62 @@
+---
+interface Props {
+  size?: number;
+  /** Hide the wordmark, e.g. in tight footers. */
+  markOnly?: boolean;
+  /** Unique suffix so gradient ids never collide when the logo appears twice. */
+  id?: string;
+}
+const { size = 34, markOnly = false, id = 'lg' } = Astro.props;
+---
+
+<span class="logo" style={`--mark:${size}px`}>
+  <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id={`${id}A`} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#7B3AA8" /><stop offset="1" stop-color="#4A1B72" />
+      </linearGradient>
+      <linearGradient id={`${id}B`} x1="1" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#FF3E9A" /><stop offset="1" stop-color="#EA1C82" />
+      </linearGradient>
+      <path id={`${id}D`} d="M32 3 Q55 25 45 44 Q33 63 20 44 Q9 25 32 3 Z" />
+    </defs>
+    {/* two teardrops rotated about a shared belly and pushed out along their own
+        axis — reads as an S / wave rather than one blob */}
+    <use
+      href={`#${id}D`}
+      fill={`url(#${id}A)`}
+      transform="translate(32 32) rotate(-42) translate(0 -10) scale(.8) translate(-32 -40)"
+    />
+    <use
+      href={`#${id}D`}
+      fill={`url(#${id}B)`}
+      transform="translate(32 32) rotate(138) translate(0 -10) scale(.8) translate(-32 -40)"
+      style="mix-blend-mode:screen"
+    />
+  </svg>
+  {!markOnly && <b>Social<span>Surfers</span></b>}
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+  }
+  .logo svg {
+    width: var(--mark);
+    height: var(--mark);
+    flex: none;
+  }
+  .logo b {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: calc(var(--mark) * 0.56);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .logo b span {
+    color: var(--bio);
+  }
+</style>

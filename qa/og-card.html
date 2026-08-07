@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face{font-family:'Fraunces';src:url('/fonts/fraunces-sub.woff2') format('woff2');font-weight:100 900;font-display:block}
+  @font-face{font-family:'JBMono';src:url('/fonts/jbmono-sub.woff2') format('woff2');font-weight:400 800;font-display:block}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    width:1200px;height:630px;overflow:hidden;position:relative;
+    background:
+      radial-gradient(120% 85% at 74% 70%, rgba(74,27,114,.72), transparent 62%),
+      radial-gradient(80% 60% at 10% 6%, rgba(234,28,130,.16), transparent 60%),
+      linear-gradient(170deg,#100722 0%,#1B0E33 48%,#2b1350 100%);
+    color:#FAF7FB;font-family:system-ui,sans-serif;
+  }
+  svg.wave{position:absolute;inset:0;width:100%;height:100%}
+  .inner{position:relative;padding:72px 76px;height:100%;display:flex;flex-direction:column;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:16px}
+  .brand svg{width:52px;height:52px}
+  .brand b{font-family:'Fraunces';font-weight:800;font-size:30px;letter-spacing:-.02em}
+  .brand b span{color:#EA1C82}
+  h1{font-family:'Fraunces';font-weight:800;font-size:82px;line-height:.94;letter-spacing:-.033em;max-width:15ch}
+  h1 em{font-style:normal;color:#EA1C82}
+  .foot{display:flex;align-items:center;justify-content:space-between;gap:24px}
+  .tag{font-family:'JBMono';font-size:16px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:rgba(250,247,251,.6)}
+  .pill{font-family:'JBMono';font-size:15px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#1B0E33;background:#FF6A4D;padding:14px 24px;border-radius:999px}
+</style>
+</head>
+<body>
+  <svg class="wave" viewBox="0 0 1200 630" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#4A1B72"/><stop offset=".55" stop-color="#EA1C82"/>
+        <stop offset=".8" stop-color="#FF4E8E"/><stop offset="1" stop-color="#4A1B72"/>
+      </linearGradient>
+    </defs>
+    <path d="M0 470 C160 466 300 452 430 436 C560 420 640 300 760 300 C880 300 940 470 1050 496 C1120 512 1170 512 1200 508"
+          fill="none" stroke="url(#g)" stroke-width="14" opacity=".08" stroke-linecap="round"/>
+    <path d="M0 470 C160 466 300 452 430 436 C560 420 640 300 760 300 C880 300 940 470 1050 496 C1120 512 1170 512 1200 508"
+          fill="none" stroke="url(#g)" stroke-width="6" opacity=".22" stroke-linecap="round"/>
+    <path d="M0 470 C160 466 300 452 430 436 C560 420 640 300 760 300 C880 300 940 470 1050 496 C1120 512 1170 512 1200 508"
+          fill="none" stroke="url(#g)" stroke-width="2.5" stroke-linecap="round"/>
+  </svg>
+
+  <div class="inner">
+    <div class="brand">
+      <svg viewBox="0 0 64 64">
+        <defs>
+          <linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7B3AA8"/><stop offset="1" stop-color="#4A1B72"/></linearGradient>
+          <linearGradient id="b" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF3E9A"/><stop offset="1" stop-color="#EA1C82"/></linearGradient>
+          <path id="d" d="M32 3 Q55 25 45 44 Q33 63 20 44 Q9 25 32 3 Z"/>
+        </defs>
+        <use href="#d" fill="url(#a)" transform="translate(32 32) rotate(-42) translate(0 -10) scale(.8) translate(-32 -40)"/>
+        <use href="#d" fill="url(#b)" transform="translate(32 32) rotate(138) translate(0 -10) scale(.8) translate(-32 -40)" style="mix-blend-mode:screen"/>
+      </svg>
+      <b>Social<span>Surfers</span></b>
+    </div>
+
+    <h1>Let&rsquo;s <em>Surf</em> Your Brand to the Social Waves.</h1>
+
+    <div class="foot">
+      <span class="tag">We don&rsquo;t just manage &middot; We grow brands</span>
+      <span class="pill">Social Media &amp; Digital Marketing</span>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,117 @@
+---
+import Closing from './Closing.astro';
+import Socials from './Socials.astro';
+import { site, waLink, telLink, mailLink } from '../data/site';
+
+/* Was a standalone /contact page. It is now the closing section of the one-pager:
+   the enquiry form was already here, and a separate page only added a navigation
+   step between "convinced" and "typing". The route still exists as a redirect so
+   any link already in the wild lands in the right place.
+
+   The address is deliberately plain text, not a map link. Nobody is being invited to
+   the office — the work is delivered remotely. It's here as a trust signal and for
+   the Google Business Profile, and a "get directions" affordance would only suggest
+   a visit that isn't on offer. */
+---
+
+<section class="ways" id="contact">
+  <div class="shell">
+    {/* Deliberately headline-free. This is the utility band — the four ways to reach
+        a human. The section's actual headline lives on the form below it; two big
+        contact headings stacked read as the same pitch made twice. */}
+    <div class="top">
+      <p class="label" data-reveal>Get in touch</p>
+      <p class="reach" data-reveal>{site.reachLine}</p>
+    </div>
+
+    <ul class="grid">
+      <li data-reveal data-reveal-group="way">
+        <span class="k">WhatsApp</span>
+        <a class="v" href={waLink()} target="_blank" rel="noopener">{site.phoneDisplay}</a>
+        <span class="note">Fastest reply &mdash; usually same day</span>
+      </li>
+      <li data-reveal data-reveal-group="way">
+        <span class="k">Phone</span>
+        <a class="v" href={telLink}>{site.phoneDisplay}</a>
+        <span class="note">{site.timezoneNote}</span>
+      </li>
+      <li data-reveal data-reveal-group="way">
+        <span class="k">Email</span>
+        <a class="v mail" href={mailLink}>{site.email}</a>
+        <span class="note">For briefs and documents</span>
+      </li>
+      <li data-reveal data-reveal-group="way">
+        <span class="k">Office</span>
+        <address class="v addr">{site.address.street}, {site.address.city}</address>
+        <span class="note">{site.address.region} {site.address.postalCode}</span>
+      </li>
+    </ul>
+
+    <div class="social" data-reveal>
+      <span class="k">Follow us</span>
+      <Socials />
+    </div>
+  </div>
+</section>
+
+<Closing />
+
+<style>
+  .ways {
+    background: var(--ink-deep);
+    padding-block: clamp(56px, 9vh, 110px) clamp(30px, 5vh, 56px);
+  }
+
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px 40px;
+    margin-bottom: clamp(20px, 3vh, 30px);
+  }
+  .reach {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--t3);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border-block: 1px solid var(--rule);
+  }
+  .grid li { background: var(--ink-deep); padding: 24px 22px; display: grid; gap: 8px; align-content: start; }
+  .k {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--t3);
+  }
+  .v {
+    font-family: var(--display);
+    font-size: 1.22rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    transition: color var(--dur-fast);
+  }
+  a.v:hover { color: var(--bio); }
+  .v.mail, .v.addr { font-size: 1rem; word-break: break-word; }
+  address.v { font-style: normal; }
+  .note { font-size: 0.84rem; color: var(--t3); }
+
+  .social {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 20px;
+    padding-top: clamp(26px, 4vh, 40px);
+  }
+</style>

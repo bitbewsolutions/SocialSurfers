@@ -1,0 +1,79 @@
+---
+import { stats } from '../data/content';
+
+/* The numbers that used to run along the bottom edge of the hero.
+   They also carry the dawn→day handover that Services used to own: the ramp is this
+   section's top padding, in fixed pixels, so it always completes before the first
+   piece of dark text. Services now starts on plain foam. */
+const figures = [
+  { v: `${stats.projectsDelivered}+`, l: 'Projects delivered' },
+  { v: String(stats.onRetainer).padStart(2, '0'), l: 'Active clients' },
+  { v: String(stats.industriesServed), l: 'Industries served' },
+  { v: String(stats.serviceLines).padStart(2, '0'), l: 'Services offered' },
+];
+---
+
+<section class="stats" aria-label="Social Surfers by the numbers">
+  <div class="shell">
+    <dl>
+      {figures.map((f) => (
+        <div class="fig" data-reveal data-reveal-group="stat">
+          <dt>{f.v}</dt>
+          <dd>{f.l}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<style>
+  .stats {
+    /* fixed-pixel dawn, for the same reason as every other band on this site:
+       percentage stops move with section height and drag text onto the wrong ground */
+    background:
+      linear-gradient(180deg, #7a2f6b 0px, #96487c 62px, #c99ab5 134px, var(--foam) 200px)
+      no-repeat;
+    background-color: var(--foam);
+    padding-block: 200px clamp(20px, 4vh, 44px);
+    color: var(--l1);
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--rule-light);
+    border-block: 1px solid var(--rule-light);
+  }
+  .fig {
+    background: var(--foam);
+    padding: 24px 22px 26px;
+    display: grid;
+    gap: 8px;
+    align-content: start;
+  }
+  .fig dt {
+    font-family: var(--mono);
+    font-size: clamp(1.75rem, 4vw, 2.6rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    color: var(--l1);
+  }
+  .fig dd {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+    color: var(--l3);
+    line-height: 1.4;
+  }
+
+  @media (max-width: 760px) {
+    .stats { padding-block: 170px clamp(16px, 3vh, 32px); }
+    dl { grid-template-columns: repeat(2, 1fr); }
+    .fig { padding: 18px 16px 20px; }
+  }
+</style>

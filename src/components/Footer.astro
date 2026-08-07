@@ -1,0 +1,120 @@
+---
+import Logo from './Logo.astro';
+import Socials from './Socials.astro';
+import { site, waLink, telLink, mailLink } from '../data/site';
+import { services } from '../data/services';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <div class="shell inner">
+    <div class="col brandcol">
+      <Logo size={38} id="ft" />
+      <p class="line">{site.closingLine}</p>
+      <p class="reach">{site.reachLine}</p>
+      <Socials />
+    </div>
+
+    <div class="col">
+      <h2 class="label">Services</h2>
+      <ul class="stack">
+        {services.map((s) => (
+          <li><a href={`/services/${s.slug}`}>{s.name}</a></li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="col">
+      <h2 class="label">Office</h2>
+      {/* NAP block — must stay byte-identical to the JSON-LD in Base.astro.
+          This is where the business sits, not a limit on who it works with. */}
+      <address>
+        {site.address.street}<br />
+        {site.address.city}, {site.address.region} {site.address.postalCode}
+      </address>
+      <ul class="stack">
+        <li><a href={telLink}>{site.phoneDisplay}</a></li>
+        <li><a href={mailLink}>{site.email}</a></li>
+        <li><a href={waLink()} target="_blank" rel="noopener">WhatsApp</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="shell base">
+    <span>&copy; {year} {site.name}. All rights reserved.</span>
+    <span class="hrs">{site.timezoneNote}</span>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    background: var(--ink-deep);
+    border-top: 1px solid var(--rule);
+    padding-top: clamp(56px, 8vh, 96px);
+  }
+  .inner {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: clamp(32px, 5vw, 72px);
+    padding-bottom: clamp(40px, 6vh, 72px);
+  }
+  .line {
+    margin-top: 18px;
+    font-family: var(--display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: var(--t2);
+    max-width: 22ch;
+  }
+  .reach {
+    margin: 12px 0 24px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--t3);
+  }
+
+  .col h2 { margin-bottom: 18px; }
+  .stack { display: grid; gap: 10px; }
+  .stack a {
+    font-size: 0.92rem;
+    color: var(--t2);
+    transition: color var(--dur-fast);
+  }
+  .stack a:hover { color: var(--t1); }
+
+  address {
+    font-style: normal;
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--t2);
+    margin-bottom: 16px;
+  }
+
+  .base {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    padding-block: 22px;
+    border-top: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    /* the copyright line is copy, not a rule — t4 is decorative-only and measured
+       2.04:1 here */
+    color: var(--t3);
+  }
+
+  @media (max-width: 860px) {
+    .inner { grid-template-columns: 1fr 1fr; }
+    .brandcol { grid-column: 1 / -1; }
+  }
+  @media (max-width: 520px) {
+    .inner { grid-template-columns: 1fr; gap: 36px; }
+  }
+</style>

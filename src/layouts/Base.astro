@@ -1,0 +1,136 @@
+---
+import '../styles/global.css';
+import { site } from '../data/site';
+import { services } from '../data/services';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Set on the homepage only — emits the full LocalBusiness graph. */
+  isHome?: boolean;
+  breadcrumbs?: { name: string; url: string }[];
+  ogImage?: string;
+  /** Any additional schema.org graph for this page (e.g. Service, ContactPage). */
+  extraLd?: Record<string, unknown>;
+}
+
+const { title, description, isHome = false, breadcrumbs, ogImage = '/og.png', extraLd } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href.replace(/\/$/, '') || site.url;
+const ogUrl = new URL(ogImage, Astro.site).href;
+const fullTitle = title.includes(site.name) ? title : `${title} — ${site.name}`;
+
+const localBusiness = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  '@id': `${site.url}/#business`,
+  name: site.name,
+  description: site.category,
+  url: site.url,
+  telephone: site.phone,
+  email: site.email,
+  image: ogUrl,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.address.street,
+    addressLocality: site.address.city,
+    addressRegion: site.address.region,
+    postalCode: site.address.postalCode,
+    addressCountry: site.address.country,
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: site.geo.lat, longitude: site.geo.lng },
+  /* The address is where the studio is; areaServed is who it will work with. Listing
+     nearby towns here told Google to stop suggesting the business to everyone else. */
+  areaServed: site.areaServed,
+  openingHours: site.openingHours,
+  sameAs: site.socials.map((s) => s.url),
+  slogan: site.tagline,
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Digital Marketing Services',
+    itemListElement: services.map((s) => ({
+      '@type': 'Offer',
+      itemOffered: { '@type': 'Service', name: s.name, url: `${site.url}/services/${s.slug}` },
+    })),
+  },
+};
+
+const breadcrumbLd = breadcrumbs && {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: breadcrumbs.map((b, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: b.name,
+    item: new URL(b.url, Astro.site).href,
+  })),
+};
+---
+
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- the display face is in the LCP element, so it gets a head start -->
+    <link
+      rel="preload"
+      href="/fonts/fraunces-sub.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:locale" content="en_IN" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogUrl} />
+
+    <meta name="theme-color" content="#100722" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    {isHome && (
+      <script
+        type="application/ld+json"
+        set:html={JSON.stringify(localBusiness)}
+      />
+    )}
+    {breadcrumbLd && (
+      <script
+        type="application/ld+json"
+        set:html={JSON.stringify(breadcrumbLd)}
+      />
+    )}
+    {extraLd && <script type="application/ld+json" set:html={JSON.stringify(extraLd)} />}
+
+    <!-- Adds .js-motion before first paint so reveal elements never flash in
+         then hide. Without JS the class is absent and everything is visible. -->
+    <script is:inline>
+      (function () {
+        try {
+          if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.documentElement.classList.add('js-motion');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "socialsurfers",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Social Surfers — social media & digital marketing agency, Yamunanagar",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.2.0",
+    "sharp": "^0.35.3"
+  }
+}

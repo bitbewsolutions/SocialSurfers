@@ -1,0 +1,62 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { services } from '../data/services';
+---
+
+<Base title="Page not found" description="That page doesn't exist. Here's where to go instead.">
+  <Nav />
+  <main id="main" class="nf">
+    <div class="shell">
+      <p class="label">Error 404</p>
+      <h1>Page not found.</h1>
+      <p class="lead">
+        That page doesn&rsquo;t exist. It may have moved, or the link might have a typo in
+        it. Try one of these instead.
+      </p>
+      <ul class="links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/#services">All services</a></li>
+        {services.slice(0, 4).map((s) => <li><a href={`/services/${s.slug}`}>{s.name}</a></li>)}
+        <li><a href="/#contact">Contact</a></li>
+      </ul>
+    </div>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .nf {
+    min-height: 76vh;
+    display: flex;
+    align-items: center;
+    padding-block: clamp(140px, 20vh, 220px) clamp(60px, 10vh, 120px);
+    background:
+      radial-gradient(120% 90% at 70% 10%, rgba(74, 27, 114, 0.6), transparent 60%),
+      linear-gradient(178deg, var(--ink-deep), var(--ink));
+  }
+  h1 {
+    margin-top: 14px;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(2.6rem, 8vw, 5.4rem);
+    line-height: 0.94;
+    letter-spacing: -0.035em;
+  }
+  .lead { margin-top: 18px; }
+  .links { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 34px; }
+  .links a {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--t2);
+    border: 1px solid var(--rule-strong);
+    border-radius: 999px;
+    padding: 9px 15px;
+    transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
+  }
+  .links a:hover { color: var(--t1); border-color: var(--bio); background: rgba(234, 28, 130, 0.12); }
+</style>

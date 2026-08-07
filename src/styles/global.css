@@ -1,0 +1,170 @@
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* The nav is fixed, so an anchor jump would otherwise park the section heading
+   underneath it. Applies to in-page nav targets on the one-pager. */
+[id] { scroll-margin-top: clamp(76px, 11vh, 96px); }
+
+body {
+  background: var(--ink-deep);
+  color: var(--t1);
+  font-family: var(--body);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--bio);
+  color: var(--foam);
+}
+
+a { color: inherit; text-decoration: none; }
+img, svg, video { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+ul, ol { list-style: none; }
+
+:focus-visible {
+  outline: 2px solid var(--coral);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ——— shared primitives ——— */
+
+.shell {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gut);
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--t3);
+}
+
+.h2 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: var(--fs-h2);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.lead {
+  font-size: var(--fs-lead);
+  line-height: 1.6;
+  color: var(--t2);
+  max-width: 52ch;
+}
+
+/* THE primary action. Ink on coral = 6.41:1.
+   White on coral would be 2.83:1 and fail AA — never do it. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--coral);
+  padding: 16px 26px;
+  border-radius: 999px;
+  box-shadow: 0 10px 34px -10px rgba(255, 106, 77, 0.75);
+  transition: transform var(--dur) var(--ease-out), box-shadow var(--dur);
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 16px 42px -10px rgba(255, 106, 77, 0.9); }
+.btn:active { transform: translateY(0); }
+.btn .arw { transition: transform var(--dur) var(--ease-out); }
+.btn:hover .arw { transform: translateX(4px); }
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--t1);
+  padding: 16px 24px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-strong);
+  background: rgba(250, 247, 251, 0.045);
+  transition: background var(--dur), border-color var(--dur), transform var(--dur) var(--ease-out);
+}
+.btn-ghost:hover {
+  background: rgba(250, 247, 251, 0.1);
+  border-color: rgba(250, 247, 251, 0.4);
+  transform: translateY(-2px);
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 200;
+  background: var(--coral);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 12px 20px;
+  border-radius: 0 0 8px 0;
+}
+.skip:focus { left: 0; }
+
+/* Reveal-on-scroll primitive. The element is visible by default and only hidden
+   once JS confirms it can animate — so it never stays invisible if JS fails. */
+[data-reveal] { opacity: 1; }
+.js-motion [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.75s var(--ease-tide), transform 0.75s var(--ease-tide);
+  transition-delay: var(--reveal-delay, 0s);
+}
+.js-motion [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-motion [data-reveal] { opacity: 1; transform: none; transition: none; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

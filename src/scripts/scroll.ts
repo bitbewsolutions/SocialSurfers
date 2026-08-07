@@ -1,0 +1,167 @@
+/**
+ * Page-level scroll controller. Everything here is transform/opacity only —
+ * no layout-triggering property is written on scroll.
+ *
+ * Owns: the left-edge progress thread, the hero's dawn→midday sky cross-fade,
+ * the sticky-nav state, and the shared reveal-on-scroll observer.
+ */
+
+export function initScroll() {
+  const thread = document.querySelector<HTMLElement>('[data-thread-fill]');
+  const skyDay = document.querySelector<HTMLElement>('[data-sky-day]');
+  const nav = document.querySelector<HTMLElement>('[data-nav]');
+  const hero = document.querySelector<HTMLElement>('[data-hero]');
+
+  let ticking = false;
+
+  function read() {
+    const y = window.scrollY || window.pageYOffset;
+    const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+    const sp = Math.min(1, y / max);
+
+    thread?.style.setProperty('--sp', sp.toFixed(4));
+
+    if (skyDay && hero) {
+      const hp = Math.min(1, y / Math.max(1, hero.offsetHeight));
+      skyDay.style.setProperty('--day', (hp * hp).toFixed(3));
+    }
+
+    nav?.classList.toggle('is-stuck', y > 40);
+    ticking = false;
+  }
+
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(read);
+  }
+
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll, { passive: true });
+  read();
+  landOnHash();
+}
+
+/**
+ * Land on the fragment when the page is ENTERED at one (…/#services from a service
+ * page, a shared /#contact link, the 404's shortcuts). This is the one-pager's main
+ * navigation, so it has to be reliable.
+ *
+ * The browser does this itself — but `html { scroll-behavior: smooth }` makes that
+ * built-in scroll ANIMATE, and it starts before the webfonts have swapped in. The
+ * reflow when Fraunces lands cancels the animation partway and the visitor is left
+ * near the top of the page. Measured: entering /#process put scrollY at 0 rather
+ * than 2534.
+ *
+ * So do it explicitly, with smooth switched off for the duration, and again once
+ * fonts have settled. In-page clicks are untouched and stay smooth.
+ *
+ * The offset is computed rather than delegated to scrollIntoView: the process
+ * section is `overflow: hidden`, which makes it its own scrollport, and Chrome then
+ * spends part of the scroll-margin scrolling that inner box — it landed 96px and
+ * 53px short in two different code paths. Plain arithmetic lands on the pixel.
+ */
+function landOnHash() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  if (!id) return;
+
+  const jump = () => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const root = document.documentElement;
+    const prev = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    const margin = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+    const top = el.getBoundingClientRect().top + window.scrollY - margin;
+    window.scrollTo(0, Math.max(0, Math.round(top)));
+    root.style.scrollBehavior = prev;
+  };
+
+  jump();
+  document.fonts?.ready.then(() => requestAnimationFrame(jump));
+  addEventListener('load', () => requestAnimationFrame(jump), { once: true });
+}
+
+/**
+ * Element scroll progress → a `--p` custom property from 0 to 1.
+ *
+ * `--p` is the fraction of the element that has passed a fixed *reading line* on
+ * screen (default 62% of viewport height, overridable per element with
+ * `data-progress-anchor`). Two consequences, both deliberate:
+ *
+ *  - Whatever `--p` drives tracks the reader instead of trailing them. The earlier
+ *    version measured against the whole section plus a viewport of run-off, so a
+ *    tall heading block consumed most of the range and the process line ran roughly
+ *    40% behind the step you were actually reading.
+ *  - Because the anchor is fixed on screen, the leading edge stays visible for the
+ *    entire time the element is in view — it enters with it and leaves with it.
+ *
+ * Still a plain scroll-linked variable, not a pinned scrub: native scrolling, the
+ * back button, keyboard paging and momentum all keep working.
+ */
+export function initSectionProgress() {
+  const els = Array.from(document.querySelectorAll<HTMLElement>('[data-progress]'));
+  if (!els.length) return;
+
+  let ticking = false;
+
+  function read() {
+    const vh = innerHeight;
+    for (const el of els) {
+      const r = el.getBoundingClientRect();
+      if (!r.height) continue;
+      const anchor = vh * (Number(el.dataset.progressAnchor) || 0.62);
+      const p = Math.max(0, Math.min(1, (anchor - r.top) / r.height));
+      el.style.setProperty('--p', p.toFixed(4));
+    }
+    ticking = false;
+  }
+
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(read);
+  }
+
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll, { passive: true });
+  read();
+}
+
+/**
+ * Reveal-on-scroll. Elements are visible by default; the .js-motion class on <html>
+ * is what hides them, and that class is only added when motion is allowed — so a JS
+ * failure can never leave the page blank.
+ */
+export function initReveals() {
+  if (!document.documentElement.classList.contains('js-motion')) return;
+  if (!('IntersectionObserver' in window)) {
+    document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-in'));
+    return;
+  }
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        const el = e.target as HTMLElement;
+        el.classList.add('is-in');
+        io.unobserve(el); // one-shot; nothing re-hides on scroll back up
+      }
+    },
+    { rootMargin: '0px 0px -12% 0px', threshold: 0.08 },
+  );
+
+  // stagger is per named group, so one section's index never leaks into another's
+  const groupCount = new Map<string, number>();
+
+  document.querySelectorAll<HTMLElement>('[data-reveal]').forEach((el) => {
+    const group = el.dataset.revealGroup;
+    if (group) {
+      const i = groupCount.get(group) ?? 0;
+      groupCount.set(group, i + 1);
+      el.style.setProperty('--reveal-delay', `${Math.min(i, 7) * 0.07}s`);
+    }
+    io.observe(el);
+  });
+}
