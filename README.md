@@ -24,9 +24,9 @@ React into a site that has no framework at all.
 
 | | on the wire |
 |---|---|
-| JS (external chunks, gzipped) | 2.4 KB |
+| JS (external chunks, gzipped) | 3.0 KB |
 | Fonts (woff2, precompressed) | 26.6 KB |
-| Heaviest page, first visit | **51.3 KB** |
+| Heaviest page, first visit | **52.1 KB** |
 | Hero image (WebP, one of four widths) | 44.5–151 KB |
 | Client logo tiles (27, lazy) | 178 KB |
 
@@ -107,13 +107,29 @@ the thing to understand before editing it:
   was an opaque ramp starting at `#0c0620` against a lighter scrimmed image, and drew
   exactly the hard horizontal line the tonal system exists to prevent.
 
-### The scrim is not decoration
+### The scrim is not decoration, but it must not eat the picture either
 
 Measured on the unscrimmed image, the band the headline occupies means **89.6/255** —
-mid-tone, with a near-white sunset at the left. White type over the raw picture would
+mid-tone, with a near-white sunrise at the left. White type over the raw picture would
 have failed in the place the eye goes first. `node tools/hero.mjs --check` reprints
-those numbers per band. Four layers do the work: a top gradient behind the nav, a
-radial pool under the copy, a left-weighted wash over the sunset, and the base veil.
+those numbers per band.
+
+The first version overcorrected: a flat 0.6 wash over the sunrise plus a 300px opaque
+handover meant roughly the bottom third of the artwork never appeared, and the client
+reasonably said so. What the scrim is for is **legibility, not mood**, so it is now
+spent where the text is and nowhere else — a tight radial pool under the copy, a light
+touch on the sunrise, and a base veil that only goes near-solid in the last stretch.
+
+Where that is not enough, the type carries its own ground. The accent words are set in
+`--grad-on-dark`, whose light end is `#ff6fa8`, and across the lit icon cluster the
+ground behind them measured **1.5:1 against a 3:1 floor**. A halo fixes that locally
+without touching the picture.
+
+**It has to be `filter: drop-shadow`, not `text-shadow`.** Those words are painted with
+`background-clip: text` over `color: transparent` — the gradient is a *background* and
+the shadow belongs to the text layer above it, so a text-shadow paints straight over
+the fill and renders both words solid black. `drop-shadow` applies to the rendered
+result and lands behind the glyphs.
 
 The nav also has to survive the change. `initScroll` adds `.on-dark` while the bar's
 **lower edge** is still inside the hero — not at `y > 40`, which would have put a
@@ -153,18 +169,50 @@ swash drawing after, rather than a fade, because a fade gives the ending away be
 the stroke reaches it. It opts out of the generic reveal's opacity/transform for the
 same reason.
 
-**Services** are gradient cards, per the client — but **one gradient, not seven**. Each
-card is a slice of the same violet→rose ramp stepped by its index, so reading across
-the grid walks the ramp end to end, and `--p` (section scroll progress) slides the whole
-set along it as the section passes. The slice is computed in the frontmatter, not in
-CSS: mapping each card's background onto its grid *cell* would have to be redeclared at
+**Services** are gradient cards, per the client — but **one gradient, not sixteen**.
+Each card is a slice of the same ramp stepped by its index, so reading across the grid
+walks the ramp end to end, and `--p` (section scroll progress) slides the whole set
+along it as the section passes. The slice is computed in the frontmatter, not in CSS:
+mapping each card's background onto its grid *cell* would have to be redeclared at
 every breakpoint, since the column count changes underneath it.
+
+Two numbers control it and they **trade against each other**, because both spend the
+same 0–100% of one ramp: `SPREAD` is how far along the ramp the last card starts,
+`WIDTH` is each card's own sweep. At 7 cards, 74/26 worked. At 16 it did not — the step
+between neighbours fell to ~5% and the ends read as solid fills. The fix was not to
+rebalance them (their sum is capped at 100) but to make the **ramp itself longer**:
+`--card-lo` is a deeper indigo than `--violet`, so 55/45 now gives both a visible
+per-card sweep and real travel across the set.
 
 Both ends of the mix stay dark enough for white type. The ramp stops at `--rose` and
 never reaches `--brand-pink`, on which white measures ~2.6:1 — the same cap `--grad`
 has, for the same reason. The eighth tile is the CTA rather than a filler service: seven
 cards leave a hole in the last row, and it is the one card that is *not* a gradient, so
 the exit doesn't get buried among the services.
+
+## The client marquee scrolls and drifts
+
+The logo rails keep flowing on their own **and** can be dragged, flicked or wheeled.
+Those cannot be two mechanisms: a CSS `transform` animation and native scrolling do not
+compose, so the track would keep sliding underneath whatever the visitor moved and snap
+when they let go. The drift is therefore driven through the same property the visitor
+moves — `scrollLeft` — with only one of them writing at a time.
+
+`scripts/marquee.ts` takes over a rail by setting `data-live`, which is what switches
+the CSS animation off and `overflow-x` on. **Without JS the CSS animation still runs
+exactly as before**, so nothing is lost when the module does not load.
+
+- The loop stays seamless for the original reason: the track holds two copies, so half
+  the scroll width is one copy. Wrapping by that amount lands on an identical pixel —
+  including mid-drag, which is what makes it feel endless in both directions.
+- Any hint of intent (hover, wheel, touch, drag) pauses the drift; it resumes ~1.1s
+  after things go still. Hover-to-pause is the behaviour `animation-play-state` used to
+  provide.
+- Pointer drag is handled explicitly, because a desktop visitor has no way to move a
+  horizontal strip short of shift+wheel. A drag that actually travelled suppresses the
+  click so it does not also open a logo's link.
+- **`prefers-reduced-motion` gets the better deal**: no auto-drift, but the rail is
+  still scrollable, where before it was a strip they could neither watch nor move.
 
 ## Reach and the address
 
@@ -351,6 +399,42 @@ passed comfortably at 65px, purely from edge fringe.
 
 Elements carrying `data-contrast-exempt` are skipped and reported by name. That is for
 logotypes only (WCAG 1.4.3); it is not a general-purpose silencer.
+
+**Four corrections came out of this design, and each one had been quietly narrowing
+what the audit actually covered.**
+
+*It measured every element's own text, not its box.* An element's border box spans its
+children, whose pixels then read as its ground — `About <em>Us</em>` measured a dark
+heading against the light gradient of "Us" and reported 2.92:1 for a run sitting on pale
+lavender. It now samples a `Range` over the element's own text nodes, and keeps those
+rects **separate**: a union spans the gap between two lines, and in the hero that gap
+contains the accent words.
+
+*The modal ground assumed the background is flatter than the text.* On a gradient card
+it is the other way round — the ground spreads across dozens of quantised buckets while
+the glyphs are all one colour, so the mode returned the **glyph** and the element
+measured against itself (1.03:1 for a heading at a true 6.4:1). Pixels within a tight
+radius of the declared text colour are now excluded first. The radius has to be tight:
+a generous one also excludes a ground that merely *resembles* the text, and a
+white-on-92%-white button came back as a pass — worse than the bug it fixed.
+
+*Text with no dominant ground was dropped in silence.* Once the hero became a photograph
+and half the sections carried gradient washes, **101 of 295 runs** had no modal ground
+and were skipped without a word — including the hero headline, both accent words, the
+sub and both buttons. Those are now measured against the *worst* of their real grounds
+(5th percentile, glyph mask grown by 2px so the antialiased fringe is not mistaken for
+background), and anything still unmeasurable is **counted and named** in the output.
+Coverage went from 190 to 258.
+
+*The reveal walk decided what was visible.* Elements mid-transition compute to opacity 0
+and were dropped, so the measured count swung between 183 and 233 across consecutive
+runs of the same page. The audit now forces the final state — drop `.js-motion`, add
+`.is-in` — which is also exactly the no-JS rendering every element must be legible in.
+
+After any change to this tool, **re-run the regression**: reintroduce a known failure
+(a white fill under the hero's ghost button does it), confirm it is caught, then restore
+and confirm the page passes. Two of the four fixes above were themselves broken on the
+first attempt and only that test found it.
 
 Exits non-zero on any failure. Run it on `/`, a service page and `/404` at both
 1440x900 and 390x844 after touching any background.

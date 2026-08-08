@@ -36,10 +36,18 @@ const SECONDS_PER_TILE = 3.6;
     </p>
   </div>
 
+  {/* data-marquee hands each rail to scripts/marquee.ts, which switches the CSS
+      animation off and drives the same motion through scrollLeft instead — so the
+      visitor can drag or flick it without fighting a transform. Without JS the
+      animation below runs exactly as it always did. */}
   <div class="marquees" data-reveal>
     {rows.map((row, i) => (
-      <div class="marquee" data-dir={i % 2 === 0 ? 'fwd' : 'rev'}>
-        <ul class="track" style={`--dur:${(row.length * SECONDS_PER_TILE).toFixed(1)}s`}>
+      <div class="marquee" data-marquee data-dir={i % 2 === 0 ? 'fwd' : 'rev'}>
+        <ul
+          class="track"
+          data-dur={(row.length * SECONDS_PER_TILE).toFixed(1)}
+          style={`--dur:${(row.length * SECONDS_PER_TILE).toFixed(1)}s`}
+        >
           {row.map((c) => (
             <li class="tile">
               <img src={c.logo} alt={c.name} width="160" height="160" loading="lazy" decoding="async" />
@@ -113,6 +121,28 @@ const SECONDS_PER_TILE = 3.6;
   }
   /* pausing on hover lets someone actually look at a logo they recognise */
   .marquees:hover .track { animation-play-state: paused; }
+
+  /* ——— once scripts/marquee.ts has taken over ———
+     The rail becomes a real scroll container and the animation stops: the drift is
+     driven through scrollLeft from here on, so leaving the transform running would
+     move the row twice. */
+  .marquee[data-live] {
+    overflow-x: auto;
+    overflow-y: hidden;
+    /* html sets scroll-behavior: smooth, and it is not inherited — but be explicit,
+       because a smooth scroller would animate every one of these per-frame writes */
+    scroll-behavior: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    /* room for the tile's hover lift, which overflow-y: hidden would otherwise clip */
+    padding-block: 6px;
+    cursor: grab;
+  }
+  .marquee[data-live]::-webkit-scrollbar { display: none; }
+  .marquee[data-live].is-dragging { cursor: grabbing; }
+  .marquee[data-live] .track { animation: none; }
+  /* a dragged rail should not select the page's text as it goes */
+  .marquee[data-live].is-dragging .tile { user-select: none; }
 
   .tile {
     flex: none;

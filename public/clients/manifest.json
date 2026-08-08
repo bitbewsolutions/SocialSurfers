@@ -3,106 +3,106 @@
     "name": "Design Expert",
     "industry": "Architecture & Interiors",
     "logo": "/clients/design-expert.webp",
-    "from": "IMG_4325.JPG.jpeg",
-    "bg": "#f8f8f8"
+    "from": "IMG_4325.JPG",
+    "bg": "#f6f5f9"
   },
   {
     "name": "Nayyar Plywood",
     "industry": "Plywood & Laminates",
     "logo": "/clients/nayyar-plywood.webp",
     "from": "IMG_6321.PNG",
-    "bg": "#f1f1f1"
+    "bg": "#f6f5f9"
   },
   {
     "name": "Royale Group",
     "industry": "Real Estate",
     "logo": "/clients/royale-group.webp",
     "from": "IMG_6322.PNG",
-    "bg": "#eff0f0"
+    "bg": "#f6f5f9"
   },
   {
     "name": "The Ice Cream House",
     "industry": "Food & Beverage",
     "logo": "/clients/the-ice-cream-house.webp",
     "from": "IMG_6323.PNG",
-    "bg": "#e2e2e2"
+    "bg": "#17102f"
   },
   {
     "name": "Food Arena",
     "industry": "Restaurant",
     "logo": "/clients/food-arena.webp",
     "from": "IMG_6324.PNG",
-    "bg": "#e0dfdf"
+    "bg": "#17102f"
   },
   {
     "name": "Derma Luxe Clinic",
     "industry": "Healthcare",
     "logo": "/clients/derma-luxe-clinic.webp",
-    "from": "IMG_6325.JPG.jpeg",
-    "bg": "#efeae7"
+    "from": "IMG_6325.JPG",
+    "bg": "#f6f5f9"
   },
   {
     "name": "RK Architect",
     "industry": "Architecture & Design",
     "logo": "/clients/rk-architect.webp",
     "from": "IMG_6326.PNG",
-    "bg": "#ececec"
+    "bg": "#17102f"
   },
   {
     "name": "Detailing Devils",
     "industry": "Automobile",
     "logo": "/clients/detailing-devils.webp",
     "from": "IMG_6327.PNG",
-    "bg": "#efefef"
+    "bg": "#f6f5f9"
   },
   {
     "name": "M.R. Metal",
     "industry": "Manufacturing",
     "logo": "/clients/m-r-metal.webp",
     "from": "IMG_6328.PNG",
-    "bg": "#eaeaeb"
+    "bg": "#f6f5f9"
   },
   {
     "name": "Gambhir Optics",
     "industry": "Retail",
     "logo": "/clients/gambhir-optics.webp",
     "from": "IMG_6329.PNG",
-    "bg": "#ededee"
+    "bg": "#17102f"
   },
   {
     "name": "Creative Kitchens",
     "industry": "Modular Interiors",
     "logo": "/clients/creative-kitchens.webp",
     "from": "IMG_6330.PNG",
-    "bg": "#eeeeee"
+    "bg": "#17102f"
   },
   {
     "name": "Silomin",
     "industry": "Retail",
     "logo": "/clients/silomin.webp",
     "from": "IMG_6331.PNG",
-    "bg": "#e0e1e1"
+    "bg": "#f6f5f9"
   },
   {
     "name": "The Elite Club",
     "industry": "Gym & Fitness",
     "logo": "/clients/the-elite-club.webp",
     "from": "IMG_6332.PNG",
-    "bg": "#f4f4f4"
+    "bg": "#f6f5f9"
   },
   {
     "name": "PRO Ultimate Gyms",
     "industry": "Gym & Fitness",
     "logo": "/clients/pro-ultimate-gyms.webp",
     "from": "IMG_6333.PNG",
-    "bg": "#e8e7e7"
+    "bg": "#f6f5f9"
   },
   {
     "name": "Sanders Bagzee",
     "industry": "Fashion & Bags",
     "logo": "/clients/sanders-bagzee.webp",
     "from": "IMG_6334.PNG",
-    "bg": "#e2e2e2"
+    "bg": "#f6f5f9"
   },
   {
     "name": "Mahak Makeover",
@@ -116,14 +116,14 @@
     "industry": "Retail",
     "logo": "/clients/sqdc.webp",
     "from": "IMG_6336.PNG",
-    "bg": "#e2e2e2"
+    "bg": "#17102f"
   },
   {
     "name": "Caballo Verticals",
     "industry": "Architecture",
     "logo": "/clients/caballo-verticals.webp",
     "from": "IMG_6337.PNG",
-    "bg": "#efeeed"
+    "bg": "#17102f"
   },
   {
     "name": "Reborn Gym",
@@ -161,13 +161,6 @@
     "bg": "#ffffff"
   },
   {
-    "name": "Vows in Velvet",
-    "industry": "Fashion",
-    "logo": "/clients/vows-in-velvet.webp",
-    "from": "WhatsApp Image 2026-08-07 at 3.40.46 PM (1).jpeg",
-    "bg": "#2e3133"
-  },
-  {
     "name": "Toyz World",
     "industry": "Retail",
     "logo": "/clients/toyz-world.webp",
@@ -179,8 +172,15 @@
     "industry": "Unknown",
     "logo": "/clients/client-27.webp",
     "verify": true,
-    "from": "WhatsApp Image 2026-08-07 at 3.40.46 PM.jpeg",
-    "bg": "#3d3c3c"
+    "from": "WhatsApp_Image_2026-08-07_at_3.40.46_PM.png",
+    "bg": "#f6f5f9"
+  },
+  {
+    "name": "Vows in Velvet",
+    "industry": "Fashion",
+    "logo": "/clients/vows-in-velvet.webp",
+    "from": "WhatsApp_Image_2026-08-07_at_3.40.46_PM__1_.png",
+    "bg": "#17102f"
   },
   {
     "name": "Romeo Lane",

@@ -281,12 +281,16 @@ h1 em {
    but the white pill underneath is not a token and stayed put — which put white type on
    a white ground at 2.36:1. Everything else in the button already adapts through tokens;
    this is the one literal in the rule. */
+/* Tints DOWN, not up. A translucent white fill is fine over flat ink but the hero is
+   a photograph now, and once its veil was lightened so the sunrise could show, the
+   pill sat on bright pixels and its 12px label fell to 3.93:1 against a 4.5 floor.
+   Darkening gives the label a ground of its own wherever the button lands. */
 .tone-dark .btn-ghost {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(6px);
+  background: rgba(10, 4, 28, 0.46);
+  border-color: rgba(255, 255, 255, 0.42);
+  backdrop-filter: blur(8px);
 }
-.tone-dark .btn-ghost:hover { background: rgba(255, 255, 255, 0.18); }
+.tone-dark .btn-ghost:hover { background: rgba(10, 4, 28, 0.62); }
 .btn-ghost:hover {
   background: #fff;
   border-color: var(--violet);

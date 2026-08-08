@@ -115,11 +115,6 @@
     "logo": "/clients/la-vanilla-coffee.webp"
   },
   {
-    "name": "Vows in Velvet",
-    "industry": "Fashion",
-    "logo": "/clients/vows-in-velvet.webp"
-  },
-  {
     "name": "Toyz World",
     "industry": "Retail",
     "logo": "/clients/toyz-world.webp"
@@ -128,6 +123,11 @@
     "name": "Client 27",
     "industry": "Unknown",
     "logo": "/clients/client-27.webp"
+  },
+  {
+    "name": "Vows in Velvet",
+    "industry": "Fashion",
+    "logo": "/clients/vows-in-velvet.webp"
   },
   {
     "name": "Romeo Lane",

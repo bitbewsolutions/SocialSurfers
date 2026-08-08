@@ -53,8 +53,7 @@ const srcset = art.sources.map((s) => `${s.src} ${s.w}w`).join(', ');
     </h1>
 
     <p class="sub" data-reveal>
-      We plan it, create the content, run the ads and send you a clear report every
-      month. One team for all of it.
+      A complete social media & digital marketing solution that builds and manages your brand's digital presence.
     </p>
 
     <div class="ctas" data-reveal>
@@ -96,8 +95,11 @@ const srcset = art.sources.map((s) => `${s.src} ${s.w}w`).join(', ');
     /* The subject sits centre-right. On a phone the frame crops to roughly a third
        of the width, and centring it would land on empty sky. */
     object-position: 58% 50%;
-    /* the descent: the picture lags the page, so the hero pulls apart as it leaves */
-    transform: scale(1.06) translate3d(0, calc(var(--hp, 0) * -3.5%), 0);
+    /* The descent: the picture lags the page, so the hero pulls apart as it leaves.
+       Scale is only as much headroom as the travel needs — it was 1.06, which threw
+       away 6% of the frame on top of what `cover` already crops, and this artwork is
+       1.5:1 against a ~1.6:1 viewport, so `cover` alone loses barely any of it. */
+    transform: scale(1.03) translate3d(0, calc(var(--hp, 0) * -1.8%), 0);
     will-change: transform;
   }
 
@@ -107,21 +109,28 @@ const srcset = art.sources.map((s) => `${s.src} ${s.w}w`).join(', ');
     z-index: -1;
     background:
       /* 1. darken behind the nav so the mark and the links keep their contrast */
-      linear-gradient(180deg, rgba(12, 6, 32, 0.82) 0%, rgba(12, 6, 32, 0.12) 20%, transparent 34%),
-      /* 2. a pool under the copy. The icon cluster the headline crosses is the
-            brightest thing in the frame, and the accent words are set in the ON-INK
-            ramp, whose light end is #ff6fa8 — over lit pink icons that had almost
-            nothing to separate it from its ground. */
-      radial-gradient(72% 62% at 50% 46%, rgba(12, 6, 32, 0.66), transparent 78%),
-      /* 3. tame the sunset, the one near-white region, which sits left */
-      linear-gradient(90deg, rgba(12, 6, 32, 0.6) 0%, rgba(12, 6, 32, 0.16) 46%, transparent 72%),
-      /* 4. the base veil, reaching near-solid ink at the foot so the handover below
-            starts from the colour the image has already arrived at */
+      linear-gradient(180deg, rgba(12, 6, 32, 0.8) 0%, rgba(12, 6, 32, 0.1) 18%, transparent 30%),
+      /* 2. a pool under the copy, and now the only heavy darkening on the frame.
+            The icon cluster the headline crosses is the brightest thing in the
+            picture, and the accent words are set in the ON-INK ramp whose light end
+            is #ff6fa8 — over lit pink icons that has almost nothing to separate it
+            from its ground. Held to an ellipse around the copy so the darkening
+            pays for legibility and nothing else. */
+      radial-gradient(62% 46% at 50% 41%, rgba(12, 6, 32, 0.82), rgba(12, 6, 32, 0.34) 62%, transparent 82%),
+      /* 3. A light touch over the sunrise rather than the flat 0.6 wash that was
+            here. That wash was the single biggest reason the picture read as half
+            hidden — it is the warmest thing in the frame and it was being erased to
+            protect text that sits above it, not on it. */
+      linear-gradient(90deg, rgba(12, 6, 32, 0.3) 0%, rgba(12, 6, 32, 0.06) 42%, transparent 64%),
+      /* 4. The base veil. Light across the picture, and it only goes near-solid in
+            the last stretch, where the handover has to start from the colour the
+            image has already arrived at. */
       linear-gradient(180deg,
-        rgba(12, 6, 32, 0.42) 0%,
-        rgba(12, 6, 32, 0.58) 46%,
-        rgba(12, 6, 32, 0.86) 78%,
-        rgba(12, 6, 32, 0.97) 100%);
+        rgba(12, 6, 32, 0.2) 0%,
+        rgba(12, 6, 32, 0.26) 48%,
+        rgba(12, 6, 32, 0.38) 76%,
+        rgba(12, 6, 32, 0.72) 90%,
+        rgba(12, 6, 32, 0.95) 100%);
   }
 
   /* The tonal handover to the paper below, as its own element so it can be masked.
@@ -129,18 +138,23 @@ const srcset = art.sources.map((s) => `${s.src} ${s.w}w`).join(', ');
      scrimmed image, which drew exactly the hard horizontal line this system exists
      to prevent. Fading its first third in removes the edge; by the time it is fully
      opaque the ramp and the image have converged on ink anyway. */
+  /* Was a flat var(--fade-h) — 300px of a 900px hero, a third of the picture spent
+     on a ramp. It is a share of the section now, so the artwork keeps the rest.
+     Compressing ink→mid into ~110px is steeper but not a step: across that distance
+     the ramp moves under one level per row against a 14/channel budget, and
+     qa/seams.mjs measures rows, not slopes. */
   .handover {
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
     z-index: -1;
-    height: var(--fade-h);
+    height: clamp(78px, 12%, 150px);
     background-image: var(--ramp-ink-to-mid);
     background-size: 100% 100%;
     background-repeat: no-repeat;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 34%);
-    mask-image: linear-gradient(to bottom, transparent 0%, #000 34%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 52%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 52%);
   }
 
   /* ——— the copy, centred and full width ——— */
@@ -175,7 +189,21 @@ const srcset = art.sources.map((s) => `${s.src} ${s.w}w`).join(', ');
     max-width: 17ch;
     text-wrap: balance;
     color: var(--t1);
-    text-shadow: 0 2px 30px rgba(8, 3, 22, 0.5);
+    /* A halo, so each glyph carries a little ground of its own. The accent words are
+       set in --grad-on-dark, whose light end is #ff6fa8, and where they cross the lit
+       icon cluster the ground behind them measured 1.5:1 against a 3:1 floor for
+       large text — darkening the whole picture enough to fix that would undo the
+       point of showing it.
+
+       filter, NOT text-shadow. The accent words are painted with background-clip:
+       text over color: transparent, which means the gradient is a BACKGROUND and the
+       shadow is part of the text layer above it — a text-shadow paints straight over
+       the fill and turns both words black. drop-shadow applies to the rendered
+       result, so the halo lands behind the glyphs where it belongs. */
+    filter:
+      drop-shadow(0 1px 2px rgba(6, 2, 18, 0.75))
+      drop-shadow(0 3px 16px rgba(6, 2, 18, 0.8))
+      drop-shadow(0 0 44px rgba(6, 2, 18, 0.55));
   }
   h1 em {
     background-image: var(--grad-text);

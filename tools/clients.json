@@ -1,31 +1,112 @@
 {
   "_note": "Source filename -> client. Read by tools/logos.mjs to name the exported tiles and to seed src/data/content.ts. Names were read off the logos themselves; anything marked \"verify\": true could not be read with confidence and needs the client to confirm before launch.",
-
-  "IMG_4325.JPG.jpeg":                                 { "name": "Design Expert",        "industry": "Architecture & Interiors" },
-  "IMG_6321.PNG":                                      { "name": "Nayyar Plywood",       "industry": "Plywood & Laminates" },
-  "IMG_6322.PNG":                                      { "name": "Royale Group",         "industry": "Real Estate" },
-  "IMG_6323.PNG":                                      { "name": "The Ice Cream House",  "industry": "Food & Beverage" },
-  "IMG_6324.PNG":                                      { "name": "Food Arena",           "industry": "Restaurant" },
-  "IMG_6325.JPG.jpeg":                                 { "name": "Derma Luxe Clinic",    "industry": "Healthcare" },
-  "IMG_6326.PNG":                                      { "name": "RK Architect",         "industry": "Architecture & Design" },
-  "IMG_6327.PNG":                                      { "name": "Detailing Devils",     "industry": "Automobile" },
-  "IMG_6328.PNG":                                      { "name": "M.R. Metal",           "industry": "Manufacturing" },
-  "IMG_6329.PNG":                                      { "name": "Gambhir Optics",       "industry": "Retail" },
-  "IMG_6330.PNG":                                      { "name": "Creative Kitchens",    "industry": "Modular Interiors" },
-  "IMG_6331.PNG":                                      { "name": "Silomin",              "industry": "Retail"},
-  "IMG_6332.PNG":                                      { "name": "The Elite Club",       "industry": "Gym & Fitness" },
-  "IMG_6333.PNG":                                      { "name": "PRO Ultimate Gyms",    "industry": "Gym & Fitness" },
-  "IMG_6334.PNG":                                      { "name": "Sanders Bagzee",       "industry": "Fashion & Bags" },
-  "IMG_6335.JPG.jpeg":                                 { "name": "Mahak Makeover",       "industry": "Salon & Spa" },
-  "IMG_6336.PNG":                                      { "name": "SQDC",                 "industry": "Retail" },
-  "IMG_6337.PNG":                                      { "name": "Caballo Verticals",    "industry": "Architecture" },
-  "IMG_6338.PNG":                                      { "name": "Reborn Gym",           "industry": "Gym & Fitness" },
-  "WhatsApp Image 2026-08-07 at 3.40.44 PM (1).jpeg":  { "name": "Deepak Bakers",        "industry": "Bakery" },
-  "WhatsApp Image 2026-08-07 at 3.40.44 PM.jpeg":      { "name": "JD Dream Decor",       "industry": "Event Decor" },
-  "WhatsApp Image 2026-08-07 at 3.40.45 PM (1).jpeg":  { "name": "Exotic Party Ideas",   "industry": "Event Decor" },
-  "WhatsApp Image 2026-08-07 at 3.40.45 PM.jpeg":      { "name": "La Vanilla Coffee",    "industry": "Cafe" },
-  "WhatsApp Image 2026-08-07 at 3.40.46 PM (1).jpeg":  { "name": "Vows in Velvet",      "industry": "Fashion"},
-  "WhatsApp Image 2026-08-07 at 3.40.46 PM (2).jpeg":  { "name": "Toyz World",           "industry": "Retail" },
-  "WhatsApp Image 2026-08-07 at 3.40.46 PM.jpeg":      { "name": "Client 27",            "industry": "Unknown", "verify": true },
-  "romeolane logo.png":                                { "name": "Romeo Lane",           "industry": "Hospitality" }
+  "IMG_4325.JPG": {
+    "name": "Design Expert",
+    "industry": "Architecture & Interiors"
+  },
+  "IMG_6321.PNG": {
+    "name": "Nayyar Plywood",
+    "industry": "Plywood & Laminates"
+  },
+  "IMG_6322.PNG": {
+    "name": "Royale Group",
+    "industry": "Real Estate"
+  },
+  "IMG_6323.PNG": {
+    "name": "The Ice Cream House",
+    "industry": "Food & Beverage"
+  },
+  "IMG_6324.PNG": {
+    "name": "Food Arena",
+    "industry": "Restaurant"
+  },
+  "IMG_6325.JPG": {
+    "name": "Derma Luxe Clinic",
+    "industry": "Healthcare"
+  },
+  "IMG_6326.PNG": {
+    "name": "RK Architect",
+    "industry": "Architecture & Design"
+  },
+  "IMG_6327.PNG": {
+    "name": "Detailing Devils",
+    "industry": "Automobile"
+  },
+  "IMG_6328.PNG": {
+    "name": "M.R. Metal",
+    "industry": "Manufacturing"
+  },
+  "IMG_6329.PNG": {
+    "name": "Gambhir Optics",
+    "industry": "Retail"
+  },
+  "IMG_6330.PNG": {
+    "name": "Creative Kitchens",
+    "industry": "Modular Interiors"
+  },
+  "IMG_6331.PNG": {
+    "name": "Silomin",
+    "industry": "Retail"
+  },
+  "IMG_6332.PNG": {
+    "name": "The Elite Club",
+    "industry": "Gym & Fitness"
+  },
+  "IMG_6333.PNG": {
+    "name": "PRO Ultimate Gyms",
+    "industry": "Gym & Fitness"
+  },
+  "IMG_6334.PNG": {
+    "name": "Sanders Bagzee",
+    "industry": "Fashion & Bags"
+  },
+  "IMG_6335.JPG.jpeg": {
+    "name": "Mahak Makeover",
+    "industry": "Salon & Spa"
+  },
+  "IMG_6336.PNG": {
+    "name": "SQDC",
+    "industry": "Retail"
+  },
+  "IMG_6337.PNG": {
+    "name": "Caballo Verticals",
+    "industry": "Architecture"
+  },
+  "IMG_6338.PNG": {
+    "name": "Reborn Gym",
+    "industry": "Gym & Fitness"
+  },
+  "WhatsApp Image 2026-08-07 at 3.40.44 PM (1).jpeg": {
+    "name": "Deepak Bakers",
+    "industry": "Bakery"
+  },
+  "WhatsApp Image 2026-08-07 at 3.40.44 PM.jpeg": {
+    "name": "JD Dream Decor",
+    "industry": "Event Decor"
+  },
+  "WhatsApp Image 2026-08-07 at 3.40.45 PM (1).jpeg": {
+    "name": "Exotic Party Ideas",
+    "industry": "Event Decor"
+  },
+  "WhatsApp Image 2026-08-07 at 3.40.45 PM.jpeg": {
+    "name": "La Vanilla Coffee",
+    "industry": "Cafe"
+  },
+  "WhatsApp_Image_2026-08-07_at_3.40.46_PM__1_.png": {
+    "name": "Vows in Velvet",
+    "industry": "Fashion"
+  },
+  "WhatsApp Image 2026-08-07 at 3.40.46 PM (2).jpeg": {
+    "name": "Toyz World",
+    "industry": "Retail"
+  },
+  "WhatsApp_Image_2026-08-07_at_3.40.46_PM.png": {
+    "name": "Client 27",
+    "industry": "Unknown",
+    "verify": true
+  },
+  "romeolane logo.png": {
+    "name": "Romeo Lane",
+    "industry": "Hospitality"
+  }
 }

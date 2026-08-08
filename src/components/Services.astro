@@ -19,12 +19,30 @@ import { waLink } from '../data/site';
  * --rose and never reaches --brand-pink, on which white measures about 2.6:1. That
  * is the same cap --grad has, for the same reason.
  */
-const SPREAD = 74; // how far along the ramp the last card starts
-const WIDTH = 26; // each card's own sweep, so a card is a gradient and not a flat fill
+/*
+ * Two numbers, and they trade against each other because both are spending the same
+ * 0–100% of one ramp:
+ *
+ *   SPREAD  how far along the ramp the LAST card starts — the travel across the set
+ *   WIDTH   each card's OWN sweep — what stops a card being a flat fill
+ *
+ * At 7 cards, 74/26 worked. At 16 it did not: the step between neighbours fell to
+ * ~5% of the ramp, and a 26% sweep across a card is about (63,42,134) → (98,38,128),
+ * which reads as solid at the ends where the ramp changes least. The fix is not to
+ * rebalance the two — their sum is capped at 100 — but to make the ramp itself
+ * longer, so both can be generous in actual colour.
+ *
+ * Hence --card-lo below: a deeper indigo than --violet. The high end stays --rose and
+ * must: the next stop up is --brand-pink, on which white measures ~2.6:1, and these
+ * cards carry white headings and 10.5px chips.
+ */
+const SPREAD = 55;
+const WIDTH = 45;
 
 const cards = services.map((s, i) => {
   const t = services.length > 1 ? i / (services.length - 1) : 0;
-  return { ...s, a: Math.round(t * SPREAD), b: Math.round(t * SPREAD) + WIDTH };
+  const a = Math.round(t * SPREAD);
+  return { ...s, a, b: a + WIDTH };
 });
 ---
 
@@ -111,6 +129,10 @@ const cards = services.map((s, i) => {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: clamp(14px, 1.6vw, 22px);
+    /* The low anchor of the card ramp — deeper than --violet so the ramp is long
+       enough for sixteen cards to differ visibly. Declared once here rather than per
+       card, and the only place to change the set's character. */
+    --card-lo: #241663;
   }
   .cell { grid-column: span 2; }
   .cell:nth-last-child(2) { grid-column: span 3; }
@@ -132,8 +154,8 @@ const cards = services.map((s, i) => {
        min() keeps the shifted stop inside the range color-mix accepts. */
     background-image: linear-gradient(
       142deg,
-      color-mix(in oklab, var(--violet), var(--rose) min(100%, calc(var(--a) + var(--p, 0) * 14%))),
-      color-mix(in oklab, var(--violet), var(--rose) min(100%, calc(var(--b) + var(--p, 0) * 14%)))
+      color-mix(in oklab, var(--card-lo), var(--rose) min(100%, calc(var(--a) + var(--p, 0) * 10%))),
+      color-mix(in oklab, var(--card-lo), var(--rose) min(100%, calc(var(--b) + var(--p, 0) * 10%)))
     );
     box-shadow: 0 18px 40px -26px rgba(30, 12, 60, 0.75);
     transition: transform var(--dur) var(--ease-out), box-shadow var(--dur);
