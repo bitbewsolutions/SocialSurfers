@@ -3,7 +3,6 @@ import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
 import Hero from '../components/Hero.astro';
 import Stats from '../components/Stats.astro';
-import Divider from '../components/Divider.astro';
 import Services from '../components/Services.astro';
 import Process from '../components/Process.astro';
 import Proof from '../components/Proof.astro';
@@ -21,9 +20,6 @@ import { site } from '../data/site';
   <main id="main">
     <Hero />
     <Stats />
-    {/* paper-to-paper boundary: the ribbon has a near-white ground, so it only sits
-        cleanly where neither side is mid-fade */}
-    <Divider />
     <Services />
     <Process />
     <Proof />
