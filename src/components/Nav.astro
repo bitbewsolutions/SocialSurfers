@@ -88,6 +88,42 @@ const links = [
     border-bottom-color: var(--hair);
   }
 
+  /* ——— over the full-bleed hero ———
+     Added by initScroll while the bar's lower edge is still inside the hero. The
+     frosted panel is suppressed here: over a photograph it reads as a smear rather
+     than as glass, and the hero's own scrim already darkens this band enough to
+     carry the bar. */
+  .nav.on-dark.is-stuck {
+    background: transparent;
+    backdrop-filter: none;
+    border-bottom-color: transparent;
+  }
+  .nav.on-dark .links a { color: rgba(246, 245, 249, 0.82); }
+  .nav.on-dark .links a:hover { color: #fff; }
+  .nav.on-dark .cta {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(6px);
+  }
+  .nav.on-dark .cta:hover { background: rgba(255, 255, 255, 0.2); }
+  /* The bars turn white, so the pill under them has to stop being white too — it is
+     a literal, not a token, so it did not follow. No contrast check would have
+     caught this: the burger holds no text. */
+  .nav.on-dark .burger {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(6px);
+  }
+  .nav.on-dark .burger span { background: #fff; }
+  /* the wordmark inherits, so "Social" turns white and "Surfers" stays brand pink */
+  .nav.on-dark :global(.logo b) { color: #fff; }
+  .nav.on-dark :global(.logo .cat) { color: rgba(246, 245, 249, 0.66); }
+  /* The mark's indigo is #4134aa — on ink it is nearly invisible. This is the
+     standard reversed-logo problem and the standard answer: the same mark, lightened
+     for a dark ground. The pink half already reads and is left alone. */
+  .nav.on-dark :global(.logo .upper) { fill: #8f83e8; }
+
   .links { display: flex; gap: 30px; align-items: center; }
   .links a {
     font-family: var(--label);

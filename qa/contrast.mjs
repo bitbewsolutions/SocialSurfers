@@ -177,27 +177,64 @@ const parseColor = (s) => {
   return { rgb: [p[0], p[1], p[2]], a: p[3] === undefined ? 1 : p[3] };
 };
 
-/** Most common pixel in the box = the ground the glyphs sit on. */
-function modalBg(x, y, bw, bh) {
-  const counts = new Map();
+/**
+ * Most common pixel in the box = the ground the glyphs sit on.
+ *
+ * With one correction, which the gradient service cards forced. The mode is taken
+ * over QUANTISED colours, and that quietly assumes the ground is flatter than the
+ * text. On a gradient ground it is the other way round: the ground's pixels spread
+ * across dozens of buckets while the glyphs are all exactly one colour, so the mode
+ * returns the TEXT and the element measures against itself.
+ *
+ * Measured on "Branding & Identity" — a 900-weight heading on a gradient card — the
+ * ground held 63.2% of the box and the glyphs 33.6%, yet the winning bucket was the
+ * glyph white at 25.6%. It reported 1.03:1 against a true 6.4:1. The same fault
+ * would just as happily invent a PASS, which is worse.
+ *
+ * So when the declared text colour is opaque and known, its pixels are excluded
+ * before the mode is taken. If that empties the box — text and ground genuinely the
+ * same colour — it falls back to the unfiltered mode so a real failure still reports.
+ */
+function modalBg(x, y, bw, bh, textRgb) {
   const x1 = Math.min(info.width, x + bw), y1 = Math.min(info.height, y + bh);
-  let n = 0;
-  for (let py = Math.max(0, y); py < y1; py++) {
-    for (let px = Math.max(0, x); px < x1; px++) {
-      const i = (py * info.width + px) * ch;
-      // quantise so anti-aliasing noise doesn't split the mode across neighbours
-      const key = ((raw[i] >> 2) << 12) | ((raw[i + 1] >> 2) << 6) | (raw[i + 2] >> 2);
-      counts.set(key, (counts.get(key) || 0) + 1);
-      n++;
+
+  const tally = (skipText) => {
+    const counts = new Map();
+    let n = 0;
+    for (let py = Math.max(0, y); py < y1; py++) {
+      for (let px = Math.max(0, x); px < x1; px++) {
+        const i = (py * info.width + px) * ch;
+        const r = raw[i], g = raw[i + 1], b = raw[i + 2];
+        if (skipText) {
+          /* Chebyshev distance, and the radius is deliberately TIGHT — solid glyph
+             interiors only, not the antialiased fringe.
+             A generous radius is the obvious choice and it is wrong: it also
+             swallows any ground that merely resembles the text, which is precisely
+             the case this tool exists to catch. At 46 a white-on-92%-white button
+             had its ground excluded too, the mode fell through to the dark pixels
+             around the pill, and a 2.4:1 failure reported as a pass. Caught by
+             deliberately reintroducing that bug and re-running. */
+          const d = Math.max(
+            Math.abs(r - textRgb[0]), Math.abs(g - textRgb[1]), Math.abs(b - textRgb[2]),
+          );
+          if (d <= 8) continue;
+        }
+        // quantise so anti-aliasing noise doesn't split the mode across neighbours
+        const key = ((r >> 2) << 12) | ((g >> 2) << 6) | (b >> 2);
+        counts.set(key, (counts.get(key) || 0) + 1);
+        n++;
+      }
     }
-  }
-  if (!n) return null;
-  let best = null, bestC = 0;
-  for (const [k, c] of counts) if (c > bestC) { bestC = c; best = k; }
-  return {
-    rgb: [((best >> 12) & 63) << 2, ((best >> 6) & 63) << 2, (best & 63) << 2],
-    share: bestC / n,
+    if (!n) return null;
+    let best = null, bestC = 0;
+    for (const [k, c] of counts) if (c > bestC) { bestC = c; best = k; }
+    return {
+      rgb: [((best >> 12) & 63) << 2, ((best >> 6) & 63) << 2, (best & 63) << 2],
+      share: bestC / n,
+    };
   };
+
+  return (textRgb && tally(true)) || tally(false);
 }
 
 /**
@@ -249,7 +286,9 @@ for (const e of els) {
   if (e.exempt) { exempted.push(e); continue; }
   const fg = parseColor(e.color);
   if (!fg && !e.clipText) continue;
-  const bg = modalBg(e.x, e.y, e.w, e.h);
+  /* Gradient text has no single painted colour to exclude, so it keeps the plain
+     mode — glyphRatio below measures those off the pixels anyway. */
+  const bg = modalBg(e.x, e.y, e.w, e.h, e.clipText || !fg || fg.a < 0.9 ? null : fg.rgb);
   if (!bg || bg.share < 0.25) continue; // too busy to judge (images, dense chips)
 
   let r;

@@ -276,6 +276,17 @@ h1 em {
   background: rgba(255, 255, 255, 0.6);
   transition: background var(--dur), border-color var(--dur), transform var(--dur) var(--ease-out);
 }
+
+/* On ink the fill has to invert with the text. .tone-dark rebinds --l1 to a near-white,
+   but the white pill underneath is not a token and stayed put — which put white type on
+   a white ground at 2.36:1. Everything else in the button already adapts through tokens;
+   this is the one literal in the rule. */
+.tone-dark .btn-ghost {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(6px);
+}
+.tone-dark .btn-ghost:hover { background: rgba(255, 255, 255, 0.18); }
 .btn-ghost:hover {
   background: #fff;
   border-color: var(--violet);

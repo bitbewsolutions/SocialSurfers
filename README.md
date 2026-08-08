@@ -24,10 +24,10 @@ React into a site that has no framework at all.
 
 | | on the wire |
 |---|---|
-| JS (external chunks, gzipped) | 2.3 KB |
+| JS (external chunks, gzipped) | 2.4 KB |
 | Fonts (woff2, precompressed) | 26.6 KB |
-| Heaviest page, first visit | **48.6 KB** |
-| Hero artwork (WebP, alpha) | 55 KB |
+| Heaviest page, first visit | **51.3 KB** |
+| Hero image (WebP, one of four widths) | 44.5–151 KB |
 | Client logo tiles (27, lazy) | 178 KB |
 
 The shader is parked (see below) and no longer bundled, which is most of the JS drop.
@@ -64,7 +64,7 @@ breaks — the sizes went up too, but far less than the result suggests.
 
 ## Shape of the site
 
-**One page, plus seven service pages.**
+**One page, plus sixteen service pages.**
 
 - `/` carries hero → stats → about → services → process → clients → contact. The nav
   links are in-page anchors (`/#services`, `/#process`, `/#clients`, `/#contact`).
@@ -90,55 +90,59 @@ needs the visitor to decode a metaphor before they know what it means, rewrite i
 
 ## The hero
 
-Light ground, type on the left, one dense focal element on the right.
+**Full-bleed photograph, headline centred across the width.** The client replaced the
+cutout render with a cinematic landscape and asked for the copy to run edge to edge.
 
-The focal element is the client's own render, knocked out of its white ground by
-`tools/hero.mjs` so it sits *on* the paper. It is treated as a **monogram, not a
-picture**: the silhouette is an S, and so is the board, and so is the wetsuit. That is
-why it gets no frame, no card and no drop shadow — a container would turn the brand's
-own letterform back into stock art.
+That flips the hero to a **dark chapter at the top of a light-first page**, which is
+the thing to understand before editing it:
 
-Three motions compose on it, which is why the markup nests three elements rather than
-one: they cannot share a `transform`.
+- `.tone-dark` is on the section, so `--l1/--l2/--l3` and `--grad-text` resolve to
+  their on-ink values. The accent words take `--grad-on-dark`; the paper ramp's dark
+  end measures 1.6:1 here and would simply vanish.
+- It has to hand over to the paper below. The usual `.to-light` class paints that ramp
+  as the section's own `background-image`, which the `<img>` covers — so the same
+  `--ramp-ink-to-mid` is composed into a separate masked `.handover` element, and
+  `Stats` carries `.from-dark`. The pair still meets at `--tone-mid`.
+- The handover is **masked to fade in over its first third**. Layered straight in it
+  was an opaque ramp starting at `#0c0620` against a lighter scrimmed image, and drew
+  exactly the hard horizontal line the tonal system exists to prevent.
 
-| | what | driven by |
-|---|---|---|
-| **swell** | clip-revealed bottom-up on load, so the wave rises into frame rather than fading in | one-shot CSS animation — the hero is above the fold, so no observer |
-| **ride** | slow drift along the wave's tangent, ±0.6° roll, 11s | infinite CSS animation |
-| **descent** | lags the page downward and rolls into the direction of travel as the hero scrolls away | `--hp` from `initScroll` |
+### The scrim is not decoration
 
-`--hp` is hero scroll progress, 0 at the top and 1 once the section has scrolled its own
-height. It is written by the existing scroll loop, so the hero's scroll motion costs no
-extra listener and no second rAF. All three are scoped to `html.js-motion`, which is
-absent under `prefers-reduced-motion` — that is what makes them respect the setting
-without a media query.
+Measured on the unscrimmed image, the band the headline occupies means **89.6/255** —
+mid-tone, with a near-white sunset at the left. White type over the raw picture would
+have failed in the place the eye goes first. `node tools/hero.mjs --check` reprints
+those numbers per band. Four layers do the work: a top gradient behind the nav, a
+radial pool under the copy, a left-weighted wash over the sunset, and the base veil.
 
-### The shader is parked, not deleted
+The nav also has to survive the change. `initScroll` adds `.on-dark` while the bar's
+**lower edge** is still inside the hero — not at `y > 40`, which would have put a
+frosted light bar on a dark photograph for the remaining ~850px. Everything in the bar
+that is a token follows automatically; the three things that are literals had to be
+inverted by hand — the ghost button's white fill, the burger's white pill, and the
+mark's indigo half, which is `#4134aa` and near-invisible on ink.
+
+### Motion
+
+`--hp` is hero scroll progress, 0 at the top and 1 once the section has scrolled its
+own height. It is written by the existing scroll loop, so the hero's scroll motion
+costs no extra listener and no second rAF. The background is scaled slightly and lags
+the page as it leaves. Under `prefers-reduced-motion` the scale stays and the travel
+stops.
+
+### The shader and the cutout are parked, not deleted
 
 `src/scripts/fluid.ts` still exists and is commented out in three places in
-`Hero.astro` (markup, styles, script). With the import commented the module is **not
-bundled at all**, so it costs nothing while parked. It is kept because it is the
-fallback if the client's render ever has to be withdrawn over the platform marks — see
-*Still open*. The placeholder metric/post/reel cards that went with it are in git at
-`fa956c3^`.
+`Hero.astro`. With the import commented the module is **not bundled at all**, so it
+costs nothing parked. It is the fallback if the client's render ever has to be
+withdrawn over the platform marks — see *Still open*.
 
-It is off because the render's ground is now transparent, so the artwork would sit on a
-live, saturated, moving gradient; the 3D icons and the shader compete for the same
-attention at the same size and the surfer loses.
+Two earlier heroes are in git rather than in the tree:
 
-Notes worth keeping on it — domain-warped fractal noise evaluated from a clock, so there
-is **no loop to seam**, unlike the video that is the usual way to get this look (1–3 MB
-plus a visible repeat). Notes worth keeping:
-
-- Feature scale is deliberately low. At texture density it reads as marbled paper; a
-  current needs features about as large as the element.
-- The mask follows the layout. Masking by `x` puts the field behind the copy once the
-  hero stacks to one column on a phone, so a `uNarrow` uniform switches it to a
-  bottom-weighted band.
-- Rendered at 0.5–0.55× with no DPR scaling. It is a soft field with no edges to alias,
-  so upscaling costs nothing visually and roughly a third of the fragment work.
-- Every failure mode — no WebGL, lost context, ≤2 cores, `prefers-reduced-motion` —
-  leaves the static CSS gradient underneath visible. There is no blank rectangle.
+| | where |
+|---|---|
+| shader + placeholder metric/post/reel cards | `fa956c3^` |
+| the cutout monogram, and the border flood-fill that keyed it | `bb15c55` |
 
 ## The About section and the services grid
 
@@ -254,46 +258,38 @@ add a line to the name map, re-run.
 
 ## Hero artwork: `node tools/hero.mjs [--check]`
 
-Takes the client's render on white and emits alpha WebP at two widths plus
-`src/data/hero-art.json`, which is what `Hero.astro` reads its `srcset` and intrinsic
-size from. Nothing is hard-coded in the markup, so a re-export cannot leave the page
-advertising a width the file does not have.
+Resizes the client's render to four widths of WebP and writes
+`src/data/hero-art.json` with the **measured** dimensions of each. The markup reads
+its `srcset` from there, so a re-export at a different size cannot leave the page
+advertising widths the files do not have.
 
-The background is found by **flood fill inward from the border**, not by a luminance
-threshold. That distinction matters for this image specifically: the surfboard and the
-Brand cube are the two whitest objects in the frame, so any threshold that catches the
-ground punches holes straight through the subject. Enclosed whites are unreachable from
-the border and survive by construction.
+| width | on the wire |
+|---|---|
+| 640 | 44.5 KB |
+| 960 | 80.7 KB |
+| 1280 | 119.9 KB |
+| 1536 | 151.2 KB |
 
-`--check` writes `_check-paper.png` and `_check-white.png` — the cutout composited on
-both grounds so the fringe is visible where it would actually show. They are
-diagnostics; delete them before committing.
+A first visit pays **one** of these, not the sum. 1536 is the source's own width and
+the ceiling — the tool never upscales, because a larger file with no more detail is
+just bytes.
 
-### What the export needs to be
+`--check` additionally prints mean luminance for the nav, headline and CTA bands of
+the **unscrimmed** image. That is the number that decides whether white type is safe,
+and it is worth re-running whenever the client swaps the artwork: a lighter render
+needs a heavier scrim, and nothing else will tell you before the contrast audit does.
 
-The current source is `brand/hero-original.png`, the client's render as supplied at
-650×1008 on white. It is a **stand-in** — too small for the 2× file, so the tool refuses
-to upscale and says so.
+The source is `hero.png` at the repo root, which is where he drops each new render.
+It is **tracked**, so every previous render is recoverable with `git show <ref>:hero.png`
+— which is not hypothetical: the file was once replaced mid-project with a
+background-removed copy at a third of the pixels, and that is how the original came
+back. `tools/hero.mjs` also checks `src/assets/hero-full.png` first and
+`brand/hero-full.png` last, so a better or a pinned source can be dropped in without
+editing the tool.
 
-It lives in `brand/` rather than at the repo root because `hero.png` there was replaced
-mid-project with a background-removed 401×622 version. That is a third of the pixels,
-and with `hero.png` first in the candidate list the next run would have silently
-downgraded the hero. Keying is also better from the opaque original: the flood fill
-seeds from a solid ground, and an already-transparent PNG has none.
-
-To replace it, drop a new export at `src/assets/hero-surfer.png` — which wins over both
-— and re-run. It needs to be:
-
-- **PNG, at least 1120 px wide** (≈1740 px tall at this ratio). 1300×2000 is ideal.
-  Long edge 2000 is a good thing to ask Canva for.
-- **On a flat background.** White is fine — the tool removes it. What breaks the fill is
-  a *gradient* background, a drop shadow under the artwork, or a border: all three give
-  the flood fill a path around the subject or a soft ramp it cannot cut cleanly.
-  Transparent PNG also works and skips the keying question entirely.
-- **Nothing touching the canvas edge.** The fill seeds from the border; artwork bleeding
-  off the edge blocks it and the ground stays opaque. Leave a margin — the tool trims
-  the empty space afterwards, so generous is free.
-- **No text, no logo, no frame.** The page supplies all of those.
+The keying pipeline that produced the old cutout hero — border flood-fill, alpha
+feathering, the lot — is in git at `bb15c55`. It has no job while the image is the
+background: there is no ground to remove when the render *is* the ground.
 
 ## Design system
 
@@ -364,22 +360,17 @@ Exits non-zero on any failure. Run it on `/`, a service page and `/404` at both
 - **`PUBLIC_FORM_ENDPOINT` is unset.** The enquiry form currently falls back to opening
   the visitor's mail client with the fields prefilled. Set the env var (Formspree,
   Web3Forms, or your own handler) to switch it to background AJAX submission.
-- **The hero art is a stand-in resolution.** `hero.png` is 650 px wide, so the 2× file
-  is soft on a retina screen. `tools/hero.mjs` prints a warning until a bigger export
-  lands at `src/assets/hero-surfer.png` — spec above.
 - **Three client names need confirming.** They could not be read off the logo with
   confidence and are flagged `"verify": true` in `tools/clients.json`: *Silomin*,
   *Looms in Velvet*, and one still called *Client 27*. Fix the name map and re-run the
   tool; the tile filenames and the data file follow automatically.
-- **The stats were doubled at the client's direction, and three of them no longer
-  match the page.** They used to be derived from page content; they are now literals in
-  `content.ts`. `brands` says 54 against 27 logo tiles and `industriesServed` says 20
-  against 10 named — both are survivable, because the roster and the industry list are
-  now framed as partial ("a selection of", "— including"), and no agency is expected to
-  show a logo per client. **`serviceLines` says 14 against seven cards and seven service
-  pages on the same screen, and has no such out.** That one is worth putting back to
-  him; the rest of the tile is unaffected either way. The consequence was put to him
-  before the change and he confirmed it — see the note on `stats` in `content.ts`.
+- **Two headline figures are the client's own and cannot be checked here.**
+  `projectsDelivered` (80+) and `brands` (54+) are literals he supplied; the logo wall
+  renders 27 tiles and is explicitly framed as "a selection of", which is what makes
+  that consistent. `industriesServed` and `serviceLines` are derived from the data
+  again — the icon grid holds 20 and the capability list holds 16 — so those two
+  cannot drift from what a visitor can count. Every figure renders with a trailing
+  "+", at his request.
 - **The hero render leans on third-party platform logos** as decorative 3D art, which
   Meta / YouTube / TikTok brand guidelines restrict. It is in use at the client's
   request, and the decision is his and on record. Ranked by likelihood: nothing happens;

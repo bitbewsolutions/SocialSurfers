@@ -31,6 +31,18 @@ export function initScroll() {
     }
 
     nav?.classList.toggle('is-stuck', y > 40);
+
+    /* The hero is a full-bleed photograph now, so the bar spends the first screen
+       over a dark image and every screen after it over paper. `on-dark` is what
+       swaps the bar's own colours between the two.
+       The switch happens when the bar's LOWER edge leaves the hero, not when the
+       page starts moving — flipping at y > 40 would have put a light bar on a dark
+       picture for the remaining ~850px of the hero. Without a hero on the page
+       (the service pages, the 404) the class simply never goes on. */
+    if (nav) {
+      const overHero = !!hero && y < hero.offsetHeight - nav.offsetHeight;
+      nav.classList.toggle('on-dark', overHero);
+    }
     ticking = false;
   }
 

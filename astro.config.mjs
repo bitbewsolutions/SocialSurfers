@@ -15,6 +15,13 @@ export default defineConfig({
   redirects: {
     '/services': '/#services',
     '/contact': '/#contact',
+    /* The service list was rebuilt from the client's capability document and two
+       slugs changed shape: video production folded into the wider photography and
+       production line, and performance marketing became the broader digital
+       marketing category it was always a part of. Both URLs were live in the
+       preview builds he has been sent links to. */
+    '/services/video-production': '/services/photography-production',
+    '/services/performance-marketing': '/services/digital-marketing',
   },
 
   integrations: [

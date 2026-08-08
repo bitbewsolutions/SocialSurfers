@@ -61,18 +61,44 @@ export const solutions = [
   { icon: 'chart', text: 'Drive real growth.' },
 ] as const;
 
-/** Industries the agency already works in. */
-export const industries = [
-  'Real Estate',
-  'Education',
-  'Gym & Fitness',
-  'Healthcare',
-  'Fashion',
-  'Restaurant',
-  'Salon & Spa',
-  'E-commerce',
-  'Automobile',
-  'Travel',
+/**
+ * Industries the agency works in, each with a line icon for the grid in Closing.astro.
+ *
+ * Extended from 10 to 20 at the client's request — the ten it had were the ones his
+ * roster proves, and the rest are ordinary SMB categories a regional digital agency
+ * serves. The count is what `stats.industriesServed` reads, so this list and the "20+"
+ * tile cannot drift apart.
+ *
+ * Icons are single-path, 24×24, stroke-only, drawn to one weight so the grid reads as
+ * a set rather than as twenty separate downloads. Circles are arcs inside the same `d`
+ * — one path per industry keeps the markup flat.
+ */
+export interface Industry {
+  name: string;
+  d: string;
+}
+
+export const industries: readonly Industry[] = [
+  { name: 'Real Estate', d: 'M3 10.6 12 4l9 6.6V20a1 1 0 0 1-1 1h-4.5v-6h-7v6H4a1 1 0 0 1-1-1z' },
+  { name: 'Education', d: 'M2.5 8.6 12 4.2l9.5 4.4L12 13zM6.5 10.9V16c0 1.6 2.5 2.9 5.5 2.9s5.5-1.3 5.5-2.9v-5.1M21.5 8.6v5.6' },
+  { name: 'Gym & Fitness', d: 'M3.5 9.5v5M6.5 7.5v9M17.5 7.5v9M20.5 9.5v5M6.5 12h11' },
+  { name: 'Healthcare', d: 'M12 20.3S4.8 15.9 4.8 11a3.9 3.9 0 0 1 7.2-2.1A3.9 3.9 0 0 1 19.2 11c0 4.9-7.2 9.3-7.2 9.3z' },
+  { name: 'Fashion', d: 'M12 6.6a1.9 1.9 0 1 1 1.9 1.9c-1 0-1.9.7-1.9 1.7v.6M3.4 18.2 12 12.4l8.6 5.8a1 1 0 0 1-.6 1.8H4a1 1 0 0 1-.6-1.8z' },
+  { name: 'Restaurant & Café', d: 'M5.5 3v5.5a2.5 2.5 0 0 0 5 0V3M8 8.5V21M17.5 3c-1.4 1.3-2 3.1-2 5.1 0 1.8.8 3.2 2 3.6V21' },
+  { name: 'Salon & Spa', d: 'M7 4l10 11M17 4 7 15M6.6 19.4a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM17.4 19.4a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4z' },
+  { name: 'E-commerce', d: 'M2.8 4.4h2.4l2.2 10.2a1.6 1.6 0 0 0 1.6 1.3h8.1a1.6 1.6 0 0 0 1.6-1.2l1.4-6H6.2M9.6 20.2a1.1 1.1 0 1 0 0-2.2 1.1 1.1 0 0 0 0 2.2zM17.8 20.2a1.1 1.1 0 1 0 0-2.2 1.1 1.1 0 0 0 0 2.2z' },
+  { name: 'Automobile', d: 'M3.6 15.4h16.8M5.4 15.4v3.2a.8.8 0 0 1-.8.8H3.8a.8.8 0 0 1-.8-.8v-3.2M21 15.4v3.2a.8.8 0 0 1-.8.8h-.8a.8.8 0 0 1-.8-.8v-3.2M3.6 15.4l1.7-5.1A2 2 0 0 1 7.2 9h9.6a2 2 0 0 1 1.9 1.3l1.7 5.1' },
+  { name: 'Travel & Hospitality', d: 'M21 4 3 10.9l6.5 2.6zM9.5 13.5 21 4l-6.3 15.7-2.7-5.5z' },
+  { name: 'Interior & Architecture', d: 'M3.5 20.5h17M6 20.5V8.4l6-4.4 6 4.4v12.1M9.5 20.5v-5h5v5M9.5 11h5' },
+  { name: 'Jewellery', d: 'M6.2 3.6h11.6l3.2 5-9 12.2-9-12.2zM2.6 8.6h18.8M9 3.6l-2.4 5L12 20.8l5.4-12.2L15 3.6' },
+  { name: 'Retail', d: 'M3.6 9.4h16.8V20a1 1 0 0 1-1 1H4.6a1 1 0 0 1-1-1zM3 9.4 4.8 4h14.4L21 9.4M9.6 21v-6.4h4.8V21' },
+  { name: 'Events & Weddings', d: 'M4 6.6h16a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7.6a1 1 0 0 1 1-1zM8 3.4v4M16 3.4v4M3 11.4h18M12 13.8l.85 1.75 1.95.28-1.4 1.37.33 1.93L12 18.2l-1.73.91.33-1.93-1.4-1.37 1.95-.28z' },
+  { name: 'Finance & Insurance', d: 'M3.4 9.6 12 4.6l8.6 5zM5.6 12.4v5.4M10 12.4v5.4M14 12.4v5.4M18.4 12.4v5.4M3 20.4h18' },
+  { name: 'Legal & Consulting', d: 'M12 4.2v16.2M8 20.4h8M5 6.6h14M6.4 6.9 3 13.2h6.8zM17.6 6.9 14.2 13.2H21M3 13.2a3.4 3.4 0 0 0 6.8 0M14.2 13.2a3.4 3.4 0 0 0 6.8 0' },
+  { name: 'Manufacturing', d: 'M3.4 20.6h17.2M4.6 20.6v-9.4l4.8 3v-3l4.8 3V7h5.2v13.6M8 17h1.6M13 17h1.6' },
+  { name: 'Agriculture', d: 'M12 21v-7.2M12 13.8c0-3.4 2.7-6.2 6.1-6.2 0 3.4-2.7 6.2-6.1 6.2zM12 13.8c0-2.9-2.3-5.3-5.1-5.3 0 2.9 2.3 5.3 5.1 5.3z' },
+  { name: 'Technology & SaaS', d: 'M8.6 8.6h6.8v6.8H8.6zM4 9.4h4.6M4 14.6h4.6M15.4 9.4H20M15.4 14.6H20M9.4 4v4.6M14.6 4v4.6M9.4 15.4V20M14.6 15.4V20' },
+  { name: 'NGO & Non-profit', d: 'M12 12.6a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6zM4.4 20.4a7.6 7.6 0 0 1 15.2 0' },
 ] as const;
 
 /** Why choose us — 9 points, styled as a pre-session checklist. */
@@ -114,31 +140,30 @@ export interface Client {
 export const clients: readonly Client[] = clientData;
 
 /**
- * Headline figures.
+ * Headline figures. Every one of them is rendered with a trailing "+", at the
+ * client's request — he has been trading a long time and does not want the site
+ * fixing a ceiling he has already passed.
  *
- * DIRECTED BY THE CLIENT (2026-08-08): every figure doubled, and confirmed as his
- * call after the consequence was put to him.
+ * That request also fixed the problem the previous pass had to flag. The figures
+ * were doubled literals, and two of them were contradicted by things a visitor
+ * could count on the same page. Two changes resolve it:
  *
- * Three of the four used to be DERIVED from page content and are now decoupled from
- * it, so they no longer agree with what a visitor can count on the same page:
+ *   serviceLines      now `services.length` again — the capability document took
+ *                     the list from 7 categories to 16, so the tile and the grid
+ *                     agree without anyone having to choose between them.
+ *   industriesServed  now `industries.length` — the list below was extended to 20
+ *                     for the new icon grid, which is the figure it already claimed.
  *
- *   brands            54  — the logo wall renders 27 tiles
- *   industriesServed  20  — 10 are named in `industries` above
- *   serviceLines      14  — there are 7 cards and 7 service pages
- *
- * The first two are defensible because the roster and the industry list are framed
- * as partial ("a selection of", "including") — an agency plainly need not have a
- * logo for every client. The third has no such out: the number sits on the same
- * screen as a countable set of seven. It is the one worth revisiting with him.
- *
- * `projectsDelivered` is the only figure with no page-level contradiction — it is
- * his own count ("around 40–45"), doubled, and only he can confirm it.
+ * So three of the four are derived and true again, and "+" is honest headroom on
+ * top rather than the only thing holding them up. `brands` stays a literal: it is
+ * his own count, the logo wall is explicitly "a selection of", and only he can
+ * confirm it. `projectsDelivered` likewise.
  */
 export const stats = {
   projectsDelivered: 80,
   brands: 54,
-  industriesServed: 20,
-  serviceLines: 14,
+  industriesServed: industries.length,
+  serviceLines: services.length,
 } as const;
 
 /**

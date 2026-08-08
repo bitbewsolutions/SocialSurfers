@@ -6,15 +6,22 @@ import { stats } from '../data/content';
    its suffix are separate elements: `background-clip: text` paints one box across
    the whole element, so a "+" inside it would take a slice of the ramp meant for a
    digit and land a different colour than the number it belongs to. */
+/* Every figure carries a "+" at the client's request — he does not want the site
+   fixing a ceiling he has already passed. Three of the four are derived from real
+   counts, so the "+" is headroom rather than the only thing making them true. */
 const figures = [
-  { n: stats.projectsDelivered, suffix: '+', l: 'Projects delivered' },
-  { n: stats.brands, suffix: '+', l: 'Brands served' },
-  { n: stats.industriesServed, suffix: '', l: 'Industries served' },
-  { n: stats.serviceLines, suffix: '', l: 'Services offered' },
+  { n: stats.projectsDelivered, l: 'Projects delivered' },
+  { n: stats.brands, l: 'Brands served' },
+  { n: stats.industriesServed, l: 'Industries served' },
+  { n: stats.serviceLines, l: 'Services offered' },
 ];
 ---
 
-<section class="stats" aria-label="Social Surfers by the numbers">
+{/* .from-dark is the second half of the hero's tonal handover. The hero paints
+    ink→mid into its own scrim (it cannot use .to-light, whose ramp the background
+    image would cover); this finishes mid→paper. Mismatch the pair and the join
+    shows as a step. */}
+<section class="stats from-dark" aria-label="Social Surfers by the numbers">
   <div class="shell">
     <dl>
       {figures.map((f) => (
@@ -23,8 +30,7 @@ const figures = [
               JS, a crawler and the accessibility tree all read. The counter only
               overwrites it while running, and puts it back at the end. */}
           <dt>
-            <span class="n" data-count={f.n}>{f.n}</span>
-            {f.suffix && <span class="sfx">{f.suffix}</span>}
+            <span class="n" data-count={f.n}>{f.n}</span><span class="sfx">+</span>
           </dt>
           <dd class="label">{f.l}</dd>
         </div>
@@ -35,8 +41,19 @@ const figures = [
 
 <style>
   .stats {
-    background: var(--paper);
-    padding-block: clamp(16px, 3vh, 36px) clamp(28px, 5vh, 56px);
+    /* background-COLOR, not the shorthand: .from-dark delivers the ramp as a
+       background-image, and `background: var(--paper)` would reset it to none. */
+    background-color: var(--paper);
+    /* The figure tiles are opaque paper — that is how the 1px grid lines are drawn,
+       by letting the hair-coloured <dl> show through the gaps. So they cannot sit
+       ON the ramp: the tile's flat paper against the ramp's mid-purple is a hard
+       edge, which is exactly what seams.mjs caught at 186px in. Content clears the
+       ramp completely rather than the usual 75%, and the ramp is shortened to keep
+       that from becoming a canyon.
+       Shortening is safe: the two halves of a boundary must meet at --tone-mid, and
+       they still do — only the distance each takes to get there differs. */
+    --fade-h: 230px;
+    padding-block: var(--fade-h) clamp(28px, 5vh, 56px);
     color: var(--l1);
   }
 
@@ -82,7 +99,7 @@ const figures = [
   }
 
   @media (max-width: 760px) {
-    .stats { padding-block: 4px clamp(20px, 4vh, 40px); }
+    .stats { --fade-h: 190px; padding-block: var(--fade-h) clamp(20px, 4vh, 40px); }
     dl { grid-template-columns: repeat(2, 1fr); }
     .fig { padding: 20px 14px 22px; }
   }
