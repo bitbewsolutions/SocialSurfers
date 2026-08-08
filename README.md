@@ -65,15 +65,41 @@ needs the visitor to decode a metaphor before they know what it means, rewrite i
 
 Light ground, type on the left, one dense focal element on the right.
 
-The old surfer-on-a-neon-line is gone. It was decoration pretending to be a diagram and
-it communicated nothing about the business. What replaced it — a flowing current — would
-say no more on its own; **the meaning comes from the artifacts riding it** (a post, a
-reel, a metric climbing), which is also the only reason the reference image this was
-worked from reads as a social agency rather than a purple splash. Those cards are
-placeholders in `Hero.astro` and are built to be swapped for real client work without
-touching the layout.
+The focal element is the client's own render, knocked out of its white ground by
+`tools/hero.mjs` so it sits *on* the paper. It is treated as a **monogram, not a
+picture**: the silhouette is an S, and so is the board, and so is the wetsuit. That is
+why it gets no frame, no card and no drop shadow — a container would turn the brand's
+own letterform back into stock art.
 
-`src/scripts/fluid.ts` — domain-warped fractal noise evaluated from a clock, so there
+Three motions compose on it, which is why the markup nests three elements rather than
+one: they cannot share a `transform`.
+
+| | what | driven by |
+|---|---|---|
+| **swell** | clip-revealed bottom-up on load, so the wave rises into frame rather than fading in | one-shot CSS animation — the hero is above the fold, so no observer |
+| **ride** | slow drift along the wave's tangent, ±0.6° roll, 11s | infinite CSS animation |
+| **descent** | lags the page downward and rolls into the direction of travel as the hero scrolls away | `--hp` from `initScroll` |
+
+`--hp` is hero scroll progress, 0 at the top and 1 once the section has scrolled its own
+height. It is written by the existing scroll loop, so the hero's scroll motion costs no
+extra listener and no second rAF. All three are scoped to `html.js-motion`, which is
+absent under `prefers-reduced-motion` — that is what makes them respect the setting
+without a media query.
+
+### The shader is parked, not deleted
+
+`src/scripts/fluid.ts` still exists and is commented out in three places in
+`Hero.astro` (markup, styles, script). With the import commented the module is **not
+bundled at all**, so it costs nothing while parked. It is kept because it is the
+fallback if the client's render ever has to be withdrawn over the platform marks — see
+*Still open*. The placeholder metric/post/reel cards that went with it are in git at
+`fa956c3^`.
+
+It is off because the render's ground is now transparent, so the artwork would sit on a
+live, saturated, moving gradient; the 3D icons and the shader compete for the same
+attention at the same size and the surfer loses.
+
+Notes worth keeping on it — domain-warped fractal noise evaluated from a clock, so there
 is **no loop to seam**, unlike the video that is the usual way to get this look (1–3 MB
 plus a visible repeat). Notes worth keeping:
 
@@ -122,6 +148,7 @@ qa/
   weigh.mjs      per-page gzipped weight against the budget
 tools/
   logos.mjs      client logo pipeline — see below
+  hero.mjs       hero render -> knocked-out WebP + manifest — see below
   clients.json   source filename -> client name/industry (hand-maintained)
 .fontsrc/        font sources + the subsetting script (not shipped)
 brand/           the client's original artwork; source of truth, not served
@@ -172,6 +199,40 @@ add a line to the name map, re-run.
 > only copy of the client's source artwork and the pipeline needs it to re-run. Move it
 > to asset storage (Drive, S3) before this repo gets a remote; nothing in the build
 > depends on it, only `tools/logos.mjs` does.
+
+## Hero artwork: `node tools/hero.mjs [--check]`
+
+Takes the client's render on white and emits alpha WebP at two widths plus
+`src/data/hero-art.json`, which is what `Hero.astro` reads its `srcset` and intrinsic
+size from. Nothing is hard-coded in the markup, so a re-export cannot leave the page
+advertising a width the file does not have.
+
+The background is found by **flood fill inward from the border**, not by a luminance
+threshold. That distinction matters for this image specifically: the surfboard and the
+Brand cube are the two whitest objects in the frame, so any threshold that catches the
+ground punches holes straight through the subject. Enclosed whites are unreachable from
+the border and survive by construction.
+
+`--check` writes `_check-paper.png` and `_check-white.png` — the cutout composited on
+both grounds so the fringe is visible where it would actually show. They are
+diagnostics; delete them before committing.
+
+### What the export needs to be
+
+The current source is `hero.png` at the repo root, 650×1008. It is a **stand-in** — too
+small for the 2× file, so the tool refuses to upscale and says so. To replace it, drop a
+new export at `src/assets/hero-surfer.png` and re-run. It needs to be:
+
+- **PNG, at least 1120 px wide** (≈1740 px tall at this ratio). 1300×2000 is ideal.
+  Long edge 2000 is a good thing to ask Canva for.
+- **On a flat background.** White is fine — the tool removes it. What breaks the fill is
+  a *gradient* background, a drop shadow under the artwork, or a border: all three give
+  the flood fill a path around the subject or a soft ramp it cannot cut cleanly.
+  Transparent PNG also works and skips the keying question entirely.
+- **Nothing touching the canvas edge.** The fill seeds from the border; artwork bleeding
+  off the edge blocks it and the ground stays opaque. Leave a margin — the tool trims
+  the empty space afterwards, so generous is free.
+- **No text, no logo, no frame.** The page supplies all of those.
 
 ## Design system
 
@@ -242,10 +303,9 @@ Exits non-zero on any failure. Run it on `/`, a service page and `/404` at both
 - **`PUBLIC_FORM_ENDPOINT` is unset.** The enquiry form currently falls back to opening
   the visitor's mail client with the fields prefilled. Set the env var (Formspree,
   Web3Forms, or your own handler) to switch it to background AJAX submission.
-- **The hero artifact cards are placeholders.** "1.2M total reach", "+12.5%" and
-  "3.6M views" are illustrative and must be replaced with real client numbers or
-  removed before launch — they are the one place on the site currently showing figures
-  we cannot stand behind.
+- **The hero art is a stand-in resolution.** `hero.png` is 650 px wide, so the 2× file
+  is soft on a retina screen. `tools/hero.mjs` prints a warning until a bigger export
+  lands at `src/assets/hero-surfer.png` — spec above.
 - **Three client names need confirming.** They could not be read off the logo with
   confidence and are flagged `"verify": true` in `tools/clients.json`: *Silomin*,
   *Looms in Velvet*, and one still called *Client 27*. Fix the name map and re-run the
@@ -253,10 +313,14 @@ Exits non-zero on any failure. Run it on `/`, a service page and `/404` at both
 - **`stats.projectsDelivered` is 40**, the conservative floor of the client's own
   "around 40–45". `stats.brands` is not an estimate — it is the length of the roster.
   Replace the 40 with the exact figure when he confirms it.
-- **The client's own hero render** (`hero.png` at the repo root) is not in use; the
-  shader hero stands. Note it leans on third-party platform logos as decorative 3D art,
-  which Meta/YouTube/TikTok brand guidelines restrict — worth resolving before it ships
-  anywhere.
+- **The hero render leans on third-party platform logos** as decorative 3D art, which
+  Meta / YouTube / TikTok brand guidelines restrict. It is in use at the client's
+  request, and the decision is his and on record. Ranked by likelihood: nothing happens;
+  a removal request arrives and the asset is swapped; **Meta ad disapproval** — by far
+  the most probable outcome with real cost, since a landing page misusing Meta's marks
+  can get ads rejected or the Business Manager flagged. What actually escalates risk is
+  implying partnership, so no "official partner" or "certified" copy goes anywhere near
+  it. If it has to come down, restore the shader hero — see *The hero*.
 - **No testimonials.** `hasRealTestimonials` is `false`, so the clients section renders
   the value pillars instead. Flip it once real quotes with named businesses exist.
   Nothing invented ships in the meantime.

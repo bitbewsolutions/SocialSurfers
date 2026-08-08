@@ -16,6 +16,12 @@
 /clients/*
   Cache-Control: public, max-age=2592000
 
+# Artwork built by tools/hero.mjs. Filenames carry their pixel width, so a re-export
+# at a new size lands on a new URL; a same-size re-key does not, hence a month
+# rather than a year.
+/art/*
+  Cache-Control: public, max-age=2592000
+
 /*.svg
   Cache-Control: public, max-age=2592000
 /*.png

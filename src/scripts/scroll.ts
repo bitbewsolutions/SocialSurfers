@@ -2,13 +2,12 @@
  * Page-level scroll controller. Everything here is transform/opacity only —
  * no layout-triggering property is written on scroll.
  *
- * Owns: the left-edge progress thread, the hero's dawn→midday sky cross-fade,
- * the sticky-nav state, and the shared reveal-on-scroll observer.
+ * Owns: the left-edge progress thread, the hero's scroll progress (--hp), the
+ * sticky-nav state, and the shared reveal-on-scroll observer.
  */
 
 export function initScroll() {
   const thread = document.querySelector<HTMLElement>('[data-thread-fill]');
-  const skyDay = document.querySelector<HTMLElement>('[data-sky-day]');
   const nav = document.querySelector<HTMLElement>('[data-nav]');
   const hero = document.querySelector<HTMLElement>('[data-hero]');
 
@@ -21,9 +20,14 @@ export function initScroll() {
 
     thread?.style.setProperty('--sp', sp.toFixed(4));
 
-    if (skyDay && hero) {
-      const hp = Math.min(1, y / Math.max(1, hero.offsetHeight));
-      skyDay.style.setProperty('--day', (hp * hp).toFixed(3));
+    /* Hero scroll progress: 0 at the top, 1 once the hero has scrolled its own
+       height. Drives the surfer's descent and the bloom behind it, both of which
+       are pure CSS off this one variable — so the hero's scroll motion adds no
+       listener and no second rAF loop to the page.
+       (This computation previously fed the dawn→midday sky cross-fade. That element
+       went with the diurnal arc; the arithmetic was the only part worth keeping.) */
+    if (hero) {
+      hero.style.setProperty('--hp', Math.min(1, y / Math.max(1, hero.offsetHeight)).toFixed(4));
     }
 
     nav?.classList.toggle('is-stuck', y > 40);
