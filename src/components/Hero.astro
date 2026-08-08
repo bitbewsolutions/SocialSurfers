@@ -95,7 +95,9 @@ const srcset = art.sources.map((s) => `${s.src} ${s.w}w`).join(', ');
     min-height: 100svh;
     display: flex;
     align-items: center;
-    padding: 132px 0 92px;
+    /* Trimmed from 132/92. The artwork is sized off whatever vertical room is left
+       after this, so padding here is the direct cost of how large it can be. */
+    padding: clamp(98px, 12vh, 118px) 0 clamp(48px, 7vh, 72px);
     overflow: hidden;
     background: var(--paper);
   }
@@ -128,8 +130,9 @@ const srcset = art.sources.map((s) => `${s.src} ${s.w}w`).join(', ');
 
   .inner {
     display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.8fr);
-    gap: clamp(24px, 4vw, 64px);
+    /* was 1.1 / 0.8 — the artwork now takes the larger share of the row */
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1fr);
+    gap: clamp(20px, 2.6vw, 44px);
     align-items: center;
     width: 100%;
   }
@@ -186,7 +189,10 @@ const srcset = art.sources.map((s) => `${s.src} ${s.w}w`).join(', ');
   .art {
     position: relative;
     display: grid;
-    place-items: center;
+    /* pinned to the end of its column rather than centred in it: centred, the
+       artwork left a slack gutter on the right and read as floating in the middle
+       of the page instead of occupying the right half of it */
+    place-items: center end;
     min-width: 0;
   }
 
@@ -205,11 +211,22 @@ const srcset = art.sources.map((s) => `${s.src} ${s.w}w`).join(', ');
     filter: blur(26px);
   }
 
+  /* The reveal below leaves a clip on this box for good — `both` keeps the final
+     frame, and that final frame is `inset(0 0 0 0)`, i.e. clipped to exactly the
+     border box. Everything the ride and the descent do afterwards is then trimmed
+     against it: the drift disappears off the top and left, the descent off the
+     bottom. So the clipped box is padded out past the furthest any of the motion
+     can travel — 13px of drift and 15px of rotation swing up, 52px of descent plus
+     the same swing down. */
+  .swell {
+    padding: 34px 36px 88px;
+  }
+
   .ride {
     /* sized off the viewport's HEIGHT: this is a tall portrait render in a section
        that is 100svh, so height is what can overflow. Width follows from the
        intrinsic ratio on the element. */
-    height: min(68vh, 620px);
+    height: min(82vh, 800px);
     width: auto;
     max-width: 100%;
   }
@@ -268,8 +285,11 @@ const srcset = art.sources.map((s) => `${s.src} ${s.w}w`).join(', ');
     h1 { max-width: 14ch; }
     /* portrait art in a single column: cap it so it cannot push the CTAs off the
        first screen on a short phone */
-    .ride { height: clamp(280px, 44vh, 420px); }
+    .ride { height: clamp(310px, 50vh, 470px); }
     .bloom { inset: -10% -14%; }
+    .swell { padding: 26px 28px 64px; }
+    /* one column — nothing to sit beside, so back to centred */
+    .art { place-items: center; }
   }
   @media (max-width: 520px) {
     .ctas > * { flex: 1 1 100%; justify-content: center; }
