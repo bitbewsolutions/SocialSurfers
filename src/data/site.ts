@@ -13,7 +13,10 @@ export const site = {
   legalName: 'Social Surfers',
   tagline: "Let's Surf Your Brand to the Social Waves.",
   category: 'Complete Social Media & Digital Marketing Solutions',
-  voiceLine: "We don't just manage. We Grow Brands!",
+  /* Set in the brochure's handwriting, and punctuated as it is there — a comma, not
+     a full stop, so the two halves read as one breath. `.fontsrc/subset.py` derives
+     the script font's character set from this exact string: change it, re-run it. */
+  voiceLine: "We don't just manage, We Grow Brands!",
   closingLine: 'Your Brand. Our Strategy. Real Growth.',
   reachLine: 'Working with brands across India and overseas.',
 
@@ -23,7 +26,15 @@ export const site = {
   phoneDisplay: '+91 8684-010403',
   email: 'socialsurfersmedia@gmail.com',
 
-  /** Studio address — a real place, not a service-area limit. */
+  /**
+   * Studio address — a real place, not a service-area limit.
+   *
+   * This is now SCHEMA ONLY. The client asked for the visible address to be the two
+   * states and nothing else, so no page renders the street any more; `locations`
+   * below is what the footer and contact block print. The full record stays here
+   * because the Google Business Profile is matched on it — dropping it from the
+   * JSON-LD would cost the local listing, which is the opposite of what he wants.
+   */
   address: {
     street: 'Near Trikona Park, Model Town',
     city: 'Yamunanagar',
@@ -32,6 +43,13 @@ export const site = {
     country: 'IN',
   },
   addressDisplay: 'Near Trikona Park, Model Town, Yamunanagar, Haryana 135001',
+
+  /**
+   * What the page actually shows. Chandigarh is a second location with no street
+   * address of its own; only the Haryana studio is a registered place, which is why
+   * exactly one of these appears in the LocalBusiness schema.
+   */
+  locations: ['Haryana', 'Chandigarh'],
 
   /** Approximate — replace with the exact pin from the client's Google Business Profile. */
   geo: { lat: 30.129, lng: 77.288 },

@@ -24,23 +24,50 @@ React into a site that has no framework at all.
 
 | | on the wire |
 |---|---|
-| CSS (gzipped) | 9.5 KB |
-| JS (external chunks, gzipped) | 5.3 KB |
-| Fonts (woff2, precompressed) | 39.4 KB |
-| Heaviest page, first visit | **63.5 KB** |
+| JS (external chunks, gzipped) | 2.3 KB |
+| Fonts (woff2, precompressed) | 26.6 KB |
+| Heaviest page, first visit | **48.6 KB** |
+| Hero artwork (WebP, alpha) | 55 KB |
 | Client logo tiles (27, lazy) | 178 KB |
 
-Lighter than the dark version this replaced (69.5 KB) *including* the shader: Fraunces
-(22.5 KB, display only) was dropped for Space Grotesk (14.8 KB), which serves display
-**and** body. Both faces are self-hosted and hard-subset with `fonttools` —
-see `.fontsrc/subset.py`. JetBrains Mono 31 KB → 24.6 KB.
+The shader is parked (see below) and no longer bundled, which is most of the JS drop.
+Fonts got smaller while gaining a family — see **Type**.
+
+## Type
+
+The client's poster is one neutral neo-grotesque: very heavy caps, regular body, and
+**no monospace anywhere**. So Space Grotesk *and* JetBrains Mono were both replaced by
+**Archivo** — a single variable file at 100–900 that sets display at 900, body at 400,
+and the small letterspaced caps the mono used to set. **Dancing Script** sets the
+brochure's handwritten line and nothing else.
+
+| | before | after |
+|---|---|---|
+| display + body | Space Grotesk 14.8 KB | Archivo 20.1 KB |
+| labels | JetBrains Mono 24.6 KB | *(same file)* |
+| handwriting | — | Dancing Script 5.9 KB |
+| **total** | **39.4 KB** | **26.6 KB** |
+
+Both are cut from the `@fontsource-variable` packages in devDependencies, so no binary
+is vendored and a version bump is an `npm install`. Run `python .fontsrc/subset.py`
+after changing either.
+
+The script face is subset to **exactly the characters `site.voiceLine` uses** — 5.9 KB
+against 19.2 KB for the full alphabet. That is only safe because the subsetter reads
+the string out of `site.ts` rather than having it typed a second time: change the line,
+re-run, and the glyph set follows. If that field is ever renamed the script raises
+instead of quietly shipping a font with holes in it.
+
+`--w-display: 900` is where most of "make the headings bigger" actually came from. On a
+neo-grotesque, weight buys more apparent size than points do, and it costs no line
+breaks — the sizes went up too, but far less than the result suggests.
 
 ## Shape of the site
 
 **One page, plus seven service pages.**
 
-- `/` carries hero → stats → services → process → clients → contact. The nav links are
-  in-page anchors (`/#services`, `/#process`, `/#clients`, `/#contact`).
+- `/` carries hero → stats → about → services → process → clients → contact. The nav
+  links are in-page anchors (`/#services`, `/#process`, `/#clients`, `/#contact`).
 - `/services/<slug>` — each service keeps its own page. They hold the detail and the
   search intent a homepage section can't, and they are the only routes in the sitemap
   besides `/`.
@@ -113,17 +140,42 @@ plus a visible repeat). Notes worth keeping:
 - Every failure mode — no WebGL, lost context, ≤2 cores, `prefers-reduced-motion` —
   leaves the static CSS gradient underneath visible. There is no blank rectangle.
 
-## Reach
+## The About section and the services grid
+
+**About** is the brochure spread, brought over as the client drew it: heading and two
+paragraphs left, the category line and its three points right, and the handwritten line
+closing the left column. The line *writes itself on* — a clip wipe per line with the
+swash drawing after, rather than a fade, because a fade gives the ending away before
+the stroke reaches it. It opts out of the generic reveal's opacity/transform for the
+same reason.
+
+**Services** are gradient cards, per the client — but **one gradient, not seven**. Each
+card is a slice of the same violet→rose ramp stepped by its index, so reading across
+the grid walks the ramp end to end, and `--p` (section scroll progress) slides the whole
+set along it as the section passes. The slice is computed in the frontmatter, not in
+CSS: mapping each card's background onto its grid *cell* would have to be redeclared at
+every breakpoint, since the column count changes underneath it.
+
+Both ends of the mix stay dark enough for white type. The ramp stops at `--rose` and
+never reaches `--brand-pink`, on which white measures ~2.6:1 — the same cap `--grad`
+has, for the same reason. The eighth tile is the CTA rather than a filler service: seven
+cards leave a hole in the last row, and it is the one card that is *not* a gradient, so
+the exit doesn't get buried among the services.
+
+## Reach and the address
 
 The business takes work from anywhere. `areaServed` in the schema is `Worldwide`, and
-no `<title>`, description or body copy is scoped to a town. The **address stays** — in
-the footer, the contact band and the LocalBusiness JSON-LD — because it's real and
-Google needs it for the Business Profile. Address ≠ service area; don't collapse the
-two back together.
+no `<title>`, description or body copy is scoped to a town.
 
-It's **plain text, not a map link.** Nobody is being invited to the office; the work is
-delivered remotely. The address is a trust signal, and a "get directions" affordance
-would only offer a visit that isn't on the table.
+**The visible address is two states and nothing more** — `site.locations`, rendered as
+"Haryana · Chandigarh" in the footer and the contact band. That is the client's
+instruction. Chandigarh is a second location with no street address of its own.
+
+**The full street address still goes to Google**, via the LocalBusiness JSON-LD in
+`Base.astro`, which reads `site.address`. The Business Profile is matched on that
+record, so dropping it from the schema would cost the local listing — the opposite of
+what was asked for. `site.address` is therefore schema-only now; no page renders it.
+Address ≠ service area, and neither is the same as what's printed on the page.
 
 ## Where things live
 
@@ -150,7 +202,7 @@ tools/
   logos.mjs      client logo pipeline — see below
   hero.mjs       hero render -> knocked-out WebP + manifest — see below
   clients.json   source filename -> client name/industry (hand-maintained)
-.fontsrc/        font sources + the subsetting script (not shipped)
+.fontsrc/        subset.py — cuts the two faces from node_modules (not shipped)
 brand/           the client's original artwork; source of truth, not served
 ```
 
@@ -219,9 +271,18 @@ diagnostics; delete them before committing.
 
 ### What the export needs to be
 
-The current source is `hero.png` at the repo root, 650×1008. It is a **stand-in** — too
-small for the 2× file, so the tool refuses to upscale and says so. To replace it, drop a
-new export at `src/assets/hero-surfer.png` and re-run. It needs to be:
+The current source is `brand/hero-original.png`, the client's render as supplied at
+650×1008 on white. It is a **stand-in** — too small for the 2× file, so the tool refuses
+to upscale and says so.
+
+It lives in `brand/` rather than at the repo root because `hero.png` there was replaced
+mid-project with a background-removed 401×622 version. That is a third of the pixels,
+and with `hero.png` first in the candidate list the next run would have silently
+downgraded the hero. Keying is also better from the opaque original: the flood fill
+seeds from a solid ground, and an already-transparent PNG has none.
+
+To replace it, drop a new export at `src/assets/hero-surfer.png` — which wins over both
+— and re-run. It needs to be:
 
 - **PNG, at least 1120 px wide** (≈1740 px tall at this ratio). 1300×2000 is ideal.
   Long edge 2000 is a good thing to ask Canva for.
@@ -310,9 +371,15 @@ Exits non-zero on any failure. Run it on `/`, a service page and `/404` at both
   confidence and are flagged `"verify": true` in `tools/clients.json`: *Silomin*,
   *Looms in Velvet*, and one still called *Client 27*. Fix the name map and re-run the
   tool; the tile filenames and the data file follow automatically.
-- **`stats.projectsDelivered` is 40**, the conservative floor of the client's own
-  "around 40–45". `stats.brands` is not an estimate — it is the length of the roster.
-  Replace the 40 with the exact figure when he confirms it.
+- **The stats were doubled at the client's direction, and three of them no longer
+  match the page.** They used to be derived from page content; they are now literals in
+  `content.ts`. `brands` says 54 against 27 logo tiles and `industriesServed` says 20
+  against 10 named — both are survivable, because the roster and the industry list are
+  now framed as partial ("a selection of", "— including"), and no agency is expected to
+  show a logo per client. **`serviceLines` says 14 against seven cards and seven service
+  pages on the same screen, and has no such out.** That one is worth putting back to
+  him; the rest of the tile is unaffected either way. The consequence was put to him
+  before the change and he confirmed it — see the note on `stats` in `content.ts`.
 - **The hero render leans on third-party platform logos** as decorative 3D art, which
   Meta / YouTube / TikTok brand guidelines restrict. It is in use at the client's
   request, and the decision is his and on record. Ranked by likelihood: nothing happens;

@@ -1,12 +1,16 @@
 ---
 import { stats } from '../data/content';
 
-/* The numbers that used to run along the bottom edge of the hero. */
+/* The numbers that used to run along the bottom edge of the hero.
+   Set in the gradient at display size, per the client — which is why the figure and
+   its suffix are separate elements: `background-clip: text` paints one box across
+   the whole element, so a "+" inside it would take a slice of the ramp meant for a
+   digit and land a different colour than the number it belongs to. */
 const figures = [
-  { v: `${stats.projectsDelivered}+`, l: 'Projects delivered' },
-  { v: String(stats.brands), l: 'Brands served' },
-  { v: String(stats.industriesServed), l: 'Industries served' },
-  { v: String(stats.serviceLines).padStart(2, '0'), l: 'Services offered' },
+  { n: stats.projectsDelivered, suffix: '+', l: 'Projects delivered' },
+  { n: stats.brands, suffix: '+', l: 'Brands served' },
+  { n: stats.industriesServed, suffix: '', l: 'Industries served' },
+  { n: stats.serviceLines, suffix: '', l: 'Services offered' },
 ];
 ---
 
@@ -15,8 +19,14 @@ const figures = [
     <dl>
       {figures.map((f) => (
         <div class="fig" data-reveal data-reveal-group="stat">
-          <dt>{f.v}</dt>
-          <dd>{f.l}</dd>
+          {/* The final value is the element's text, so it is what a visitor without
+              JS, a crawler and the accessibility tree all read. The counter only
+              overwrites it while running, and puts it back at the end. */}
+          <dt>
+            <span class="n" data-count={f.n}>{f.n}</span>
+            {f.suffix && <span class="sfx">{f.suffix}</span>}
+          </dt>
+          <dd class="label">{f.l}</dd>
         </div>
       ))}
     </dl>
@@ -24,11 +34,9 @@ const figures = [
 </section>
 
 <style>
-  /* No gradient handover any more — the hero and this section share one ground,
-     so the band is just a ruled row of figures. */
   .stats {
     background: var(--paper);
-    padding-block: clamp(8px, 2vh, 24px) clamp(20px, 4vh, 44px);
+    padding-block: clamp(16px, 3vh, 36px) clamp(28px, 5vh, 56px);
     color: var(--l1);
   }
 
@@ -41,33 +49,41 @@ const figures = [
   }
   .fig {
     background: var(--paper);
-    padding: 24px 22px 26px;
+    padding: clamp(20px, 3vh, 34px) clamp(14px, 2vw, 26px) clamp(22px, 3vh, 32px);
     display: grid;
-    gap: 8px;
+    gap: 10px;
     align-content: start;
   }
+
   .fig dt {
-    font-family: var(--mono);
-    font-size: clamp(1.75rem, 4vw, 2.6rem);
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: -0.03em;
+    display: flex;
+    align-items: baseline;
+    font-family: var(--display);
+    font-weight: var(--w-display);
+    font-size: clamp(2.3rem, 5.6vw, 4.3rem);
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+    /* tabular figures so the column does not jitter while the counter runs */
     font-variant-numeric: tabular-nums;
-    color: var(--l1);
   }
+  /* Each part takes its own slice of the ramp on purpose — see the note above. */
+  .fig dt .n,
+  .fig dt .sfx {
+    background-image: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .fig dt .sfx { font-size: 0.6em; }
+
   .fig dd {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.17em;
-    text-transform: uppercase;
-    color: var(--l3);
-    line-height: 1.4;
+    color: var(--l2);
+    line-height: 1.35;
   }
 
   @media (max-width: 760px) {
-    .stats { padding-block: 0 clamp(16px, 3vh, 32px); }
+    .stats { padding-block: 4px clamp(20px, 4vh, 40px); }
     dl { grid-template-columns: repeat(2, 1fr); }
-    .fig { padding: 18px 16px 20px; }
+    .fig { padding: 20px 14px 22px; }
   }
 </style>

@@ -1,0 +1,223 @@
+---
+import { about, solutions } from '../data/content';
+import { site } from '../data/site';
+
+/*
+ * The brochure's About spread, brought over more or less as the client drew it:
+ * heading and two paragraphs on the left, the category line and its three points on
+ * the right, and the handwritten line closing the left column.
+ *
+ * It is also where the page stops being white. The three sections above it are all
+ * plain paper, which is what the client was reacting to — so this one carries a
+ * gradient wash. The wash is masked to zero at both edges rather than simply fading
+ * by eye, because the sections above and below are flat paper and any residual tint
+ * at the boundary is a hard step: exactly what qa/seams.mjs exists to catch.
+ */
+
+const icons = {
+  target: 'M12 3a9 9 0 1 0 9 9M12 7.5a4.5 4.5 0 1 0 4.5 4.5M12 12l7-7M19 5V2.5M19 5h2.5',
+  bubble: 'M4 5.5h16v11H9.5L5 20.5v-4H4z M8.5 11h.01 M12 11h.01 M15.5 11h.01',
+  chart: 'M4 20h16 M7.5 20v-6 M12 20V6.5 M16.5 20v-9',
+};
+---
+
+<section class="about" id="about" aria-labelledby="about-h">
+  <div class="wash" aria-hidden="true"></div>
+
+  <div class="shell grid">
+    <div class="col">
+      <h2 class="h2" id="about-h" data-reveal>About <em>Us</em></h2>
+
+      {about.body.map((p) => (
+        <p class="body" data-reveal data-reveal-group="about">{p}</p>
+      ))}
+
+      {/* The handwritten line. It writes itself on rather than fading in — the
+          generic reveal is overridden below so the wipe is the only thing that
+          happens, otherwise the fade gives the ending away before the stroke
+          reaches it. */}
+      <p class="voice" data-reveal aria-label={site.voiceLine}>
+        <span class="ln a" aria-hidden="true">We don&rsquo;t just manage,</span>
+        <span class="ln b" aria-hidden="true">
+          We Grow Brands!
+          <svg class="swash" viewBox="0 0 260 14" fill="none" aria-hidden="true" preserveAspectRatio="none">
+            <path
+              d="M2 8.5C46 3.5 96 2.5 140 4.5c38 1.7 74 5 118 2"
+              stroke="url(#swashg)"
+              stroke-width="3"
+              stroke-linecap="round"
+              pathLength="1"
+            />
+            <defs>
+              <linearGradient id="swashg" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#3f2a86" />
+                <stop offset="1" stop-color="#ea1c82" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </span>
+      </p>
+    </div>
+
+    <div class="col side">
+      <h3 class="cat" data-reveal>{site.category}</h3>
+      <span class="rule" aria-hidden="true"></span>
+
+      <ul class="points">
+        {solutions.map((s) => (
+          <li data-reveal data-reveal-group="sol">
+            <span class="disc" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d={icons[s.icon]} />
+              </svg>
+            </span>
+            <span class="txt">{s.text}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    position: relative;
+    isolation: isolate;
+    background: var(--paper);
+    padding-block: var(--section-y);
+    overflow: hidden;
+  }
+
+  /* The colour. Masked to nothing at the top and bottom edges so the section meets
+     the flat paper above and below at exactly paper, with no step to find. */
+  .wash {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(58% 52% at 14% 26%, rgba(63, 42, 134, 0.20), transparent 72%),
+      radial-gradient(52% 48% at 88% 64%, rgba(234, 28, 130, 0.17), transparent 72%),
+      radial-gradient(46% 44% at 52% 96%, rgba(255, 106, 77, 0.10), transparent 70%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: clamp(32px, 6vw, 88px);
+    align-items: start;
+  }
+  .col { min-width: 0; }
+
+  .h2 { margin-bottom: clamp(20px, 3vh, 32px); }
+
+  .body {
+    font-size: var(--fs-lead);
+    line-height: 1.66;
+    color: var(--l2);
+    max-width: 46ch;
+  }
+  .body + .body { margin-top: 18px; }
+
+  /* ——— the handwritten line ——— */
+  .voice {
+    margin-top: clamp(28px, 4vh, 44px);
+    font-family: var(--script);
+    font-weight: 700;
+    font-size: clamp(1.75rem, 3.6vw, 2.9rem);
+    line-height: 1.16;
+    display: grid;
+    justify-items: start;
+  }
+  .ln {
+    display: block;
+    /* the wipe's resting state; the reveal opens it */
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.85s var(--ease-tide);
+  }
+  .ln.a { color: var(--violet); }
+  .ln.b {
+    position: relative;
+    color: var(--rose);
+    padding-right: 0.12em;
+    transition-delay: 0.55s;
+  }
+
+  .swash {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.16em;
+    width: 100%;
+    height: 0.38em;
+  }
+  .swash path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 0.7s var(--ease-out) 1.15s;
+  }
+
+  /* The generic reveal would fade the whole line in and pre-empt the wipe, so this
+     element opts out of the transform/opacity half of it and keeps only the trigger. */
+  :global(html.js-motion) .voice {
+    opacity: 1;
+    transform: none;
+  }
+  :global(html.js-motion) .voice .ln { clip-path: inset(0 100% 0 0); }
+  :global(html.js-motion) .voice.is-in .ln { clip-path: inset(0 -8% 0 0); }
+  :global(html.js-motion) .voice.is-in .swash path { stroke-dashoffset: 0; }
+  /* No JS, or motion turned down: the line is simply there, fully drawn. */
+  :global(html:not(.js-motion)) .voice .ln { clip-path: none; }
+  :global(html:not(.js-motion)) .voice .swash path { stroke-dashoffset: 0; }
+
+  /* ——— the three points ——— */
+  .cat {
+    font-family: var(--display);
+    font-weight: var(--w-display);
+    font-size: var(--fs-h3);
+    line-height: 1.16;
+    letter-spacing: -0.018em;
+    color: var(--l1);
+    max-width: 18ch;
+  }
+  .rule {
+    display: block;
+    width: 68px;
+    height: 3px;
+    margin: 18px 0 26px;
+    border-radius: 99px;
+    background: var(--grad);
+  }
+
+  .points { display: grid; gap: 20px; }
+  .points li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 15px;
+  }
+  .disc {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--grad);
+    color: #fff;
+    box-shadow: 0 10px 24px -12px rgba(63, 42, 134, 0.75);
+  }
+  .disc svg { width: 21px; height: 21px; }
+  .txt {
+    font-size: var(--fs-lead);
+    font-weight: 600;
+    color: var(--l1);
+  }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; gap: 44px; }
+    .cat { max-width: none; }
+  }
+</style>

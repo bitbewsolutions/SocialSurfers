@@ -11,12 +11,16 @@
  * size including the favicon, and the two brand colours become tokens rather than
  * being baked into pixels.
  */
+import { site } from '../data/site';
+
 interface Props {
   size?: number;
   /** Hide the wordmark, e.g. in tight spaces. */
   markOnly?: boolean;
+  /** Set the category line under the wordmark. Nav and footer only. */
+  tagline?: boolean;
 }
-const { size = 34, markOnly = false } = Astro.props;
+const { size = 34, markOnly = false, tagline = false } = Astro.props;
 ---
 
 <span class="logo" style={`--mark:${size}px`}>
@@ -33,8 +37,15 @@ const { size = 34, markOnly = false } = Astro.props;
   {/* The wordmark is the brand lockup, so it keeps the client's exact pink even
       though that measures 2.99:1 on paper. WCAG 1.4.3 exempts logotypes; the
       attribute declares that to qa/contrast.mjs rather than leaving the tool to
-      guess or the failure to be ignored by hand every run. */}
-  {!markOnly && <b data-contrast-exempt="logotype">Social<span>Surfers</span></b>}
+      guess or the failure to be ignored by hand every run.
+      The two words are separated now, as they are on the poster — it set them on
+      two lines, which is a space by another name. */}
+  {!markOnly && (
+    <span class="lockup">
+      <b data-contrast-exempt="logotype">Social <span>Surfers</span></b>
+      {tagline && <i class="cat">{site.category}</i>}
+    </span>
+  )}
 </span>
 
 <style>
@@ -52,13 +63,43 @@ const { size = 34, markOnly = false } = Astro.props;
   .upper { fill: var(--brand-indigo); }
   .lower { fill: var(--brand-pink); }
 
+  .lockup {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+  }
+
   .logo b {
     font-family: var(--display);
-    font-weight: 700;
-    font-size: calc(var(--mark) * 0.54);
-    letter-spacing: -0.03em;
+    /* 900 to match the poster's wordmark, which is the heaviest thing on it */
+    font-weight: 900;
+    font-size: calc(var(--mark) * 0.46);
+    letter-spacing: -0.022em;
     line-height: 1;
     white-space: nowrap;
   }
   .logo b span { color: var(--brand-pink); }
+
+  /* The category line the client asked for under the mark. Deliberately quiet —
+     it is a descriptor, and at nav size anything louder competes with the
+     wordmark it is explaining. */
+  .cat {
+    font-family: var(--label);
+    font-style: normal;
+    font-weight: 700;
+    font-size: calc(var(--mark) * 0.174);
+    letter-spacing: 0.085em;
+    line-height: 1.15;
+    text-transform: uppercase;
+    color: var(--l3);
+    white-space: nowrap;
+  }
+
+  /* On a phone the bar is the mark, the wordmark and the burger, and the category
+     line does not fit between them — it ran under the burger. It is not lost: the
+     same line is the heading of the right-hand column in the About section, at a
+     size where it can actually be read. */
+  @media (max-width: 900px) {
+    .cat { display: none; }
+  }
 </style>

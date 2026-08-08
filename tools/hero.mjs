@@ -29,9 +29,20 @@ import sharp from 'sharp';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 
-/* The client's export, in preference order. hero.png is the 650px original and is
-   only a stand-in — it is soft at 2x. See README for the export spec. */
-const CANDIDATES = ['src/assets/hero-surfer.png', 'hero.png'];
+/*
+ * Sources in preference order, highest usable resolution first.
+ *
+ * brand/hero-original.png is the client's render as supplied, 650x1008 on white. It
+ * sits in brand/ with the rest of the source-of-truth artwork precisely so that a
+ * re-run cannot pick up something worse: hero.png at the repo root was replaced
+ * mid-project with a background-removed 401x622 version, which is a third of the
+ * pixels and would have quietly downgraded the hero the next time anyone ran this.
+ * Keying works better from the opaque original anyway — the flood fill needs a solid
+ * ground to seed from, and an already-transparent PNG has no ground at all.
+ *
+ * Drop a larger export at src/assets/hero-surfer.png and it wins over both.
+ */
+const CANDIDATES = ['src/assets/hero-surfer.png', 'brand/hero-original.png', 'hero.png'];
 const OUT = 'public/art';
 const MANIFEST = 'src/data/hero-art.json';
 const WIDTHS = [560, 1120];          // 1x and 2x of the widest the column ever gets

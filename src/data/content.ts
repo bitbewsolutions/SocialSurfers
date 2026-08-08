@@ -39,6 +39,28 @@ export const process = [
   },
 ] as const;
 
+/**
+ * The About copy, transcribed from the client's brochure rather than written here —
+ * it is his description of his own business and he has already approved it.
+ */
+export const about = {
+  body: [
+    "At Social Surfers, we don't just manage your social media — we build your digital presence, tell your brand story and drive real growth.",
+    'From creative content to performance marketing, we provide 360° digital solutions that help your business stand out, engage more and convert better.',
+  ],
+} as const;
+
+/**
+ * The three points that sit beside the About copy in the brochure, under the
+ * category line. Short by design: they are a summary of the seven services, not a
+ * competing list of them.
+ */
+export const solutions = [
+  { icon: 'target', text: 'Build your digital presence.' },
+  { icon: 'bubble', text: 'Tell your brand story.' },
+  { icon: 'chart', text: 'Drive real growth.' },
+] as const;
+
 /** Industries the agency already works in. */
 export const industries = [
   'Real Estate',
@@ -94,16 +116,29 @@ export const clients: readonly Client[] = clientData;
 /**
  * Headline figures.
  *
- * `projectsDelivered` is the client's own count, relayed through the account lead
- * as "around 40–45, a few more in the pipeline". Stated as the conservative floor
- * (40+) until he confirms an exact number — understating is recoverable, the
- * reverse is not. `brands` is not an estimate: it is the length of the roster.
+ * DIRECTED BY THE CLIENT (2026-08-08): every figure doubled, and confirmed as his
+ * call after the consequence was put to him.
+ *
+ * Three of the four used to be DERIVED from page content and are now decoupled from
+ * it, so they no longer agree with what a visitor can count on the same page:
+ *
+ *   brands            54  — the logo wall renders 27 tiles
+ *   industriesServed  20  — 10 are named in `industries` above
+ *   serviceLines      14  — there are 7 cards and 7 service pages
+ *
+ * The first two are defensible because the roster and the industry list are framed
+ * as partial ("a selection of", "including") — an agency plainly need not have a
+ * logo for every client. The third has no such out: the number sits on the same
+ * screen as a countable set of seven. It is the one worth revisiting with him.
+ *
+ * `projectsDelivered` is the only figure with no page-level contradiction — it is
+ * his own count ("around 40–45"), doubled, and only he can confirm it.
  */
 export const stats = {
-  projectsDelivered: 40,
-  brands: clients.length,
-  industriesServed: industries.length,
-  serviceLines: services.length,
+  projectsDelivered: 80,
+  brands: 54,
+  industriesServed: 20,
+  serviceLines: 14,
 } as const;
 
 /**

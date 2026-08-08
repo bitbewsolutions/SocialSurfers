@@ -11,21 +11,27 @@
    ═══════════════════════════════════════════════════════════════════ */
 
 @font-face {
-  font-family: 'Grotesk';
-  src: url('/fonts/grotesk-sub.woff2') format('woff2');
-  font-weight: 300 700;
+  font-family: 'Archivo';
+  src: url('/fonts/archivo-sub.woff2') format('woff2');
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
-  /* Space Grotesk, subset to latin + the punctuation the copy uses.
-     One file covers display and body — 14.8 KB for both. */
+  /* The client's poster is one neutral neo-grotesque, very heavy for the caps and
+     nothing else in the mix — no monospace anywhere. So this one file replaces both
+     Space Grotesk and JetBrains Mono: 900 for display, 400 for body, 700 letterspaced
+     caps for the labels the mono used to set. 20.1 KB for all of it.
+     Regenerate with `python .fontsrc/subset.py`. */
 }
 
 @font-face {
-  font-family: 'JBMono';
-  src: url('/fonts/jbmono-sub.woff2') format('woff2');
-  font-weight: 400 800;
+  font-family: 'Script';
+  src: url('/fonts/script-sub.woff2') format('woff2');
+  font-weight: 400 700;
   font-style: normal;
   font-display: swap;
+  /* Dancing Script — the brochure's handwritten line, and nothing else on the site.
+     Subset to exactly the characters of `voiceLine`, which is why it is 5.9 KB and
+     not 19.2: see .fontsrc/subset.py. Change that line, re-run the subsetter. */
 }
 
 :root {
@@ -85,21 +91,31 @@
   --hair-ink: rgba(246, 245, 249, 0.14);
   --hair-ink-2: rgba(246, 245, 249, 0.26);
 
-  /* ——— type ——— */
-  --display: 'Grotesk', 'Segoe UI', system-ui, sans-serif;
-  --body: 'Grotesk', 'Segoe UI', system-ui, sans-serif;
-  --mono: 'JBMono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  /* ——— type ———
+     One family at three jobs. `--label` is not a monospace any more: the poster has
+     none, so small caps labels are the same face at 700 with wide tracking. The
+     token kept a short name because 26 rules reference it. */
+  --display: 'Archivo', 'Segoe UI', system-ui, sans-serif;
+  --body: 'Archivo', 'Segoe UI', system-ui, sans-serif;
+  --label: 'Archivo', 'Segoe UI', system-ui, sans-serif;
+  --script: 'Script', 'Segoe UI', cursive;
+
+  /* Display weight. The client asked for big and bold, and on a neo-grotesque most
+     of "big" is actually weight — 900 at the same point size reads far larger than
+     700 did, without costing a line break. Sizes went up too, but not as far as
+     they look: the perceived jump is mostly this. */
+  --w-display: 900;
 
   /* fluid scale, 390 → 1440 */
-  /* sized for the full tagline, which is 41 characters — the previous 5.5rem was set
-     for a 25-character headline and forced this one to five lines in its column */
-  --fs-display: clamp(2.15rem, 4.6vw, 4.05rem);
-  --fs-h2: clamp(1.9rem, 4.4vw, 3.4rem);
-  --fs-h3: clamp(1.2rem, 2.3vw, 1.65rem);
-  --fs-lead: clamp(1rem, 1.8vw, 1.15rem);
-  --fs-body: clamp(0.95rem, 1.5vw, 1.02rem);
-  --fs-small: 0.86rem;
-  --fs-label: clamp(9px, 1.4vw, 10.5px);
+  /* the display size is bounded by the tagline, which is 41 characters and shares
+     the row with the artwork — past ~4.6rem it takes a fifth line in its column */
+  --fs-display: clamp(2.4rem, 5.4vw, 4.6rem);
+  --fs-h2: clamp(2rem, 4.9vw, 3.9rem);
+  --fs-h3: clamp(1.25rem, 2.6vw, 1.8rem);
+  --fs-lead: clamp(1.02rem, 1.9vw, 1.22rem);
+  --fs-body: clamp(0.97rem, 1.5vw, 1.05rem);
+  --fs-small: 0.88rem;
+  --fs-label: clamp(10px, 1.4vw, 11.5px);
 
   /* ——— rhythm ——— */
   --gut: clamp(20px, 5vw, 72px);

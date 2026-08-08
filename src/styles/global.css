@@ -177,22 +177,35 @@ ul, ol { list-style: none; }
   padding-inline: var(--gut);
 }
 
+/* Was monospace; the poster has none. Same face at 800 with wide tracking does the
+   same job — a small dense marker that cannot be mistaken for body copy. */
 .label {
-  font-family: var(--mono);
+  font-family: var(--label);
   font-size: var(--fs-label);
-  font-weight: 600;
-  letter-spacing: 0.2em;
+  font-weight: 800;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--l3);
 }
 
 .h2 {
   font-family: var(--display);
-  font-weight: 700;
+  font-weight: var(--w-display);
   font-size: var(--fs-h2);
-  line-height: 1.04;
-  letter-spacing: -0.028em;
+  line-height: 1.01;
+  /* heavier weight closes the counters, so the tracking that suited 700 looks
+     cramped at 900 — it is pulled back rather than pushed further negative */
+  letter-spacing: -0.022em;
   text-wrap: balance;
+}
+
+/* The brochure's handwritten line. One line on the whole site; see .fontsrc. */
+.script {
+  font-family: var(--script);
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 /*
@@ -230,7 +243,7 @@ h1 em {
   display: inline-flex;
   align-items: center;
   gap: 11px;
-  font-family: var(--mono);
+  font-family: var(--label);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -251,7 +264,7 @@ h1 em {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-family: var(--mono);
+  font-family: var(--label);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -276,7 +289,7 @@ h1 em {
   z-index: 200;
   background: var(--violet);
   color: #fff;
-  font-family: var(--mono);
+  font-family: var(--label);
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;

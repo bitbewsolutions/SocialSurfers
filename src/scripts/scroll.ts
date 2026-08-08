@@ -133,6 +133,58 @@ export function initSectionProgress() {
 }
 
 /**
+ * Count-up on the headline figures.
+ *
+ * The element's text is already the final value — the counter overwrites it while
+ * running and restores it at the end. So no-JS, reduced-motion, a crawler and the
+ * accessibility tree all read the real number, and the animation is purely additive.
+ *
+ * `aria-hidden` is NOT used and the value is not announced mid-flight: the figures
+ * sit in a <dl> that a screen reader reads once, and rewriting the text 60 times a
+ * second in a live region would be hostile. It stays a visual flourish.
+ */
+export function initCounters() {
+  if (!document.documentElement.classList.contains('js-motion')) return;
+  const els = Array.from(document.querySelectorAll<HTMLElement>('[data-count]'));
+  if (!els.length || !('IntersectionObserver' in window)) return;
+
+  const DUR = 1100;
+
+  const run = (el: HTMLElement) => {
+    const target = Number(el.dataset.count);
+    if (!Number.isFinite(target)) return;
+    const final = el.textContent ?? String(target);
+    const t0 = performance.now();
+
+    const step = (now: number) => {
+      const t = Math.min(1, (now - t0) / DUR);
+      // ease-out cubic: fast off the mark, settling onto the number rather than
+      // arriving at constant speed and stopping dead
+      const v = 1 - Math.pow(1 - t, 3);
+      if (t < 1) {
+        el.textContent = String(Math.round(target * v));
+        requestAnimationFrame(step);
+      } else {
+        el.textContent = final;
+      }
+    };
+    requestAnimationFrame(step);
+  };
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        io.unobserve(e.target);
+        run(e.target as HTMLElement);
+      }
+    },
+    { threshold: 0.6 },
+  );
+  els.forEach((el) => io.observe(el));
+}
+
+/**
  * Reveal-on-scroll. Elements are visible by default; the .js-motion class on <html>
  * is what hides them, and that class is only added when motion is allowed — so a JS
  * failure can never leave the page blank.

@@ -26,13 +26,12 @@ const year = new Date().getFullYear();
     </div>
 
     <div class="col">
-      <h2 class="label">Office</h2>
-      {/* NAP block — must stay byte-identical to the JSON-LD in Base.astro.
-          This is where the business sits, not a limit on who it works with. */}
-      <address>
-        {site.address.street}<br />
-        {site.address.city}, {site.address.region} {site.address.postalCode}
-      </address>
+      <h2 class="label">Where we are</h2>
+      {/* The client asked for the two states and no further detail, so the street no
+          longer appears on any page. The full NAP still reaches Google through the
+          LocalBusiness JSON-LD in Base.astro, which is what the Business Profile is
+          matched against — this block is no longer the place to check it. */}
+      <address>{site.locations.join(' · ')}</address>
       <ul class="stack">
         <li><a href={telLink}>{site.phoneDisplay}</a></li>
         <li><a href={mailLink}>{site.email}</a></li>
@@ -71,7 +70,7 @@ const year = new Date().getFullYear();
   }
   .reach {
     margin: 12px 0 24px;
-    font-family: var(--mono);
+    font-family: var(--label);
     font-size: 10px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -103,7 +102,7 @@ const year = new Date().getFullYear();
     gap: 10px;
     padding-block: 22px;
     border-top: 1px solid var(--hair-ink);
-    font-family: var(--mono);
+    font-family: var(--label);
     font-size: 9.5px;
     letter-spacing: 0.14em;
     text-transform: uppercase;

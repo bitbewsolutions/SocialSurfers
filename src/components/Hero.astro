@@ -37,10 +37,12 @@ const srcset = art.sources.map((s) => `${s.src} ${s.w}w`).join(', ');
     <div class="copy">
       <p class="eyebrow" data-reveal>Strategy. Creativity. Technology. Results.</p>
 
-      {/* the client's own tagline. "Social Waves" carries the gradient — one of
-          exactly two gradient fills on the site. */}
+      {/* The client's own tagline, and now the poster's own emphasis: both "Brand"
+          and "Social Waves" are accented there, so both carry the gradient here.
+          Each <em> gets its own slice of the ramp, which is what the poster does
+          too — the two words are not meant to read as one continuous sweep. */}
       <h1 data-reveal>
-        Let&rsquo;s Surf Your Brand to the <em>Social Waves.</em>
+        Let&rsquo;s Surf Your <em>Brand</em> to the <em>Social Waves.</em>
       </h1>
 
       <p class="sub" data-reveal>
@@ -138,7 +140,7 @@ const srcset = art.sources.map((s) => `${s.src} ${s.w}w`).join(', ');
   }
 
   .eyebrow {
-    font-family: var(--mono);
+    font-family: var(--label);
     font-size: clamp(9.5px, 1.2vw, 11px);
     font-weight: 700;
     letter-spacing: 0.22em;
@@ -149,25 +151,19 @@ const srcset = art.sources.map((s) => `${s.src} ${s.w}w`).join(', ');
 
   h1 {
     font-family: var(--display);
-    font-weight: 700;
+    font-weight: var(--w-display);
     font-size: var(--fs-display);
-    line-height: 1.02;
-    letter-spacing: -0.035em;
+    line-height: 0.99;
+    letter-spacing: -0.025em;
     max-width: 15ch;
     text-wrap: balance;
     color: var(--l1);
   }
-  /* One of exactly two gradient fills on the site. Large bold type, so 3:1 applies;
-     this ramp measures 5.1:1 at its lightest stop. */
+  /* Large bold type, so 3:1 applies; this ramp measures 5.1:1 at its lightest stop.
+     The shared rule in global.css supplies the fill — only the ramp is restated
+     here, because the hero always sits on paper and never rebinds --grad-text. */
   h1 em {
-    font-style: normal;
-    /* held on one line so the gradient sweep is deterministic — across a line break
-       each fragment gets its own slice of the ramp and the colour jumps */
-    white-space: nowrap;
-    background: var(--grad);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    background-image: var(--grad);
   }
 
   .sub {

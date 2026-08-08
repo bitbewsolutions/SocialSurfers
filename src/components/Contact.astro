@@ -15,6 +15,11 @@ import { site, waLink, telLink, mailLink } from '../data/site';
 ---
 
 <section class="ways from-dark" id="contact">
+  {/* The light valley between the dark chapter above and the dark footer below was
+      the longest stretch of plain paper left on the page, which is what the client
+      was pointing at. Same masked wash as the About section: zero at both edges, so
+      the ramps that straddle those boundaries still meet flat paper. */}
+  <div class="wash" aria-hidden="true"></div>
   <div class="shell">
     {/* Deliberately headline-free. This is the utility band — the four ways to reach
         a human. The section's actual headline lives on the form below it; two big
@@ -41,9 +46,11 @@ import { site, waLink, telLink, mailLink } from '../data/site';
         <span class="note">For briefs and documents</span>
       </li>
       <li data-reveal data-reveal-group="way">
-        <span class="k">Office</span>
-        <address class="v addr">{site.address.street}, {site.address.city}</address>
-        <span class="note">{site.address.region} {site.address.postalCode}</span>
+        <span class="k">Where we are</span>
+        {/* Two states, no street — the client's instruction. The registered address
+            still goes to Google through the JSON-LD in Base.astro. */}
+        <address class="v addr">{site.locations.join(' · ')}</address>
+        <span class="note">Working with brands anywhere</span>
       </li>
     </ul>
 
@@ -58,8 +65,21 @@ import { site, waLink, telLink, mailLink } from '../data/site';
 
 <style>
   .ways {
+    position: relative;
+    isolation: isolate;
     background-color: var(--paper);
     padding-bottom: clamp(30px, 5vh, 56px);
+  }
+
+  .wash {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(50% 46% at 16% 34%, rgba(63, 42, 134, 0.15), transparent 72%),
+      radial-gradient(46% 44% at 86% 72%, rgba(234, 28, 130, 0.13), transparent 72%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 80%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 80%, transparent);
   }
 
   .top {
@@ -71,7 +91,7 @@ import { site, waLink, telLink, mailLink } from '../data/site';
     margin-bottom: clamp(20px, 3vh, 30px);
   }
   .reach {
-    font-family: var(--mono);
+    font-family: var(--label);
     font-size: 10px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -87,7 +107,7 @@ import { site, waLink, telLink, mailLink } from '../data/site';
   }
   .grid li { background: var(--paper); padding: 24px 22px; display: grid; gap: 8px; align-content: start; }
   .k {
-    font-family: var(--mono);
+    font-family: var(--label);
     font-size: 9px;
     font-weight: 500;
     letter-spacing: 0.22em;

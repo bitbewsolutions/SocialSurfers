@@ -1,48 +1,89 @@
 ---
 import { services } from '../data/services';
+import { waLink } from '../data/site';
+
+/*
+ * Gradient cards, per the client — but one gradient, not seven.
+ *
+ * Each card is a slice of the SAME violet→rose ramp, stepped by its position in the
+ * set, so reading across the grid walks the brand ramp from one end to the other.
+ * Seven independently-gradient boxes would have been seven competing objects; this
+ * is one wave with seven windows onto it.
+ *
+ * The slice is computed here rather than in CSS because the alternative — mapping
+ * each card's background onto its grid cell with background-size/position — has to
+ * be redeclared at every breakpoint, since the column count changes underneath it.
+ * An index-derived mix does not care how the cards happen to wrap.
+ *
+ * Both ends of the mix stay dark enough to carry white type: the ramp stops at
+ * --rose and never reaches --brand-pink, on which white measures about 2.6:1. That
+ * is the same cap --grad has, for the same reason.
+ */
+const SPREAD = 74; // how far along the ramp the last card starts
+const WIDTH = 26; // each card's own sweep, so a card is a gradient and not a flat fill
+
+const cards = services.map((s, i) => {
+  const t = services.length > 1 ? i / (services.length - 1) : 0;
+  return { ...s, a: Math.round(t * SPREAD), b: Math.round(t * SPREAD) + WIDTH };
+});
 ---
 
-<section class="services to-dark" id="services">
+<section class="services to-dark" id="services" data-progress data-progress-anchor="0.85">
   {/* the dawn ramp lives in Stats now — this section starts on plain foam */}
   <div class="shell head">
     <p class="label" data-reveal>What we do</p>
-    <h2 class="h2" data-reveal>Seven services.<br />Pick one, or <em>take them all.</em></h2>
+    {/* "Seven services" was a headline and a claim at once. The figures above now
+        say 14, so the number came out of the heading rather than being contradicted
+        by a tile two screens up. */}
+    <h2 class="h2" data-reveal>Our services.<br />Pick one, or <em>take them all.</em></h2>
     <p class="lead" data-reveal>
-      Everything we offer, and exactly what&rsquo;s included in each. Click any service to
+      Everything we offer, and exactly what&rsquo;s included in each. Open any service to
       see the full detail.
     </p>
   </div>
 
   <div class="shell">
-    {/* a set, not a sequence — so no 01/02/03 markers. The "how we work" section is
-        the thing that's actually ordered. */}
-    <ul class="lines">
-      {services.map((s) => (
-        <li class="line" data-reveal data-reveal-group="svc">
-          <a href={`/services/${s.slug}`}>
-            <span class="node" aria-hidden="true"></span>
-            <span class="rule" aria-hidden="true"></span>
+    <ul class="grid">
+      {cards.map((s) => (
+        <li class="cell" data-reveal data-reveal-group="svc" style={`--a:${s.a}%;--b:${s.b}%`}>
+          <a class="card" href={`/services/${s.slug}`}>
+            <span class="sheen" aria-hidden="true"></span>
 
-            <span class="main">
-              <h3>{s.name}</h3>
-              <p>{s.blurb}</p>
-            </span>
+            <h3>{s.name}</h3>
+            <p class="blurb">{s.blurb}</p>
 
             <span class="spec">
-              {s.items.slice(0, 6).map((it) => (
+              {s.items.slice(0, 4).map((it) => (
                 <span class="chip">{it}</span>
               ))}
-              {s.items.length > 6 && <span class="chip more">+{s.items.length - 6} more</span>}
+              {s.items.length > 4 && <span class="chip more">+{s.items.length - 4} more</span>}
             </span>
 
-            <span class="go" aria-hidden="true">
-              <svg width="15" height="10" viewBox="0 0 15 10" fill="none">
-                <path d="M0 5h13M9 1l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <span class="go">
+              <i>See the detail</i>
+              <svg width="15" height="10" viewBox="0 0 15 10" fill="none" aria-hidden="true">
+                <path d="M0 5h13M9 1l4 4-4 4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </span>
           </a>
         </li>
       ))}
+
+      {/* The eighth tile. Seven cards leave a hole in the last row, and the honest
+          thing to put in it is the next step rather than a filler service. */}
+      <li class="cell ask" data-reveal data-reveal-group="svc">
+        <div class="card">
+          <h3>Not sure which one?</h3>
+          <p class="blurb">
+            Most brands start with management and content, then add ads once the feed is
+            working. Tell us where you are and we&rsquo;ll say what we&rsquo;d do first.
+          </p>
+          <span class="asks">
+            <a class="btn" href="#enquire">Book a discovery call</a>
+            <a class="btn-ghost" href={waLink()} target="_blank" rel="noopener">WhatsApp us</a>
+          </span>
+        </div>
+      </li>
     </ul>
   </div>
 </section>
@@ -61,73 +102,65 @@ import { services } from '../data/services';
   }
   .head .label { color: var(--l3); }
   .head .h2 { color: var(--l1); max-width: 20ch; }
-  .head .lead { color: var(--l2); }
+  .head .lead { color: var(--l2); max-width: 52ch; }
 
-  /* the measured axis: a fine rule with a node per line, like a chart's y-axis.
-     Keeps the instrument idea without drawing a literal surfboard. */
-  .lines {
-    margin-top: clamp(44px, 7vh, 84px);
-    position: relative;
-    padding-left: clamp(22px, 3vw, 42px);
-    border-left: 1px solid var(--hair);
-  }
-
-  .line + .line { border-top: 1px solid var(--hair); }
-
-  .line a {
+  /* Six tracks so the last row splits in half without a special case: a service card
+     spans two (three per row), and the closing pair spans three each. */
+  .grid {
+    margin-top: clamp(40px, 6vh, 76px);
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr) 28px;
-    align-items: start;
-    gap: clamp(18px, 3vw, 52px);
-    padding-block: clamp(22px, 2.6vh, 34px);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: clamp(14px, 1.6vw, 22px);
+  }
+  .cell { grid-column: span 2; }
+  .cell:nth-last-child(2) { grid-column: span 3; }
+  .cell.ask { grid-column: span 3; }
+
+  .card {
     position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    height: 100%;
+    display: grid;
+    align-content: start;
+    gap: 12px;
+    padding: clamp(22px, 2.4vw, 30px);
+    border-radius: calc(var(--radius) + 6px);
+    color: #fff;
+    /* This card's slice of the one ramp. --p is the section's scroll progress, so
+       the whole set slides along the ramp as the section passes — the wave moves.
+       min() keeps the shifted stop inside the range color-mix accepts. */
+    background-image: linear-gradient(
+      142deg,
+      color-mix(in oklab, var(--violet), var(--rose) min(100%, calc(var(--a) + var(--p, 0) * 14%))),
+      color-mix(in oklab, var(--violet), var(--rose) min(100%, calc(var(--b) + var(--p, 0) * 14%)))
+    );
+    box-shadow: 0 18px 40px -26px rgba(30, 12, 60, 0.75);
+    transition: transform var(--dur) var(--ease-out), box-shadow var(--dur);
   }
 
-  .node {
+  /* a soft highlight, so a flat fill reads as a surface catching light */
+  .sheen {
     position: absolute;
-    left: calc(clamp(22px, 3vw, 42px) * -1 - 5px);
-    top: calc(clamp(22px, 2.6vh, 34px) + 7px);
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: var(--paper);
-    border: 2px solid var(--violet);
-    transition: background var(--dur-fast), border-color var(--dur-fast), transform var(--dur) var(--ease-out);
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(120% 76% at 12% 0%, rgba(255, 255, 255, 0.2), transparent 62%);
   }
 
-  /* the annotation leader, drawn from the axis to the title on reveal */
-  .rule {
-    position: absolute;
-    left: calc(clamp(22px, 3vw, 42px) * -1);
-    top: calc(clamp(22px, 2.6vh, 34px) + 11px);
-    width: clamp(22px, 3vw, 42px);
-    height: 1px;
-    background: linear-gradient(90deg, var(--violet), rgba(74, 27, 114, 0.12));
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.65s var(--ease-tide) 0.12s;
-  }
-  .line.is-in .rule { transform: scaleX(1); }
-  :global(html:not(.js-motion)) .rule { transform: scaleX(1); }
-
-  .line h3 {
+  .card h3 {
     font-family: var(--display);
     font-size: var(--fs-h3);
-    font-weight: 700;
+    font-weight: var(--w-display);
     line-height: 1.06;
-    letter-spacing: -0.022em;
-    color: var(--l1);
-    transition: color var(--dur-fast);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
   }
-  .line .main p {
-    margin-top: 9px;
-    font-size: 0.96rem;
+  .blurb {
+    font-size: var(--fs-body);
     line-height: 1.55;
-    color: var(--l2);
-    max-width: 40ch;
+    color: rgba(255, 255, 255, 0.87);
   }
 
-  /* the actual deliverables, not a vague promise — this is the spec-sheet part */
   .spec {
     display: flex;
     flex-wrap: wrap;
@@ -135,39 +168,73 @@ import { services } from '../data/services';
     padding-top: 4px;
   }
   .chip {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    color: var(--l2);
-    border: 1px solid var(--hair-2);
+    font-family: var(--label);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.93);
+    border: 1px solid rgba(255, 255, 255, 0.34);
     border-radius: 999px;
     padding: 5px 10px;
     white-space: nowrap;
-    transition: border-color var(--dur-fast), color var(--dur-fast);
   }
-  .chip.more { color: var(--violet); border-color: rgba(74, 27, 114, 0.4); font-weight: 700; }
+  /* Darkens rather than lightens. Lightening the fill raised the local background
+     under 10.5px text and took it to 4.24:1 against a 4.5 floor — the one place on
+     the page where the count chip fell below its own siblings, which carry no fill
+     at all. Going the other way puts it above them instead. */
+  .chip.more {
+    background: rgba(20, 8, 40, 0.22);
+    border-color: rgba(255, 255, 255, 0.42);
+    color: #fff;
+  }
 
   .go {
-    justify-self: end;
-    align-self: center;
-    color: var(--violet);
-    opacity: 0.55;
-    transition: transform var(--dur) var(--ease-out), opacity var(--dur-fast);
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 6px;
+    align-self: end;
+  }
+  .go i {
+    font-style: normal;
+    font-family: var(--label);
+    font-size: var(--fs-label);
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .go svg { transition: transform var(--dur) var(--ease-out); }
+
+  .card:hover { transform: translateY(-4px); box-shadow: 0 26px 54px -26px rgba(30, 12, 60, 0.9); }
+  .card:hover .go svg { transform: translateX(5px); }
+
+  /* The closing tile is the one card that is not a gradient — it is the exit from
+     the set, and dressing it as another service would bury the CTA among them. */
+  .ask .card {
+    background-image: none;
+    background-color: var(--paper-2);
+    color: var(--l1);
+    border: 1px solid var(--hair);
+    box-shadow: 0 18px 40px -30px rgba(30, 12, 60, 0.5);
+  }
+  .ask .card:hover { transform: none; }
+  .ask .blurb { color: var(--l2); }
+  .asks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
   }
 
-  .line a:hover h3 { color: var(--violet); }
-  .line a:hover .node { background: var(--rose); border-color: var(--rose); transform: scale(1.25); }
-  .line a:hover .go { transform: translateX(5px); opacity: 1; }
-  .line a:hover .chip { border-color: rgba(74, 27, 114, 0.34); color: var(--l1); }
-
-  @media (max-width: 900px) {
-    .line a { grid-template-columns: minmax(0, 1fr) 22px; gap: 14px; }
-    .spec { display: none; } /* the count lives on the service page on small screens */
-    .go { align-self: start; margin-top: 4px; }
+  @media (max-width: 1020px) {
+    /* two per row: every card spans three, the closing pair included */
+    .cell,
+    .cell:nth-last-child(2),
+    .cell.ask { grid-column: span 3; }
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    .rule { transform: scaleX(1); transition: none; }
+  @media (max-width: 680px) {
+    .cell,
+    .cell:nth-last-child(2),
+    .cell.ask { grid-column: span 6; }
   }
 </style>

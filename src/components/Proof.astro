@@ -26,9 +26,13 @@ const SECONDS_PER_TILE = 3.6;
     <h2 class="h2" data-reveal>
       {stats.projectsDelivered}+ projects delivered<br /><em>for {stats.brands} brands.</em>
     </h2>
+    {/* "A selection of" is load-bearing, not padding: the headline figure is 54 and
+        the wall renders 27 tiles, so the wall has to read as partial rather than as
+        the full roster. See the note on `stats` in data/content.ts. */}
     <p class="lead" data-reveal>
-      Gyms, salons, restaurants, real estate, architecture, retail, automotive
-      &mdash; different businesses, the same way of working.
+      A selection of the brands we work with &mdash; gyms, salons, restaurants, real
+      estate, architecture, retail, automotive. Different businesses, the same way of
+      working.
     </p>
   </div>
 
@@ -153,7 +157,7 @@ const SECONDS_PER_TILE = 3.6;
   }
   .pillars li:nth-child(4n) { border-right: 0; }
   .pillars .k {
-    font-family: var(--mono);
+    font-family: var(--label);
     font-size: clamp(10px, 1.6vw, 12px);
     font-weight: 700;
     letter-spacing: 0.22em;
@@ -177,7 +181,7 @@ const SECONDS_PER_TILE = 3.6;
   .log blockquote { font-size: 1rem; line-height: 1.6; color: var(--l1); }
   .log footer { margin-top: 16px; display: grid; gap: 3px; }
   .log footer b { font-family: var(--display); font-size: 1rem; }
-  .log footer span { font-family: var(--mono); font-size: 9.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--l3); }
+  .log footer span { font-family: var(--label); font-size: 9.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--l3); }
   .log .result { color: var(--rose); }
 
   @media (max-width: 860px) {
