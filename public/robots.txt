@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.socialsurfers.in/sitemap-index.xml
+# Must be on the same host as `site:` in astro.config.mjs and Netlify's primary
+# domain. Pointing at the non-primary form makes every crawler's first request a
+# redirect.
+Sitemap: https://socialsurfers.in/sitemap-index.xml

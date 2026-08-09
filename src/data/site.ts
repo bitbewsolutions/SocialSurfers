@@ -20,7 +20,11 @@ export const site = {
   closingLine: 'Your Brand. Our Strategy. Real Growth.',
   reachLine: 'Working with brands across India and overseas.',
 
-  url: 'https://www.socialsurfers.in',
+  /* Must equal `site:` in astro.config.mjs and the Sitemap line in public/robots.txt,
+     and all three must match Netlify's primary domain — see the note in the config.
+     This one feeds the JSON-LD, so a stale value here tells Google the business and
+     the website are at different addresses. */
+  url: 'https://socialsurfers.in',
 
   phone: '+918684010403',
   phoneDisplay: '+91 8684-010403',

@@ -138,13 +138,27 @@ If the site is not connected yet:
 ### Domain
 
 4. **Domain management → Add a domain** → `socialsurfers.in`.
-5. Set **`www.socialsurfers.in` as the primary** — it must match `site:` in
-   `astro.config.mjs` — and let the apex redirect to it.
+5. **Leave the apex (`socialsurfers.in`) as the primary.** Netlify sets that by
+   default and the site is configured to match it. `www` will 301 to it, which is
+   what you want.
+
+   > Whichever form is primary, **three files must name the same host**: `site:` in
+   > `astro.config.mjs`, `url` in `src/data/site.ts`, and the `Sitemap:` line in
+   > `public/robots.txt`. If they disagree with Netlify, every page carries a
+   > canonical pointing at a URL that redirects back to that same page, and every
+   > sitemap entry is a redirect — Search Console reports the lot as *"Page with
+   > redirect"* and will not index from it. All three, or none.
+
 6. At **GoDaddy**, add the records Netlify shows you: an `A` record for the apex, and
    `CNAME www → <site>.netlify.app`. **Leave the nameservers at GoDaddy.** You are
    pointing records, not transferring anything.
 7. Wait for the padlock. Netlify issues the certificate itself once DNS resolves,
    usually minutes, occasionally an hour.
+
+   While it is issuing you will see **"We're provisioning a certificate for your
+   site, you cannot change custom domains until that process completes."** That is
+   normal and self-clearing — it is a lock, not an error. Wait it out rather than
+   retrying.
 
 ---
 
