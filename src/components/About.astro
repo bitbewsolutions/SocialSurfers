@@ -93,51 +93,42 @@ const icons = {
           column ended two thirds of the way down and left a visible hole beside it.
           On a phone the columns stack and it lands just below the line it belongs to. */}
       <figure class="growth" data-reveal>
-        <svg viewBox="0 0 330 175" role="img" aria-label="Two lines over time: flat when social media is only managed, rising when the brand is grown.">
+        <svg viewBox="0 0 320 128" role="img" aria-label="Two paths from the same starting point: one stays flat when social media is only managed, one climbs when the brand is grown.">
           <defs>
             {/* runs bottom-left to top-right, so the ramp climbs with the line */}
             <linearGradient id="growLine" x1="0" y1="1" x2="1" y2="0">
               <stop class="g0" offset="0" />
               <stop class="g1" offset="1" />
             </linearGradient>
-            <linearGradient id="growFill" x1="0" y1="0" x2="0" y2="1">
-              <stop class="f0" offset="0" />
-              <stop class="f1" offset="1" />
-            </linearGradient>
+            <radialGradient id="growGlow">
+              <stop class="gl0" offset="0" />
+              <stop class="gl1" offset="1" />
+            </radialGradient>
           </defs>
 
-          {/* NOT class="grid" — this file already uses that for the section's own
-              two-column layout, and an SVG <g> would have inherited display:grid
-              plus the breakpoint that collapses it. */}
-          <g class="rules" aria-hidden="true">
-            <path d="M8 40h314M8 78h314M8 116h314" />
-            <path class="axis" d="M8 152h314" />
-          </g>
+          <circle class="glow" cx="298" cy="22" r="40" />
 
-          <path
-            class="area"
-            d="M14 130C50 124 64 114 94 106S136 84 166 74S208 46 242 36S288 22 308 18L308 152L14 152Z"
-          />
-
+          {/* Both paths open on EXACTLY M18 112. That shared origin is the whole
+              graphic: same business, same month, two outcomes. The first version
+              started them four units apart, which read as two loose ends and a
+              drawing mistake — which is what it was. */}
           <path
             class="ln-flat"
             pathLength="1"
-            d="M14 126C48 120 64 130 94 124S140 128 170 122S216 126 246 121S292 122 316 119"
+            d="M18 112C62 110 78 118 118 115S174 108 214 112S270 116 298 111"
           />
           <path
             class="ln-rise"
             pathLength="1"
-            d="M14 130C50 124 64 114 94 106S136 84 166 74S208 46 242 36S288 22 308 18"
+            d="M18 112C92 108 142 98 182 78S258 44 298 22"
           />
 
-          <g class="pins">
-            <circle cx="94" cy="106" r="3.6" style="--d:0.9s" />
-            <circle cx="166" cy="74" r="3.6" style="--d:1.05s" />
-            <circle cx="242" cy="36" r="3.6" style="--d:1.2s" />
-          </g>
-          <g class="head">
-            <circle class="halo" cx="308" cy="18" r="13" />
-            <circle class="dot" cx="308" cy="18" r="5.4" />
+          <circle class="origin" cx="18" cy="112" r="4.4" />
+          <circle class="tail" cx="298" cy="111" r="3.4" style="--d:0.7s" />
+          <circle class="step" cx="182" cy="78" r="4" style="--d:1.05s" />
+          <g class="head" style="--d:1.3s">
+            <circle class="halo" cx="298" cy="22" r="12" />
+            <circle class="dot" cx="298" cy="22" r="5.6" />
           </g>
         </svg>
 
@@ -299,34 +290,50 @@ const icons = {
      follow the tokens — this section is light today and the ramp would be wrong on
      ink. `stop-color` is the one place a CSS custom property has to be applied
      through a class rather than inline. */
-  .rules path { fill: none; stroke: var(--hair); stroke-width: 1; stroke-dasharray: 2 5; }
-  .rules .axis { stroke: var(--hair-2); stroke-dasharray: none; }
-
+  /* No gridlines, no axis, no area fill. All three were chart FURNITURE, and their
+     only effect was to make a conceptual drawing pose as measured data — which is
+     what made it read as forced. What is left is the argument: one origin, two
+     outcomes. The glow gives the graphic presence without pretending to plot
+     anything. */
   .g0 { stop-color: var(--violet); }
   .g1 { stop-color: var(--rose); }
-  .f0 { stop-color: var(--violet); stop-opacity: 0.17; }
-  .f1 { stop-color: var(--violet); stop-opacity: 0; }
+  .gl0 { stop-color: var(--rose); stop-opacity: 0.16; }
+  .gl1 { stop-color: var(--rose); stop-opacity: 0; }
 
-  .area { fill: url(#growFill); stroke: none; }
+  .glow { fill: url(#growGlow); }
+
   /* ln- prefix, because .flat is also the legend swatch class in this file */
+
+  /* The dotted texture has to be expressed as a FRACTION OF THE PATH.
+     `pathLength="1"` rescales every dash unit so the whole line measures 1, so the
+     plain `3 5` that was here meant a dash three times longer than the line itself
+     — it rendered solid, in both the animated and the no-JS state. ~0.014 of a
+     ~290-unit path is the 4px dash it was meant to be. Change the path and these
+     want re-checking. */
   .ln-flat {
     fill: none;
     stroke: var(--l3);
     stroke-width: 2;
     stroke-linecap: round;
-    stroke-dasharray: 4 5;
-    opacity: 0.55;
+    stroke-dasharray: 0.014 0.019;
+    opacity: 0.5;
   }
   .ln-rise {
     fill: none;
     stroke: url(#growLine);
-    stroke-width: 3;
+    stroke-width: 3.2;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
-  .pins circle { fill: var(--paper); stroke: var(--rose); stroke-width: 2.4; }
+
+  /* The shared start, so it belongs to neither line and takes a neutral colour.
+     It is also the one mark with no entrance delay — the fork cannot happen
+     before the point it forks from. */
+  .origin { fill: var(--paper); stroke: var(--l3); stroke-width: 2.2; }
+  .tail { fill: var(--l3); opacity: 0.5; }
+  .step { fill: var(--paper); stroke: var(--rose); stroke-width: 2.4; }
   .head .dot { fill: var(--rose); }
-  .head .halo { fill: var(--rose); opacity: 0.14; }
+  .head .halo { fill: var(--rose); opacity: 0.16; }
 
   /* Motion, on the same contract as [data-reveal]: drawn by default, hidden only
      once .js-motion confirms JS can animate it, so no-JS and reduced-motion both
@@ -344,24 +351,28 @@ const icons = {
      be the pattern and be the reveal. It gets it back at rest, below. */
   :global(html.js-motion) .growth .ln-flat { transition-duration: 0.7s; }
   :global(html.js-motion) .growth .ln-rise { transition-delay: 0.35s; }
-  :global(html.js-motion) .growth .area { opacity: 0; transition: opacity 0.8s ease 0.9s; }
-  :global(html.js-motion) .growth .pins circle,
+  :global(html.js-motion) .growth .glow { opacity: 0; transition: opacity 0.9s ease 1.35s; }
+  :global(html.js-motion) .growth .origin,
+  :global(html.js-motion) .growth .tail,
+  :global(html.js-motion) .growth .step,
   :global(html.js-motion) .growth .head {
     opacity: 0;
     transform: scale(0.2);
     transform-box: fill-box;
     transform-origin: center;
-    transition: opacity 0.3s ease var(--d, 1.35s), transform 0.45s var(--ease-out) var(--d, 1.35s);
+    transition: opacity 0.3s ease var(--d, 0.1s), transform 0.45s var(--ease-out) var(--d, 0.1s);
   }
   :global(html.js-motion) .growth.is-in .ln-flat,
   :global(html.js-motion) .growth.is-in .ln-rise { stroke-dashoffset: 0; }
   /* restore the dotted texture once it has finished drawing */
   :global(html.js-motion) .growth.is-in .ln-flat {
-    stroke-dasharray: 4 5;
+    stroke-dasharray: 0.014 0.019;
     transition: stroke-dashoffset 0.7s var(--ease-out), stroke-dasharray 0s linear 0.7s;
   }
-  :global(html.js-motion) .growth.is-in .area { opacity: 1; }
-  :global(html.js-motion) .growth.is-in .pins circle,
+  :global(html.js-motion) .growth.is-in .glow { opacity: 1; }
+  :global(html.js-motion) .growth.is-in .origin,
+  :global(html.js-motion) .growth.is-in .tail,
+  :global(html.js-motion) .growth.is-in .step,
   :global(html.js-motion) .growth.is-in .head { opacity: 1; transform: scale(1); }
 
   .legend {
@@ -380,8 +391,13 @@ const icons = {
     text-transform: uppercase;
     color: var(--l3);
   }
-  .lg i { width: 16px; height: 3px; border-radius: 99px; flex: none; }
-  .lg.flat i { background: var(--l3); opacity: 0.55; }
+  .lg i { width: 18px; height: 3px; border-radius: 99px; flex: none; }
+  /* dashed, so the swatch is the line it names rather than a generic bar */
+  .lg.flat i {
+    border-radius: 0;
+    background: repeating-linear-gradient(90deg, var(--l3) 0 4px, transparent 4px 7px);
+    opacity: 0.55;
+  }
   .lg.up i { background: var(--grad); }
   .lg.up { color: var(--l2); }
 

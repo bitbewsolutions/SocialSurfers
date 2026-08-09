@@ -337,15 +337,19 @@ back — the script is write-only by design.
 
 ### Setting it up
 
+**[SETUP.md](SETUP.md) is the runbook** — click-by-click, in order, including the
+Netlify deploy and the GoDaddy records. `.env.example` lists every variable. The short
+version:
+
 | | where | what |
 |---|---|---|
-| 1 | Google Sheets | Create the sheet, paste `netlify/sheet.gs`, run `setup`, deploy as a Web app. Full steps are in that file's header. |
-| 2 | Netlify env | `SHEET_WEBHOOK_URL`, `SHEET_WEBHOOK_TOKEN` |
-| 3 | Resend | Add the domain, add the DKIM/SPF records it prints to GoDaddy, wait for verify |
-| 4 | Netlify env | `RESEND_API_KEY`, `NOTIFY_FROM`, `NOTIFY_TO` |
-| 5 | Netlify env | `PUBLIC_FORM_ENDPOINT=/api/enquiry` — **last**, see below |
+| 1 | Google Sheets | Create the sheet, paste `netlify/sheet.gs`, run `setup`, deploy as a Web app |
+| 2 | Netlify | Connect the repo, add the domain |
+| 3 | Resend | Add the domain, add its DNS records at GoDaddy, wait for verify |
+| 4 | Netlify env | `SHEET_WEBHOOK_URL`, `SHEET_WEBHOOK_TOKEN`, `RESEND_API_KEY`, `NOTIFY_FROM`, `NOTIFY_TO` |
+| 5 | Netlify env | `PUBLIC_FORM_ENDPOINT=/api/enquiry` — **last**, then rebuild |
 
-`.env.example` lists all of them. Two things that bite:
+Three things bite, and all three fail quietly:
 
 - **`PUBLIC_FORM_ENDPOINT` goes last.** While it is unset the form falls back to opening
   the visitor's mail client with the fields prefilled, which is a working form. Setting
