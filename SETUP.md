@@ -41,8 +41,37 @@ an Apps Script daily runtime budget measured in hours.
 
 ## 1 · The leads sheet
 
-In the Google account that should **own the data** — see the note at the bottom about
-which account that is.
+> ### Which account, and why it matters
+>
+> Apps Script is not a separate platform. A script opened through **Extensions → Apps
+> Script** is *container-bound*: it is stored inside the spreadsheet, not as a file in
+> anyone's Drive. Copy the sheet and the script comes with it; delete the sheet and it
+> goes too. So opening it from the client's sheet edits **his** sheet's script,
+> whichever account the browser is signed into. That the tab opens under your account
+> is not, by itself, a problem.
+>
+> **One click is.** On the deploy screen, `Execute as: Me` resolves to a real email
+> address — whoever is deploying. The script then runs with that identity and that
+> authorisation, and the `/exec` URL belongs to that deployment.
+>
+> If that is *your* account, the pipeline now depends on it. Any of these breaks it:
+> he removes your editor access when the project wraps, you revoke the app during a
+> permissions clean-up, or the account changes hands. And it breaks **quietly** — the
+> row just never appears. Resend is a separate service and keeps working, and the
+> function returns success when either destination accepts the lead, so the visible
+> symptom is notifications still arriving while the sheet silently stops filling.
+>
+> **So the client should own the sheet *and* click Deploy.** The practical order:
+> build the whole thing in your own throwaway sheet first and prove it end to end,
+> then repeat steps 1–10 in his account — you will have seen every screen once, which
+> makes it a ten-minute call rather than a debugging session. Afterwards, swapping
+> `SHEET_WEBHOOK_URL` and triggering a deploy is the entire migration.
+>
+> If that call cannot happen before launch, deploying it yourself works. Just record
+> it as handover debt instead of letting it become invisible.
+
+In the Google account that will **own the data and run the script** — per the note
+above, ideally the client's.
 
 1. New Google Sheet. Name it `Social Surfers — Leads`.
 2. **Extensions → Apps Script.** A new tab opens with an empty `Code.gs`.
@@ -77,7 +106,7 @@ which account that is.
    | | |
    |---|---|
    | Description | `enquiry intake` |
-   | Execute as | **Me** |
+   | Execute as | **Me** — check the email shown here is the client's, not yours |
    | Who has access | **Anyone** |
 
    **"Anyone" is required and is not the security hole it looks like.** Netlify cannot
@@ -195,9 +224,11 @@ passes and production doesn't, the fault is configuration, not code.
 
 ## Decisions worth making on purpose
 
-**Who owns the sheet.** Whoever creates it keeps it if the relationship ends. It should
-almost certainly be the **client's** Google account, with you added as an editor. The
-reverse is easier today and worse later — and "later" is exactly when it matters.
+**Who owns the sheet, and who deployed the script.** Two separate things, and both
+should be the client. Ownership decides who keeps the data if the relationship ends;
+the deploying account decides whose identity the writes run as, and therefore whose
+departure breaks them. See the callout at the top of step 1 — this is the one setup
+choice with a failure mode nobody would notice for weeks.
 
 **What he does with it.** The sheet ships with empty **Status** and **Notes** columns.
 The script only ever appends, so anything he types there is safe and no later
