@@ -76,6 +76,76 @@ const icons = {
           </li>
         ))}
       </ul>
+
+      {/* The growth picture, and it is a picture of the SENTENCE opposite it.
+
+          The client asked for something visible that implies growth, near the
+          handwritten "We don't just manage, We Grow Brands!". Two lines is the
+          whole idea: a flat one that drifts sideways and goes nowhere, and a rising
+          one that does not. That is literally the difference the line claims, so the
+          graphic argues the same thing the copy does instead of decorating it.
+
+          Deliberately unitless — no axis, no figures, no percentages. It illustrates
+          a positioning statement, and the moment it carries a number it is claiming
+          a result nobody measured.
+
+          It sits in this column rather than under the handwriting because the right
+          column ended two thirds of the way down and left a visible hole beside it.
+          On a phone the columns stack and it lands just below the line it belongs to. */}
+      <figure class="growth" data-reveal>
+        <svg viewBox="0 0 330 175" role="img" aria-label="Two lines over time: flat when social media is only managed, rising when the brand is grown.">
+          <defs>
+            {/* runs bottom-left to top-right, so the ramp climbs with the line */}
+            <linearGradient id="growLine" x1="0" y1="1" x2="1" y2="0">
+              <stop class="g0" offset="0" />
+              <stop class="g1" offset="1" />
+            </linearGradient>
+            <linearGradient id="growFill" x1="0" y1="0" x2="0" y2="1">
+              <stop class="f0" offset="0" />
+              <stop class="f1" offset="1" />
+            </linearGradient>
+          </defs>
+
+          {/* NOT class="grid" — this file already uses that for the section's own
+              two-column layout, and an SVG <g> would have inherited display:grid
+              plus the breakpoint that collapses it. */}
+          <g class="rules" aria-hidden="true">
+            <path d="M8 40h314M8 78h314M8 116h314" />
+            <path class="axis" d="M8 152h314" />
+          </g>
+
+          <path
+            class="area"
+            d="M14 130C50 124 64 114 94 106S136 84 166 74S208 46 242 36S288 22 308 18L308 152L14 152Z"
+          />
+
+          <path
+            class="ln-flat"
+            pathLength="1"
+            d="M14 126C48 120 64 130 94 124S140 128 170 122S216 126 246 121S292 122 316 119"
+          />
+          <path
+            class="ln-rise"
+            pathLength="1"
+            d="M14 130C50 124 64 114 94 106S136 84 166 74S208 46 242 36S288 22 308 18"
+          />
+
+          <g class="pins">
+            <circle cx="94" cy="106" r="3.6" style="--d:0.9s" />
+            <circle cx="166" cy="74" r="3.6" style="--d:1.05s" />
+            <circle cx="242" cy="36" r="3.6" style="--d:1.2s" />
+          </g>
+          <g class="head">
+            <circle class="halo" cx="308" cy="18" r="13" />
+            <circle class="dot" cx="308" cy="18" r="5.4" />
+          </g>
+        </svg>
+
+        <figcaption class="legend">
+          <span class="lg flat"><i aria-hidden="true"></i>Just managed</span>
+          <span class="lg up"><i aria-hidden="true"></i>Grown</span>
+        </figcaption>
+      </figure>
     </div>
   </div>
 </section>
@@ -216,8 +286,110 @@ const icons = {
     color: var(--l1);
   }
 
+  /* ——— the growth chart ——— */
+  .growth {
+    margin-top: clamp(30px, 5vh, 52px);
+    display: grid;
+    gap: 14px;
+  }
+  .growth svg { width: 100%; height: auto; overflow: visible; }
+
+  /* Colours live here rather than on the elements: a `stroke="var(--rose)"`
+     presentation attribute is not reliable across browsers, and these have to
+     follow the tokens — this section is light today and the ramp would be wrong on
+     ink. `stop-color` is the one place a CSS custom property has to be applied
+     through a class rather than inline. */
+  .rules path { fill: none; stroke: var(--hair); stroke-width: 1; stroke-dasharray: 2 5; }
+  .rules .axis { stroke: var(--hair-2); stroke-dasharray: none; }
+
+  .g0 { stop-color: var(--violet); }
+  .g1 { stop-color: var(--rose); }
+  .f0 { stop-color: var(--violet); stop-opacity: 0.17; }
+  .f1 { stop-color: var(--violet); stop-opacity: 0; }
+
+  .area { fill: url(#growFill); stroke: none; }
+  /* ln- prefix, because .flat is also the legend swatch class in this file */
+  .ln-flat {
+    fill: none;
+    stroke: var(--l3);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 4 5;
+    opacity: 0.55;
+  }
+  .ln-rise {
+    fill: none;
+    stroke: url(#growLine);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .pins circle { fill: var(--paper); stroke: var(--rose); stroke-width: 2.4; }
+  .head .dot { fill: var(--rose); }
+  .head .halo { fill: var(--rose); opacity: 0.14; }
+
+  /* Motion, on the same contract as [data-reveal]: drawn by default, hidden only
+     once .js-motion confirms JS can animate it, so no-JS and reduced-motion both
+     get the finished chart. The flat line draws FIRST and fast — it is the
+     "before", and the rising line reads as the answer to it. */
+  :global(html.js-motion) .growth .ln-flat,
+  :global(html.js-motion) .growth .ln-rise {
+    /* pathLength="1" normalises both paths, so one dash length draws either of
+       them regardless of how long they actually are */
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1s var(--ease-out);
+  }
+  /* The flat line loses its dotted texture while it draws — one dash cannot both
+     be the pattern and be the reveal. It gets it back at rest, below. */
+  :global(html.js-motion) .growth .ln-flat { transition-duration: 0.7s; }
+  :global(html.js-motion) .growth .ln-rise { transition-delay: 0.35s; }
+  :global(html.js-motion) .growth .area { opacity: 0; transition: opacity 0.8s ease 0.9s; }
+  :global(html.js-motion) .growth .pins circle,
+  :global(html.js-motion) .growth .head {
+    opacity: 0;
+    transform: scale(0.2);
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: opacity 0.3s ease var(--d, 1.35s), transform 0.45s var(--ease-out) var(--d, 1.35s);
+  }
+  :global(html.js-motion) .growth.is-in .ln-flat,
+  :global(html.js-motion) .growth.is-in .ln-rise { stroke-dashoffset: 0; }
+  /* restore the dotted texture once it has finished drawing */
+  :global(html.js-motion) .growth.is-in .ln-flat {
+    stroke-dasharray: 4 5;
+    transition: stroke-dashoffset 0.7s var(--ease-out), stroke-dasharray 0s linear 0.7s;
+  }
+  :global(html.js-motion) .growth.is-in .area { opacity: 1; }
+  :global(html.js-motion) .growth.is-in .pins circle,
+  :global(html.js-motion) .growth.is-in .head { opacity: 1; transform: scale(1); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+  }
+  .lg {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--label);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--l3);
+  }
+  .lg i { width: 16px; height: 3px; border-radius: 99px; flex: none; }
+  .lg.flat i { background: var(--l3); opacity: 0.55; }
+  .lg.up i { background: var(--grad); }
+  .lg.up { color: var(--l2); }
+
   @media (max-width: 900px) {
     .grid { grid-template-columns: 1fr; gap: 44px; }
     .cat { max-width: none; }
+    /* the columns stack here, which puts the chart directly under the handwritten
+       line — closer to where the client asked for it than the desktop layout can be */
+    .growth { margin-top: clamp(26px, 4vh, 36px); }
   }
 </style>

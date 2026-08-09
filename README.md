@@ -26,7 +26,7 @@ React into a site that has no framework at all.
 |---|---|
 | JS (external chunks, gzipped) | 3.2 KB |
 | Fonts (woff2, precompressed) | 26.6 KB |
-| Heaviest page, first visit | **53.4 KB** |
+| Heaviest page, first visit | **54.5 KB** |
 | Hero image (WebP, one of four widths) | 44.5–151 KB |
 | Client logo tiles (27, lazy + warmed a screen early) | 260 KB |
 
@@ -304,6 +304,90 @@ stagger is `0.05s × 6` rather than `0.07s × 8` — at the old figures the last
 group landed 1.24s after the first was triggered, which reads as struggling rather than
 as choreography.
 
+## Where the leads go
+
+One endpoint, `POST /api/enquiry`, and two destinations: a **Google Sheet** the client
+reviews, and a **notification email** so he knows to look. They are not alternatives —
+nobody opens a spreadsheet unprompted, and nobody runs a pipeline out of an inbox. The
+sheet is the record; the email is the trigger.
+
+```
+form ──POST JSON──▶ /api/enquiry ──▶ Apps Script /exec ──▶ Leads sheet
+   (same origin)      (Netlify fn)  └─▶ Resend ──▶ client's inbox
+```
+
+**Why a function and not a direct POST.** A static site cannot hold a secret: anything
+the browser can reach is in the bundle, and `PUBLIC_*` is in the bundle by definition.
+Posting to the Apps Script Web App from the page would have published a write endpoint
+to the client's spreadsheet, unrotatable without redeploying the script. Here the URL
+and its token are Netlify env vars, the browser only sees our own origin (so no CORS
+preflight and no third-party request on the critical path), and the same handler can
+validate, filter bots and send the email.
+
+**It is still a static site.** Netlify Functions deploy alongside a static publish
+directory. `output` stays `static` and **no Astro adapter is involved** — do not add one
+to make this work.
+
+**Why Apps Script rather than the Google Sheets API.** The API route needs a Google
+Cloud project, an enabled API, a service account, and a 2 KB JSON key living in an env
+var and needing rotation. Apps Script needs a spreadsheet, a paste, and a deploy. Both
+end up equally secret because the credential sits server-side either way, so the
+simpler one wins. Switch to the API only if something ever needs to *read* the sheet
+back — the script is write-only by design.
+
+### Setting it up
+
+| | where | what |
+|---|---|---|
+| 1 | Google Sheets | Create the sheet, paste `netlify/sheet.gs`, run `setup`, deploy as a Web app. Full steps are in that file's header. |
+| 2 | Netlify env | `SHEET_WEBHOOK_URL`, `SHEET_WEBHOOK_TOKEN` |
+| 3 | Resend | Add the domain, add the DKIM/SPF records it prints to GoDaddy, wait for verify |
+| 4 | Netlify env | `RESEND_API_KEY`, `NOTIFY_FROM`, `NOTIFY_TO` |
+| 5 | Netlify env | `PUBLIC_FORM_ENDPOINT=/api/enquiry` — **last**, see below |
+
+`.env.example` lists all of them. Two things that bite:
+
+- **`PUBLIC_FORM_ENDPOINT` goes last.** While it is unset the form falls back to opening
+  the visitor's mail client with the fields prefilled, which is a working form. Setting
+  it before a destination exists points a working form at a 503.
+- **Apps Script serves the version you DEPLOYED**, not the one in the editor. After any
+  edit: Deploy → Manage deployments → edit → Version: New version. Saving alone changes
+  nothing about what the site is talking to, and this is the usual reason an Apps Script
+  "fix" appears to do nothing.
+- **An unverified Resend sender fails in production and passes every test first**,
+  because Resend will happily send from `onboarding@resend.dev` to your own account
+  address. `NOTIFY_FROM` must be on a verified domain.
+
+### What the function guarantees
+
+- **Nothing is silently dropped.** With neither destination configured it returns 503
+  rather than accepting a lead it has nowhere to put. If one destination fails and the
+  other succeeds it returns 200, because the lead did reach the client; only both
+  failing is an outage, and that is what puts the WhatsApp fallback on screen.
+- **A rejected token counts as a failed write.** Apps Script answers HTTP 200 for
+  application errors, so the parsed `ok` is what is checked — otherwise a bad token
+  would look like a successful append forever.
+- **Bots get a plain 200.** The honeypot and the sub-2.5s fill check both answer
+  success. Telling a script which of its tricks was spotted is free tuning information.
+  This is not rate limiting; a stateless function cannot rate limit without a store.
+- **No IP address is stored.** It is the one field the client cannot act on and the one
+  that turns a contact record into personal data he is now responsible for.
+- **`reply_to` is the lead's own address**, so Reply in Gmail answers the customer. The
+  alert also carries a `wa.me` deep link built from their number — one tap from
+  notification to conversation, which for this business is the channel that converts.
+
+### `npm run test:enquiry`
+
+The rest of the QA tools drive a browser, because the rest of the site *is* the browser.
+This one is the exception: it is the only server-side code here, it holds the client's
+leads, and its failure modes are the invisible kind. `qa/enquiry.mjs` runs the real
+handler against a fake Apps Script and a fake Resend on localhost — no deploy, no
+credentials — and covers the happy path, both bot filters, seven validation cases, HTML
+escaping in the email, and every degraded combination including the ones only reachable
+in production during an outage. **34 assertions, and one of them exists because the
+first version of the test was wrong**: a bad token with email still working *should*
+return 200, and isolating that case is what proves the token rejection is caught at all.
+
 ## Growth motifs
 
 The client asked for "growth related emojis, charts, icons" and left the placement open.
@@ -323,6 +407,37 @@ animates, and they follow the `[data-reveal]` contract: visible by default, hidd
 once `.js-motion` confirms JS can animate them. Profiles differ per tile so the row is
 not one shape stamped four times, and every one ends on its tallest bar — a chart that
 dips at the end tells the visitor something nobody meant to say.
+
+### The growth chart in About
+
+The second and larger one, next to the handwritten *"We don't just manage, We Grow
+Brands!"*. It is a picture of **that sentence**: a flat dotted line that drifts sideways
+and goes nowhere, and a rising gradient line that does not. The graphic argues the same
+thing the copy does rather than decorating it, which is the only reason it earns the
+space.
+
+**Unitless on purpose** — no axis values, no figures, no percentages. It illustrates a
+positioning statement, and the moment it carries a number it is claiming a result nobody
+measured. The legend names the two lines so it reads as a comparison rather than as data.
+
+Inline SVG, ~1.1 KB gzipped against the 30–50 KB a raster would have cost, and **no
+extra request at all**. It also takes the design tokens, which a PNG cannot: the ramp,
+the hairlines and the paper all come from `tokens.css`, so it follows the palette and
+would still be right if this section were ever moved onto ink.
+
+Two mechanics worth keeping:
+
+- `pathLength="1"` on both paths normalises them, so a single dash length draws either
+  one regardless of actual length. The flat line **loses its dotted texture while it
+  draws** — one `stroke-dasharray` cannot be both the pattern and the reveal — and gets
+  it back with a zero-duration transition timed to the end of the draw.
+- Colours are in CSS, not presentation attributes. `stroke="var(--rose)"` as an
+  attribute is not reliable, and `stop-color` on a gradient stop has to be reached
+  through a class for the same reason.
+
+It lives in the right-hand column rather than under the handwriting because that column
+ended two thirds of the way down and left a visible hole beside the line. On a phone the
+columns stack and it lands directly below the line it belongs to.
 
 ## Reach and the address
 
@@ -361,6 +476,14 @@ qa/
   contrast.mjs   WCAG audit against rendered pixels — see below
   seams.mjs      hard-step detector for tone boundaries — see below
   weigh.mjs      per-page gzipped weight against the budget
+  enquiry.mjs    contract test for the lead function — npm run test:enquiry
+netlify/
+  functions/
+    enquiry.mjs  the only server-side code: validate -> leads sheet + notify email
+  sheet.gs       Apps Script source. NOT deployed from here — it lives inside the
+                 client's spreadsheet; this is the version-controlled copy
+netlify.toml     build settings, caching and security headers, in the repo rather
+                 than only in the Netlify UI
 tools/
   logos.mjs      client logo pipeline — see below
   hero.mjs       hero render -> knocked-out WebP + manifest — see below
@@ -572,9 +695,16 @@ Exits non-zero on any failure. Run it on `/`, a service page and `/404` at both
 
 ## Still open
 
-- **`PUBLIC_FORM_ENDPOINT` is unset.** The enquiry form currently falls back to opening
-  the visitor's mail client with the fields prefilled. Set the env var (Formspree,
-  Web3Forms, or your own handler) to switch it to background AJAX submission.
+- **The lead pipeline is built but not connected.** `netlify/functions/enquiry.mjs`,
+  the Apps Script and the test all exist and pass; what is missing is the three
+  accounts-side steps only the client's own logins can do — create the sheet, deploy
+  the script, verify the domain in Resend — and the env vars that follow. Until then
+  `PUBLIC_FORM_ENDPOINT` stays unset and the form falls back to the visitor's mail
+  client, which is a working form. See **Where the leads go**.
+- **Decide who owns the leads sheet.** Whoever creates it keeps it if the relationship
+  ends. It should almost certainly be the client's Google account with the agency added
+  as an editor — the reverse is easier to set up today and worse later. Worth choosing
+  on purpose rather than by accident.
 - **Three client names need confirming.** They could not be read off the logo with
   confidence and are flagged `"verify": true` in `tools/clients.json`: *Silomin*,
   *Looms in Velvet*, and one still called *Client 27*. Fix the name map and re-run the

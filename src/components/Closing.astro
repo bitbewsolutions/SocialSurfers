@@ -212,6 +212,12 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
   const status = document.querySelector<HTMLElement>('[data-status]');
   const label = document.querySelector<HTMLElement>('[data-submit-label]');
 
+  /* When the form became reachable. netlify/functions/enquiry.mjs rejects anything
+     filled in under 2.5s as automated, and this is the clock it reads — measured
+     from page load rather than from first keystroke, because a bot that fills the
+     fields programmatically never generates one. */
+  const armed = Date.now();
+
   if (form && status && label) {
     const endpoint = form.dataset.endpoint || '';
     const btn = form.querySelector('button[type=submit]') as HTMLButtonElement;
@@ -259,13 +265,23 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
         return;
       }
 
+      /* JSON, not the FormData object.
+
+         Our own function is the endpoint now, and parsing multipart/form-data in a
+         serverless handler is real work for no benefit when both ends are ours. It
+         also stays portable: Formspree and Web3Forms both accept exactly this
+         shape, so pointing PUBLIC_FORM_ENDPOINT at one of them still works if the
+         function is ever dropped. */
+      const payload: Record<string, string | number> = { elapsed: Date.now() - armed, page: location.pathname };
+      data.forEach((v, k) => { payload[k] = String(v); });
+
       btn.disabled = true;
       label.textContent = 'Sending…';
       try {
         const res = await fetch(endpoint, {
           method: 'POST',
-          body: data,
-          headers: { Accept: 'application/json' },
+          body: JSON.stringify(payload),
+          headers: { 'content-type': 'application/json', Accept: 'application/json' },
         });
         if (!res.ok) throw new Error(String(res.status));
         form.reset();
