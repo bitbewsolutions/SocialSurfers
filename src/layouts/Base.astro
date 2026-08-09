@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import { site } from '../data/site';
 import { services } from '../data/services';
+import heroArt from '../data/hero-art.json';
 
 interface Props {
   title: string;
@@ -76,14 +77,40 @@ const breadcrumbLd = breadcrumbs && {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
 
-    <!-- one face for display and body, and it is in the LCP element — preload it -->
+    <!-- One face for display and body, and it is in the LCP element — preload it.
+
+         This pointed at /fonts/grotesk-sub.woff2 until now, which has not existed
+         since the type system was replaced: the file is archivo-sub.woff2. So every
+         visit spent a request on a 404 and the font the headline is actually set in
+         was never preloaded — it was discovered at CSS parse time instead, one round
+         trip later, which is precisely the delay the preload was added to remove.
+         If this filename changes again, change it HERE too; a wrong path fails
+         silently and only shows up as a slower first paint. -->
     <link
       rel="preload"
-      href="/fonts/grotesk-sub.woff2"
+      href="/fonts/archivo-sub.woff2"
       as="font"
       type="font/woff2"
       crossorigin
     />
+
+    {/* The hero photograph is the LCP element on the homepage. The preload scanner
+        would find the <img> on its own, but only after the inlined stylesheet ahead
+        of it has been parsed; declared here it starts in the same breath as the font.
+
+        srcset and sizes MUST match the <img> exactly or the browser picks a
+        different candidate and downloads the picture twice — which is why both come
+        from the same manifest rather than being written out by hand. */}
+    {isHome && (
+      <link
+        rel="preload"
+        as="image"
+        href={heroArt.src}
+        imagesrcset={heroArt.sources.map((s) => `${s.src} ${s.w}w`).join(', ')}
+        imagesizes="100vw"
+        fetchpriority="high"
+      />
+    )}
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />

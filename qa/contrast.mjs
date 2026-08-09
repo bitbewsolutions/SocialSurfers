@@ -458,10 +458,15 @@ if (exempted.length) {
 }
 if (unmeasurable.length) {
   console.log(`  ${unmeasurable.length} UNMEASURABLE — no dominant ground, judge these by eye:`);
-  for (const e of unmeasurable.slice(0, 12)) {
+  /* "…and 26 more" is fine as a summary and useless as a work list — these are
+     exactly the runs a human has to check, so --all prints every one of them. */
+  const shown = args.includes('--all') ? unmeasurable : unmeasurable.slice(0, 12);
+  for (const e of shown) {
     console.log(`     ${e.sel}  ${JSON.stringify(e.text)}`);
   }
-  if (unmeasurable.length > 12) console.log(`     …and ${unmeasurable.length - 12} more`);
+  if (shown.length < unmeasurable.length) {
+    console.log(`     …and ${unmeasurable.length - shown.length} more (--all to list them)`);
+  }
 }
 console.log('  ' + '-'.repeat(78));
 if (!fails.length) {

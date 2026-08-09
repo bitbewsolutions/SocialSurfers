@@ -24,11 +24,11 @@ React into a site that has no framework at all.
 
 | | on the wire |
 |---|---|
-| JS (external chunks, gzipped) | 3.0 KB |
+| JS (external chunks, gzipped) | 3.2 KB |
 | Fonts (woff2, precompressed) | 26.6 KB |
-| Heaviest page, first visit | **52.1 KB** |
+| Heaviest page, first visit | **53.4 KB** |
 | Hero image (WebP, one of four widths) | 44.5–151 KB |
-| Client logo tiles (27, lazy) | 178 KB |
+| Client logo tiles (27, lazy + warmed a screen early) | 260 KB |
 
 The shader is parked (see below) and no longer bundled, which is most of the JS drop.
 Fonts got smaller while gaining a family — see **Type**.
@@ -66,8 +66,9 @@ breaks — the sizes went up too, but far less than the result suggests.
 
 **One page, plus sixteen service pages.**
 
-- `/` carries hero → stats → about → services → process → clients → contact. The nav
-  links are in-page anchors (`/#services`, `/#process`, `/#clients`, `/#contact`).
+- `/` carries hero → stats → about → services → process → clients → **industries** →
+  enquiry → get in touch. The nav links are in-page anchors (`/#services`,
+  `/#process`, `/#clients`, `/#contact`).
 - `/services/<slug>` — each service keeps its own page. They hold the detail and the
   search intent a homepage section can't, and they are the only routes in the sitemap
   besides `/`.
@@ -79,6 +80,44 @@ breaks — the sizes went up too, but far less than the result suggests.
 Cross-page anchors are load-bearing here, so `initScroll()` lands on the fragment
 itself — see the comment on `landOnHash()` for why the browser's own behaviour and
 `scrollIntoView` both get it wrong on this page.
+
+### Section order and the tonal chain are one decision, not two
+
+The ramps are *paired* across each boundary — the section above spends its last
+`--fade-h` reaching `--tone-mid`, the one below spends its first leaving it — so moving
+a section means re-pairing it, and a mismatched pair shows as a hard line. The chain,
+which is also written out at the top of `pages/index.astro`:
+
+| section | class | |
+|---|---|---|
+| Hero | `tone-dark` | paints ink→mid into its own scrim, not via `.to-light` — the `<img>` would cover it |
+| Stats | `from-dark` | pairs with the hero's handover |
+| About | — | paper, masked wash |
+| Services | `to-dark` | |
+| Process | `tone-dark from-light` | |
+| Clients | `tone-dark to-light` | |
+| Industries | `from-dark` | took this pairing over from the contact band |
+| Enquiry | — | paper; no ramp, it sits between two light sections |
+| Get in touch | `to-dark` | last light section, so it inherited the footer handover |
+| Footer | `tone-dark from-light` | |
+
+Two of those classes also supply padding (`.to-dark` a bottom, `.from-dark` a top), and
+an Astro scoped selector outranks them — it carries a `[data-astro-cid-*]` attribute and
+they do not. So a section that sets its own `padding-bottom` silently discards the ramp
+clearance. `Contact.astro` restates both for that reason.
+
+`Contact.astro` used to render `Closing.astro` as a child. It doesn't any more: a
+component that renders the section after it cannot be reordered independently of it,
+which is exactly what this pass needed. `index.astro` orders both.
+
+**Industries** is its own section as of this pass. It was a label and a 104px icon grid
+in the left column of the enquiry block, sharing half a page with the pitch, the
+checklist and the contact buttons — twenty tiles at that size in that space is a
+texture, not a section, and the client read it as decoration. It now follows the logo
+wall, so the page argues *here is who we work for* and then *here is the shape of that
+work* before it asks for anything. The closing **"and many more"** tile is deliberately
+not in the `industries` array: that array is what `stats.industriesServed` counts, and a
+tile naming no industry would have made the figure two screens up read 21.
 
 ## Voice
 
@@ -214,6 +253,77 @@ exactly as before**, so nothing is lost when the module does not load.
 - **`prefers-reduced-motion` gets the better deal**: no auto-drift, but the rail is
   still scrollable, where before it was a strip they could neither watch nor move.
 
+## What gets loaded, and when
+
+The client asked whether the site could *feel* faster. Most of the answer was one bug
+and one wrong assumption about lazy loading.
+
+**The font preload pointed at a file that does not exist.** `Base.astro` preloaded
+`/fonts/grotesk-sub.woff2`, which has not been the filename since the type system was
+replaced — it is `archivo-sub.woff2`. Every visit spent a request on a 404, and the
+face the LCP headline is set in was never preloaded at all; it was discovered at CSS
+parse time, one round trip later, which is precisely the delay a preload removes. If
+the subsetter's output filename ever changes again, change it in `Base.astro` too: a
+wrong path here fails silently and only shows up as a slower first paint.
+
+**The hero is preloaded with `imagesrcset`/`imagesizes`.** It is the LCP element. The
+preload scanner would find the `<img>` on its own, but only after the inlined
+stylesheet ahead of it is parsed. `srcset` and `sizes` must match the `<img>` exactly
+or the browser picks a different candidate and downloads the picture twice — both come
+from `data/hero-art.json` rather than being written out by hand.
+
+**The logo wall stopped assembling itself in front of the visitor.** `loading="lazy"`
+is right for 27 tiles two thirds down the page, but native lazy loading decides by
+intersection, and the marquee is a *horizontal* scroller: most tiles sit outside the
+rail's own overflow box, so they stayed unloaded until the drift carried them in and
+then decoded one at a time. `marquee.ts` keeps the attribute and warms the cache a
+screen early instead — an IntersectionObserver at `rootMargin: 700px` fetches the
+outstanding URLs through `new Image()`. Measured on the built page:
+
+| viewport is | observer | tiles loaded |
+|---|---|---|
+| at the top of the page | not fired | 0 / 54 |
+| 1200px above the rail | not fired | 18 / 54 — native lazy has begun |
+| 500px above the rail | **fires, 9 URLs** | 54 / 54 |
+
+Those last nine are the ones that used to pop. Note the *unique-URL* set: the track
+holds every logo twice for the seamless loop, so warming elements rather than URLs
+would queue 54 requests for 27 files. The rail element carries `data-warmed="<n>"`
+afterwards, which is how the table above was measured.
+
+> Verify this with `qa/probe.mjs … --nowalk`. The default walk scrolls the whole
+> document before evaluating, so everything is already warm by the time you look —
+> a first pass without the flag reported 54/54 loaded at scroll 0 and meant nothing.
+
+**Reveal timing was part of "slow" too.** The observer used `rootMargin: -12%` with a
+`0.08` threshold, so an element had to be an eighth of the way up the screen before it
+could start a 0.75s fade — on a phone you routinely scrolled to blank space and waited.
+The threshold compounded it on tall blocks: the 21-tile industry grid is taller than a
+phone viewport, so 8% *of it* is most of a screen. Now `-6%` / `0.02`, and the per-group
+stagger is `0.05s × 6` rather than `0.07s × 8` — at the old figures the last tile in a
+group landed 1.24s after the first was triggered, which reads as struggling rather than
+as choreography.
+
+## Growth motifs
+
+The client asked for "growth related emojis, charts, icons" and left the placement open.
+They live on the stat tiles, which turn into small KPI cards: rising bar chart, figure,
+label. That section is four numbers all describing growth, so a rising chart is the
+plainest possible drawing of what it already says.
+
+**Not emoji, deliberately.** 📈 renders as a different picture on Android, iOS, Windows
+and Samsung, cannot take the brand ramp, and sits next to a hand-built wordmark looking
+like clip art. The bars are the site's own gradient instead — each takes its own point
+on the ramp *by index*, so the chart walks violet→rose the way `--grad` does. Giving
+each bar `background: var(--grad)` would compress the whole ramp into 7px and read as a
+flat fill.
+
+They grow with `transform`, not `height`, so nothing here triggers layout while it
+animates, and they follow the `[data-reveal]` contract: visible by default, hidden only
+once `.js-motion` confirms JS can animate them. Profiles differ per tile so the row is
+not one shape stamped four times, and every one ends on its tallest bar — a chart that
+dips at the end tells the visitor something nobody meant to say.
+
 ## Reach and the address
 
 The business takes work from anywhere. `areaServed` in the schema is `Worldwide`, and
@@ -234,12 +344,13 @@ Address ≠ service area, and neither is the same as what's printed on the page.
 ```
 src/
   data/          the only place content lives — site.ts (NAP, socials, WhatsApp),
-                 services.ts (7 services + per-page SEO), content.ts (process,
-                 projects, stats)
+                 services.ts (16 services + per-page SEO), content.ts (process,
+                 industries, whyUs, pillars, stats)
   components/    one file per section; styles are Astro-scoped
   scripts/
     fluid.ts     the hero's WebGL current
     scroll.ts    progress thread, fragment landing, per-element --p, reveal observer
+    marquee.ts   scrollLeft-driven logo drift + drag, and the tile cache warmer
   layouts/Base.astro   <head>, OG tags, LocalBusiness / Service / Breadcrumb JSON-LD
 qa/
   shot.mjs       CDP screenshots. --full, --reduce, --vp WxH:name, and
@@ -383,7 +494,23 @@ button label. Coral is beautiful and cannot carry text on paper (2.55:1).
   otherwise and land dark-on-dark — exactly how the logo wordmark reached 1.08:1 in the
   footer during this rework.
 
-### `node qa/contrast.mjs <url> [--vp 1440x900] [--worst 10]`
+### `node qa/seams.mjs <url> [--vp 1440x900] [--max 14]`
+
+Walks every pixel row and reports where the background jumps further in one row than a
+smooth ramp ever would. The "background" of a row is its **modal** pixel, not a fixed
+column — a single column runs through headlines and logo tiles, and every glyph edge it
+crosses looks exactly like a seam.
+
+That heuristic has one honest limit, and it shows at **390x844**: where a row is
+*mostly* one card or two logo tiles, the mode is the content rather than the ground, and
+the tool reports a step at the card's edge. Six such findings sit in `services` and
+`clients` on phones. They are content boundaries, not ramp failures — verified by
+building the previous commit in a throwaway worktree and diffing the output, which
+reproduced all six at the same offsets within their sections. **Compare against a
+baseline before treating a mobile finding as a regression**; desktop is clean and any
+new entry there is real.
+
+### `node qa/contrast.mjs <url> [--vp 1440x900] [--worst 10] [--all]`
 
 You cannot catch that class of bug by reading CSS: the declared colour is fine, the
 pixel behind it is not. The tool renders the page, takes the modal pixel inside each
@@ -431,10 +558,14 @@ and were dropped, so the measured count swung between 183 and 233 across consecu
 runs of the same page. The audit now forces the final state — drop `.js-motion`, add
 `.is-in` — which is also exactly the no-JS rendering every element must be legible in.
 
+`--all` prints every unmeasurable run instead of the first twelve. "…and 26 more" is a
+fine summary and a useless work list — those are exactly the runs a human has to check.
+
 After any change to this tool, **re-run the regression**: reintroduce a known failure
-(a white fill under the hero's ghost button does it), confirm it is caught, then restore
-and confirm the page passes. Two of the four fixes above were themselves broken on the
-first attempt and only that test found it.
+(a white fill under the hero's ghost button does it; a near-white `color` on the
+industry tile names is the same test in a light section), confirm it is caught, then
+restore and confirm the page passes. Two of the four fixes above were themselves broken
+on the first attempt and only that test found it.
 
 Exits non-zero on any failure. Run it on `/`, a service page and `/404` at both
 1440x900 and 390x844 after touching any background.
@@ -448,13 +579,20 @@ Exits non-zero on any failure. Run it on `/`, a service page and `/404` at both
   confidence and are flagged `"verify": true` in `tools/clients.json`: *Silomin*,
   *Looms in Velvet*, and one still called *Client 27*. Fix the name map and re-run the
   tool; the tile filenames and the data file follow automatically.
-- **Two headline figures are the client's own and cannot be checked here.**
-  `projectsDelivered` (80+) and `brands` (54+) are literals he supplied; the logo wall
-  renders 27 tiles and is explicitly framed as "a selection of", which is what makes
-  that consistent. `industriesServed` and `serviceLines` are derived from the data
-  again — the icon grid holds 20 and the capability list holds 16 — so those two
-  cannot drift from what a visitor can count. Every figure renders with a trailing
-  "+", at his request.
+- **Three headline figures are the client's own and cannot be checked here.**
+  He raised all four this pass, to 500 / 150 / 20 / 25. `projectsDelivered` and
+  `brands` are literals he supplied; the logo wall renders 27 tiles and is explicitly
+  framed as "a selection of", which is what keeps that consistent — more so at 150 than
+  it was at 54. `industriesServed` stays derived from `industries.length`, which is
+  exactly the 20 he asked for.
+  **`serviceLines` is the one to understand before touching it.** It is a literal 25
+  while the services grid shows **16 cards**, so at a glance they look like they
+  disagree. They don't: the cards are *categories*, and the `items` beneath them list
+  200 individual services — every card already says "+14 more" or similar. 25 is
+  comfortably true against the thing the number names and comfortably conservative
+  against 200. If it ever needs defending, that is the answer; if he would rather it
+  were unarguable, `services.length` (16) and 200 are both derivable and both honest.
+  Every figure renders with a trailing "+", at his request.
 - **The hero render leans on third-party platform logos** as decorative 3D art, which
   Meta / YouTube / TikTok brand guidelines restrict. It is in use at the client's
   request, and the decision is his and on record. Ranked by likelihood: nothing happens;

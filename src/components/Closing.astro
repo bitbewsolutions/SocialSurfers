@@ -1,5 +1,5 @@
 ---
-import { industries, whyUs } from '../data/content';
+import { whyUs } from '../data/content';
 import { site, waLink, telLink } from '../data/site';
 
 /* Set PUBLIC_FORM_ENDPOINT (Formspree, Web3Forms, or your own handler) to enable
@@ -8,28 +8,13 @@ import { site, waLink, telLink } from '../data/site';
 const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
 ---
 
-<section class="close to-dark" id="enquire">
+<section class="close" id="enquire">
   <div class="shell">
     <div class="grid">
       <div class="pitch">
-        {/* Icons rather than text badges, per the client's reference. The list is
-            also what `stats.industriesServed` counts, so the grid and the "20+" tile
-            cannot disagree — which is why "including" came back off the label. */}
-        <p class="label" data-reveal>Who we work with</p>
-        <ul class="inds">
-          {industries.map((i) => (
-            <li data-reveal data-reveal-group="ind">
-              <span class="ico" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
-                     stroke-linecap="round" stroke-linejoin="round">
-                  <path d={i.d} />
-                </svg>
-              </span>
-              <span class="nm">{i.name}</span>
-            </li>
-          ))}
-        </ul>
-
+        {/* The industry grid used to open this column. It is its own section now,
+            directly under the client wall — see Industries.astro. */}
+        <p class="label" data-reveal>Start here</p>
         <h2 class="h2" data-reveal>Tell us what you&rsquo;re <em>trying to grow.</em></h2>
         <p class="lead" data-reveal>
           One call, no pitch deck. We&rsquo;ll tell you what we&rsquo;d actually do for your
@@ -103,16 +88,13 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
 </section>
 
 <style>
-  /* The resolution beat: the water goes calm and the ground goes light again.
-     Fixed-pixel stops, for the same reason as the process section's bands. This
-     used to ramp dark→foam across 100% of the section, and the section is ~1400px
-     tall — so the ground was still mid-purple where the ink-coloured heading, lead
-     and checklist sit. Measured 1.76:1 on the h2, 2.40:1 on the lead.
-     Pinned this way the dawn always completes in 240px and every dark-on-light
-     element below it is on actual foam. */
+  /* No ramp of its own any more. It used to close the page on .to-dark, handing over
+     to the footer; the "get in touch" band sits between them now and carries that
+     handover instead, so both halves of the boundary stay adjacent. */
   .close {
     background-color: var(--paper);
-    padding-top: var(--section-y);
+    /* asymmetric on purpose — the band below opens with its own top padding */
+    padding-block: clamp(60px, 9vh, 118px) clamp(48px, 7vh, 90px);
     color: var(--l1);
   }
 
@@ -125,60 +107,7 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
 
   /* everything in this column now sits on foam, so it takes the light-ground ramp */
   .pitch .label { color: var(--l3); }
-  /* auto-fill rather than a fixed column count: twenty tiles across a column that
-     is itself half the page needs to reflow at more sizes than three breakpoints
-     would cover, and every tile is the same object so there is no ordering to keep */
-  .inds {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
-    gap: 8px;
-    margin: 18px 0 clamp(36px, 6vh, 64px);
-  }
-  .inds li {
-    display: grid;
-    justify-items: center;
-    align-content: start;
-    gap: 9px;
-    padding: 16px 8px 14px;
-    border-radius: var(--radius);
-    border: 1px solid var(--hair);
-    background: rgba(255, 255, 255, 0.55);
-    transition: border-color var(--dur-fast), background var(--dur-fast), transform var(--dur) var(--ease-out);
-  }
-  .inds .ico {
-    display: grid;
-    place-items: center;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    color: var(--violet);
-    background: rgba(63, 42, 134, 0.08);
-    transition: background var(--dur-fast), color var(--dur-fast);
-  }
-  .inds .ico svg { width: 21px; height: 21px; }
-  .inds .nm {
-    font-size: 11.5px;
-    font-weight: 700;
-    line-height: 1.25;
-    text-align: center;
-    color: var(--l2);
-    text-wrap: balance;
-  }
-  .inds li:hover {
-    transform: translateY(-2px);
-    border-color: rgba(63, 42, 134, 0.28);
-    background: rgba(255, 255, 255, 0.85);
-  }
-  .inds li:hover .ico { background: var(--grad); color: #fff; }
-
-  @media (max-width: 420px) {
-    .inds { grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px; }
-    .inds li { padding: 13px 6px 11px; }
-    .inds .ico { width: 34px; height: 34px; }
-    .inds .ico svg { width: 19px; height: 19px; }
-  }
-
-  .pitch .h2 { color: var(--l1); max-width: 16ch; }
+  .pitch .h2 { color: var(--l1); max-width: 16ch; margin-top: 14px; }
   .pitch .lead { color: var(--l2); margin-top: 18px; }
 
   .checks {

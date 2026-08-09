@@ -1,12 +1,16 @@
 ---
-import Closing from './Closing.astro';
 import Socials from './Socials.astro';
 import { site, waLink, telLink, mailLink } from '../data/site';
 
-/* Was a standalone /contact page. It is now the closing section of the one-pager:
-   the enquiry form was already here, and a separate page only added a navigation
-   step between "convinced" and "typing". The route still exists as a redirect so
-   any link already in the wild lands in the right place.
+/* Was a standalone /contact page. It is now the last band of the one-pager, at the
+   client's request — the four ways to reach a human, immediately above the footer.
+   The route still exists as a redirect so any link already in the wild lands in the
+   right place.
+
+   It used to sit ABOVE the enquiry form and render it as a child. Both are sections
+   of the page now and index.astro orders them, which is why this file no longer
+   imports Closing: a component that renders the section after it cannot be moved
+   independently of it, and that is exactly what this pass had to do.
 
    The address is deliberately plain text, not a map link. Nobody is being invited to
    the office — the work is delivered remotely. It's here as a trust signal and for
@@ -14,7 +18,7 @@ import { site, waLink, telLink, mailLink } from '../data/site';
    a visit that isn't on offer. */
 ---
 
-<section class="ways from-dark" id="contact">
+<section class="ways to-dark" id="contact">
   {/* The light valley between the dark chapter above and the dark footer below was
       the longest stretch of plain paper left on the page, which is what the client
       was pointing at. Same masked wash as the About section: zero at both edges, so
@@ -61,14 +65,18 @@ import { site, waLink, telLink, mailLink } from '../data/site';
   </div>
 </section>
 
-<Closing />
-
 <style>
+  /* .to-dark is the top half of the handover into the footer — it used to be on the
+     enquiry section, which now sits above this one. Both of the class's paddings are
+     restated because a scoped selector outranks it: it carries an attribute
+     selector, .to-dark does not, so whatever this rule sets simply wins. Losing the
+     bottom one silently would put the heading inside the steep part of the ramp. */
   .ways {
     position: relative;
     isolation: isolate;
     background-color: var(--paper);
-    padding-bottom: clamp(30px, 5vh, 56px);
+    padding-top: clamp(48px, 7vh, 90px);
+    padding-bottom: calc(var(--fade-h) * 0.5);
   }
 
   .wash {

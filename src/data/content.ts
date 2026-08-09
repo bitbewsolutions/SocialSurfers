@@ -62,7 +62,7 @@ export const solutions = [
 ] as const;
 
 /**
- * Industries the agency works in, each with a line icon for the grid in Closing.astro.
+ * Industries the agency works in, each with a line icon for the grid in Industries.astro.
  *
  * Extended from 10 to 20 at the client's request — the ten it had were the ones his
  * roster proves, and the rest are ordinary SMB categories a regional digital agency
@@ -140,30 +140,38 @@ export interface Client {
 export const clients: readonly Client[] = clientData;
 
 /**
- * Headline figures. Every one of them is rendered with a trailing "+", at the
- * client's request — he has been trading a long time and does not want the site
- * fixing a ceiling he has already passed.
+ * Headline figures. Every one is rendered with a trailing "+", at the client's
+ * request — he has been trading a long time and does not want the site fixing a
+ * ceiling he has already passed.
  *
- * That request also fixed the problem the previous pass had to flag. The figures
- * were doubled literals, and two of them were contradicted by things a visitor
- * could count on the same page. Two changes resolve it:
+ * The four values here are the ones HE supplied in this pass (500 / 150 / 20 / 25),
+ * raised from 80 / 54 / 20 / 16. Two are his own trading record and nobody else can
+ * check them; two are countable on the page, so they are derived rather than typed:
  *
- *   serviceLines      now `services.length` again — the capability document took
- *                     the list from 7 categories to 16, so the tile and the grid
- *                     agree without anyone having to choose between them.
- *   industriesServed  now `industries.length` — the list below was extended to 20
- *                     for the new icon grid, which is the figure it already claimed.
+ *   industriesServed  `industries.length` — exactly the 20 he asked for, and the
+ *                     grid in Industries.astro renders that same array. The "and
+ *                     many more" tile is deliberately not in it; it is a gesture,
+ *                     not a category, and counting it would make the tile read 21.
  *
- * So three of the four are derived and true again, and "+" is honest headroom on
- * top rather than the only thing holding them up. `brands` stays a literal: it is
- * his own count, the logo wall is explicitly "a selection of", and only he can
- * confirm it. `projectsDelivered` likewise.
+ *   serviceLines      the one figure worth understanding before changing. It is 25
+ *                     at his instruction while the services grid shows 16 CARDS, so
+ *                     at a glance the two look like they disagree. They do not: the
+ *                     16 cards are categories, and the `items` beneath them list 200
+ *                     individual services — every card already says "+14 more" or
+ *                     similar. 25 is comfortably true against the thing the number
+ *                     actually names, and comfortably conservative against 200.
+ *                     If it ever needs defending, that is the answer; if he would
+ *                     rather it were unarguable, `services.length` (16) and 200 are
+ *                     both derivable and both honest.
+ *
+ * `brands` and `projectsDelivered` stay literals: the logo wall is explicitly "a
+ * selection of", and only he can confirm either.
  */
 export const stats = {
-  projectsDelivered: 80,
-  brands: 54,
+  projectsDelivered: 500,
+  brands: 150,
   industriesServed: industries.length,
-  serviceLines: services.length,
+  serviceLines: 25,
 } as const;
 
 /**

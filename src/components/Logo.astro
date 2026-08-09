@@ -23,7 +23,11 @@ interface Props {
 const { size = 34, markOnly = false, tagline = false } = Astro.props;
 ---
 
-<span class="logo" style={`--mark:${size}px`}>
+{/* The inline value is --mark-LG, and the stylesheet derives --mark from it. That
+    indirection is the whole reason the phone size below can exist: an inline custom
+    property beats any selector, so a media query setting --mark directly would have
+    been ignored and the wordmark would have stayed at its desktop size. */}
+<span class="logo" style={`--mark-lg:${size}px`}>
   <svg viewBox="0 0 242 365" aria-hidden="true" focusable="false">
     <path
       class="upper"
@@ -50,6 +54,7 @@ const { size = 34, markOnly = false, tagline = false } = Astro.props;
 
 <style>
   .logo {
+    --mark: var(--mark-lg);
     display: inline-flex;
     align-items: center;
     gap: 11px;
@@ -101,5 +106,14 @@ const { size = 34, markOnly = false, tagline = false } = Astro.props;
      size where it can actually be read. */
   @media (max-width: 900px) {
     .cat { display: none; }
+  }
+
+  /* A notch down on phones, per the client — the lockup was reading as the loudest
+     thing in a 42px-tall bar. One factor rather than a second size prop: the mark,
+     the wordmark and the category line are all derived from --mark, so they stay in
+     proportion and the nav is not the only caller that has to be told about it.
+     0.85 is deliberately small — he asked for "a little". */
+  @media (max-width: 640px) {
+    .logo { --mark: calc(var(--mark-lg) * 0.85); gap: 9px; }
   }
 </style>

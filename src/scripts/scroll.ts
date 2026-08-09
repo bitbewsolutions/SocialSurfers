@@ -217,10 +217,20 @@ export function initReveals() {
         io.unobserve(el); // one-shot; nothing re-hides on scroll back up
       }
     },
-    { rootMargin: '0px 0px -12% 0px', threshold: 0.08 },
+    /* Both numbers were tuned when the page had far fewer, far smaller reveal
+       targets, and the client's note about the site feeling slow is partly this:
+       -12% meant an element had to be an eighth of the way up the screen before it
+       was allowed to start a 0.75s fade, so on a phone you routinely scrolled to
+       blank space and waited for it. The 8% threshold compounded it on tall blocks —
+       the 21-tile industry grid is taller than a phone viewport, so 8% OF IT is most
+       of a screen. A sliver is enough to commit. */
+    { rootMargin: '0px 0px -6% 0px', threshold: 0.02 },
   );
 
-  // stagger is per named group, so one section's index never leaks into another's
+  /* Stagger is per named group, so one section's index never leaks into another's.
+     Shortened as well: at 0.07s x 8 the last tile in a group landed 1.24s after the
+     first was triggered, and the eye reads the tail of that as the page struggling
+     rather than as choreography. 0.05 x 6 keeps the cascade and halves the wait. */
   const groupCount = new Map<string, number>();
 
   document.querySelectorAll<HTMLElement>('[data-reveal]').forEach((el) => {
@@ -228,7 +238,7 @@ export function initReveals() {
     if (group) {
       const i = groupCount.get(group) ?? 0;
       groupCount.set(group, i + 1);
-      el.style.setProperty('--reveal-delay', `${Math.min(i, 7) * 0.07}s`);
+      el.style.setProperty('--reveal-delay', `${Math.min(i, 6) * 0.05}s`);
     }
     io.observe(el);
   });

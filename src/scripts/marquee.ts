@@ -18,9 +18,77 @@
 
 const RESUME_AFTER = 1100; // ms of stillness before the drift starts again
 
+/**
+ * Fetch a rail's logos before it reaches the viewport.
+ *
+ * `loading="lazy"` is right for these — 27 tiles two thirds of the way down the page
+ * are not first-visit bytes. But native lazy loading decides by INTERSECTION, and
+ * this rail is a horizontal scroller: most of its tiles sit outside the rail's own
+ * overflow box, so they stayed unloaded until the drift carried them in, and then
+ * decoded one at a time in front of the visitor. A logo wall that assembles itself
+ * while you watch is the "lazy loading" the client spotted, and no amount of tuning
+ * the loading attribute fixes it, because the tiles genuinely are off screen.
+ *
+ * So: keep the attribute, and warm the cache a screen early instead. The rail's
+ * images are fetched through the Image constructor once the section is within
+ * `MARGIN` of the viewport; the <img> elements then resolve from cache the moment
+ * they intersect. Whole roster is 260 KB, and none of it is on the critical path.
+ *
+ * The unique-URL set matters: the track holds every logo twice for the seamless
+ * loop, so warming the elements rather than the URLs would queue 54 requests for 27
+ * files.
+ */
+const MARGIN = '700px 0px';
+
+function warm(root: HTMLElement) {
+  const urls = new Set<string>();
+  root.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((img) => {
+    if (img.currentSrc || img.complete) return;
+    urls.add(img.src);
+  });
+  urls.forEach((u) => { new Image().src = u; });
+  /* Records that the trigger fired and how many files it still had to ask for, so
+     the behaviour is measurable rather than asserted. Measured on the built page
+     (qa/probe.mjs --nowalk — the default walk scrolls the whole document first and
+     warms everything before you can look):
+
+       at the top of the page      not fired,  0/54 tiles loaded
+       1200px above the rail       not fired, 18/54   ← native lazy has begun
+       500px above the rail        fired: 9,  54/54
+
+     Which is exactly the gap this closes. Chrome's own lazy threshold gets most of
+     the roster on its own; the last nine are the tiles sitting outside the rail's
+     horizontal overflow box, and those are the ones that used to appear one at a
+     time as the drift carried them in. */
+  root.dataset.warmed = String(urls.size);
+}
+
+function warmOnApproach(rails: HTMLElement[]) {
+  const root = rails[0]?.closest<HTMLElement>('.marquees') ?? rails[0];
+  if (!root) return;
+
+  if (!('IntersectionObserver' in window)) {
+    warm(root);
+    return;
+  }
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        io.disconnect();
+        warm(root);
+      }
+    },
+    { rootMargin: MARGIN },
+  );
+  io.observe(root);
+}
+
 export function initMarquee() {
   const rails = Array.from(document.querySelectorAll<HTMLElement>('[data-marquee]'));
   if (!rails.length) return;
+
+  warmOnApproach(rails);
 
   /* Auto-drift is motion; scrolling is not. Under prefers-reduced-motion the rail
      still becomes scrollable — that is strictly better than what those visitors had

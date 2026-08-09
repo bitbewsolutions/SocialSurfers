@@ -7,9 +7,33 @@ import About from '../components/About.astro';
 import Services from '../components/Services.astro';
 import Process from '../components/Process.astro';
 import Proof from '../components/Proof.astro';
+import Industries from '../components/Industries.astro';
+import Closing from '../components/Closing.astro';
 import Contact from '../components/Contact.astro';
 import Footer from '../components/Footer.astro';
 import { site } from '../data/site';
+
+/*
+ * Section order, and the tonal chain that runs underneath it.
+ *
+ * The client moved two blocks in this pass: the industry grid came out of the
+ * enquiry column to sit directly under the client wall, and "get in touch" went to
+ * the very bottom. The tonal ramps are PAIRED across each boundary — the section
+ * above spends its last --fade-h reaching --tone-mid and the one below spends its
+ * first --fade-h leaving it — so moving a section means re-pairing, not just
+ * re-ordering. The chain as it now stands:
+ *
+ *   Hero        tone-dark, paints ink→mid into its own scrim
+ *   Stats       from-dark   ← pairs with the hero's handover
+ *   About       paper
+ *   Services    to-dark
+ *   Process     tone-dark from-light
+ *   Proof       tone-dark to-light
+ *   Industries  from-dark   ← was Contact; took the pairing with it
+ *   Closing     paper       (no ramp: it is between two light sections now)
+ *   Contact     to-dark     ← was Closing's; it is the last light section
+ *   Footer      tone-dark from-light
+ */
 ---
 
 <Base
@@ -25,6 +49,8 @@ import { site } from '../data/site';
     <Services />
     <Process />
     <Proof />
+    <Industries />
+    <Closing />
     <Contact />
   </main>
   <Footer />

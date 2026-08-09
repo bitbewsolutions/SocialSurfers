@@ -1,0 +1,168 @@
+---
+import { industries, stats } from '../data/content';
+
+/*
+ * Industries we serve — its own section now, directly under the client wall.
+ *
+ * It used to be a label and a small icon grid tucked into the left column of the
+ * enquiry section, sharing a half-width column with the pitch, the checklist and the
+ * contact buttons. Twenty tiles at 104px in half a page is a texture, not a section:
+ * the client read it as decoration and asked for it to be promoted.
+ *
+ * Two things change as a result and both are the point:
+ *  - the grid gets the full shell, so a tile can be big enough to read at a glance
+ *  - it follows the logo wall, so the page argues "here is who we work for" and then
+ *    "here is the shape of that work" before it asks for anything
+ *
+ * The closing "and many more" tile is deliberately NOT in `industries`. That array is
+ * what `stats.industriesServed` counts, and a tile that names no industry would have
+ * inflated the figure on the tile two screens up by one.
+ */
+
+/** A plus in a ring — the only tile that is a gesture rather than a category. */
+const MORE_ICON = 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 8.2v7.6M8.2 12h7.6';
+---
+
+<section class="inds-sec from-dark" id="industries" aria-labelledby="inds-h">
+  {/* Same masked wash as About and the contact band. This section added ~900px of
+      plain paper between two that already had one, and "the site looks too white in
+      places" is a note we have had from the client once already. Masked to nothing
+      at both edges so the ramp above and the flat paper below both meet it clean —
+      an untidy edge here is exactly what qa/seams.mjs is for. */}
+  <div class="wash" aria-hidden="true"></div>
+
+  <div class="shell head">
+    <p class="label" data-reveal>{stats.industriesServed}+ categories</p>
+    <h2 class="h2" id="inds-h" data-reveal>Industries <em>we serve.</em></h2>
+    <p class="lead" data-reveal>
+      The categories we work in most. If yours isn&rsquo;t here it almost certainly still
+      fits &mdash; what changes between a gym and a jeweller is the content, not the
+      method.
+    </p>
+  </div>
+
+  <div class="shell">
+    <ul class="inds">
+      {industries.map((i) => (
+        <li data-reveal data-reveal-group="ind">
+          <span class="ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d={i.d} />
+            </svg>
+          </span>
+          <span class="nm">{i.name}</span>
+        </li>
+      ))}
+
+      {/* The closer the client asked for. Filled rather than outlined, so the set
+          visibly ENDS on it instead of just running out of tiles. */}
+      <li class="more" data-reveal data-reveal-group="ind">
+        <span class="ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d={MORE_ICON} />
+          </svg>
+        </span>
+        <span class="nm">and many more</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  /* .from-dark finishes the ramp Proof starts, so this section opens on the mid
+     purple and arrives at paper. It supplies the top padding; the bottom is ours. */
+  .inds-sec {
+    position: relative;
+    isolation: isolate;
+    background-color: var(--paper);
+    /* Deliberately less than --section-y: the section below opens with a full one,
+       and two of them stacked put ~300px of empty paper between the last tile and
+       the next heading. */
+    padding-bottom: clamp(48px, 7vh, 90px);
+    color: var(--l1);
+    overflow: hidden;
+  }
+
+  /* Starts at 34% rather than the 16% About uses: the first 300px of this section is
+     the .from-dark ramp, and tinting a ramp is how you get a step in the middle of
+     one. By 34% of a ~950px section the ground is flat paper. */
+  .wash {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(54% 46% at 12% 46%, rgba(63, 42, 134, 0.16), transparent 72%),
+      radial-gradient(50% 44% at 90% 78%, rgba(234, 28, 130, 0.14), transparent 72%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 34%, #000 86%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 34%, #000 86%, transparent 100%);
+  }
+
+  .head {
+    display: grid;
+    gap: 18px;
+  }
+  .head .label { color: var(--l3); }
+  .head .h2 { max-width: 16ch; }
+  .head .lead { color: var(--l2); max-width: 56ch; }
+
+  /* auto-fill rather than a fixed column count: twenty-one tiles across the full
+     shell reflow at more sizes than three breakpoints would cover, and every tile is
+     the same object so there is no ordering to preserve. Wider minimum than the old
+     half-column version — the names get one line more often now. */
+  .inds {
+    margin-top: clamp(36px, 6vh, 66px);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: clamp(8px, 1vw, 12px);
+  }
+  .inds li {
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    gap: 11px;
+    padding: 22px 12px 18px;
+    border-radius: var(--radius);
+    border: 1px solid var(--hair);
+    background: rgba(255, 255, 255, 0.55);
+    transition: border-color var(--dur-fast), background var(--dur-fast), transform var(--dur) var(--ease-out);
+  }
+  .inds .ico {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    color: var(--violet);
+    background: rgba(63, 42, 134, 0.08);
+    transition: background var(--dur-fast), color var(--dur-fast);
+  }
+  .inds .ico svg { width: 25px; height: 25px; }
+  .inds .nm {
+    font-size: 12.5px;
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+    color: var(--l2);
+    text-wrap: balance;
+  }
+  .inds li:hover {
+    transform: translateY(-2px);
+    border-color: rgba(63, 42, 134, 0.28);
+    background: rgba(255, 255, 255, 0.85);
+  }
+  .inds li:hover .ico { background: var(--grad); color: #fff; }
+
+  /* the terminator wears the hover state permanently */
+  .inds .more .ico { background: var(--grad); color: #fff; }
+  .inds .more .nm { color: var(--l1); }
+
+  @media (max-width: 520px) {
+    .inds { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 7px; }
+    .inds li { padding: 16px 8px 14px; }
+    .inds .ico { width: 38px; height: 38px; }
+    .inds .ico svg { width: 21px; height: 21px; }
+    .inds .nm { font-size: 11.5px; }
+  }
+</style>

@@ -7,13 +7,29 @@ import { stats } from '../data/content';
    the whole element, so a "+" inside it would take a slice of the ramp meant for a
    digit and land a different colour than the number it belongs to. */
 /* Every figure carries a "+" at the client's request — he does not want the site
-   fixing a ceiling he has already passed. Three of the four are derived from real
-   counts, so the "+" is headroom rather than the only thing making them true. */
+   fixing a ceiling he has already passed. Two of the four are derived from real
+   counts; see the note on `stats` in data/content.ts for which and why. */
+
+/*
+ * The growth motif the client asked for ("emojis, charts, icons — you figure it
+ * out"). This is the place for it and it only needed one answer: the section is four
+ * numbers that all describe growth, and a rising bar chart is the plainest possible
+ * drawing of that. So each tile becomes a small KPI card — chart, figure, label.
+ *
+ * Not emoji, deliberately. 📈 renders as a different picture on Android, iOS, Windows
+ * and Samsung, cannot take the brand ramp, and sits next to a hand-built wordmark
+ * looking like clip art. These bars are the site's own gradient, walked left to
+ * right across the chart, so the motif is the brand rather than a sticker on it.
+ *
+ * Profiles differ per tile so the row does not read as one shape stamped four times,
+ * and every one of them ends on its tallest bar — a chart that dips at the end is
+ * telling the visitor something nobody meant to say.
+ */
 const figures = [
-  { n: stats.projectsDelivered, l: 'Projects delivered' },
-  { n: stats.brands, l: 'Brands served' },
-  { n: stats.industriesServed, l: 'Industries served' },
-  { n: stats.serviceLines, l: 'Services offered' },
+  { n: stats.projectsDelivered, l: 'Projects delivered', bars: [26, 40, 34, 62, 84, 100] },
+  { n: stats.brands, l: 'Brands served', bars: [20, 33, 55, 48, 74, 100] },
+  { n: stats.industriesServed, l: 'Industries served', bars: [32, 28, 51, 66, 79, 100] },
+  { n: stats.serviceLines, l: 'Services offered', bars: [18, 42, 38, 58, 80, 100] },
 ];
 ---
 
@@ -26,6 +42,15 @@ const figures = [
     <dl>
       {figures.map((f) => (
         <div class="fig" data-reveal data-reveal-group="stat">
+          {/* aria-hidden: it is the same information as the figure below it, drawn.
+              A screen reader announcing six unlabelled bars before every number
+              would be pure noise. */}
+          <span class="spark" aria-hidden="true">
+            {f.bars.map((h, i) => (
+              <i style={`--h:${h}%;--c:${Math.round((i / (f.bars.length - 1)) * 100)}%;--d:${(i * 0.07).toFixed(2)}s`}></i>
+            ))}
+          </span>
+
           {/* The final value is the element's text, so it is what a visitor without
               JS, a crawler and the accessibility tree all read. The counter only
               overwrites it while running, and puts it back at the end. */}
@@ -71,6 +96,34 @@ const figures = [
     gap: 10px;
     align-content: start;
   }
+
+  /* ——— the chart ———
+     Bars grow with transform, not height, so nothing in this section triggers layout
+     while it animates — the same rule the rest of the page's motion follows.
+     Each bar takes its own point on the brand ramp by index, so the chart walks
+     violet→rose the way --grad does; a per-bar `background: var(--grad)` would have
+     given every bar the whole ramp compressed into 7px, which is a flat fill. */
+  .spark {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: clamp(26px, 3.4vh, 38px);
+    margin-bottom: 2px;
+  }
+  .spark i {
+    display: block;
+    width: clamp(6px, 0.8vw, 9px);
+    height: var(--h);
+    border-radius: 2px;
+    background: color-mix(in oklab, var(--violet), var(--rose) var(--c));
+    transform-origin: bottom;
+    transition: transform 0.7s var(--ease-tide) var(--d);
+  }
+  /* Visible by default and only hidden once JS has confirmed it can animate — the
+     same contract as [data-reveal]. Without JS, or with motion turned down, the
+     chart is simply drawn. */
+  :global(html.js-motion) .spark i { transform: scaleY(0); }
+  :global(html.js-motion) .fig.is-in .spark i { transform: scaleY(1); }
 
   .fig dt {
     display: flex;
