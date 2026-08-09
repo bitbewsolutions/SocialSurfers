@@ -26,7 +26,7 @@ React into a site that has no framework at all.
 |---|---|
 | JS (external chunks, gzipped) | 3.2 KB |
 | Fonts (woff2, precompressed) | 26.6 KB |
-| Heaviest page, first visit | **54.5 KB** |
+| Heaviest page, first visit | **53.7 KB** |
 | Hero image (WebP, one of four widths) | 44.5–151 KB |
 | Client logo tiles (27, lazy + warmed a screen early) | 260 KB |
 
@@ -412,36 +412,46 @@ once `.js-motion` confirms JS can animate them. Profiles differ per tile so the 
 not one shape stamped four times, and every one ends on its tallest bar — a chart that
 dips at the end tells the visitor something nobody meant to say.
 
-### The growth chart in About
+### The growth illustration in About
 
-The second and larger one, next to the handwritten *"We don't just manage, We Grow
-Brands!"*. It is a picture of **that sentence**: a flat dotted line that drifts sideways
-and goes nowhere, and a rising gradient line that does not. The graphic argues the same
-thing the copy does rather than decorating it, which is the only reason it earns the
-space.
+The larger one, beside the handwritten *"We don't just manage, We Grow Brands!"* — the
+client's own 3D render of a rising chart standing off a phone.
 
-**Unitless on purpose** — no axis values, no figures, no percentages. It illustrates a
-positioning statement, and the moment it carries a number it is claiming a result nobody
-measured. The legend names the two lines so it reads as a comparison rather than as data.
+It replaced a hand-built SVG of two diverging lines, and the reason is worth recording
+because the SVG was, on paper, the better engineering: ~1.1 KB, no request, tokenised
+colours, animated. It lost anyway. It read as a **diagram** on a page whose hero is a
+cinematic render, and the client's note was simply that it wasn't giving "that real
+vibe" — which is a fair read. The render speaks the same language as the rest of the
+site. Weight is not the only budget.
 
-Inline SVG, ~1.1 KB gzipped against the 30–50 KB a raster would have cost, and **no
-extra request at all**. It also takes the design tokens, which a PNG cannot: the ramp,
-the hairlines and the paper all come from `tokens.css`, so it follows the palette and
-would still be right if this section were ever moved onto ink.
+`node tools/growth.mjs` handles it — same shape as `tools/hero.mjs` (manifest-driven
+srcset, never upscales) with two differences:
 
-Two mechanics worth keeping:
+- **Alpha is load-bearing.** It is a cutout sitting directly on the section's gradient
+  wash. Nothing paints a card behind it: a panel would put a hard-edged rectangle in
+  the middle of a section whose whole job is to be soft. Do not add `.flatten()`.
+- **It crops to the artwork.** The 500x500 export was **58% transparent margin** — the
+  subject is a landscape band across the middle. Shipping the canvas would have cost
+  bytes for nothing and forced a square hole in the layout with the illustration
+  floating small inside it. The crop is measured from the alpha channel rather than
+  using sharp's `.trim()`, which takes its threshold from the corner pixel and would
+  silently keep the whole canvas the day a render arrives with a full-bleed glow.
 
-- `pathLength="1"` on both paths normalises them, so a single dash length draws either
-  one regardless of actual length. The flat line **loses its dotted texture while it
-  draws** — one `stroke-dasharray` cannot be both the pattern and the reveal — and gets
-  it back with a zero-duration transition timed to the end of the draw.
-- Colours are in CSS, not presentation attributes. `stroke="var(--rose)"` as an
-  attribute is not reliable, and `stop-color` on a gradient stop has to be reached
-  through a class for the same reason.
+**111 KB PNG → 12.9 KB WebP**, lazy and below the fold, so a first visit pays none of
+it. `width`/`height` come from the manifest and reserve the box before the bytes land,
+which is the entire CLS story for a lazy image.
 
-It lives in the right-hand column rather than under the handwriting because that column
-ended two thirds of the way down and left a visible hole beside the line. On a phone the
-columns stack and it lands directly below the line it belongs to.
+**The artwork caps at 425px**, which is why the CSS caps the display at 420 — past that
+the browser is upscaling. If the client re-exports at 1000px+, drop it in and re-run:
+the extra widths in `WIDTHS` start emitting on their own and no markup changes.
+
+`alt=""` on purpose. The handwritten line beside it makes exactly this point, and a
+screen reader announcing both would read the same claim twice.
+
+It lives in the right-hand column because that column ended two thirds of the way down
+and left a visible hole beside the line. On a phone the columns stack and it lands
+directly below the line it belongs to, which is closer to where the client asked for it
+than the desktop layout can be.
 
 ## Reach and the address
 
@@ -490,7 +500,8 @@ netlify.toml     build settings, caching and security headers, in the repo rathe
                  than only in the Netlify UI
 tools/
   logos.mjs      client logo pipeline — see below
-  hero.mjs       hero render -> knocked-out WebP + manifest — see below
+  hero.mjs       hero render -> responsive WebP + manifest — see below
+  growth.mjs     About illustration -> cropped, responsive WebP + manifest
   clients.json   source filename -> client name/industry (hand-maintained)
 .fontsrc/        subset.py — cuts the two faces from node_modules (not shipped)
 brand/           the client's original artwork; source of truth, not served

@@ -1,6 +1,7 @@
 ---
 import { about, solutions } from '../data/content';
 import { site } from '../data/site';
+import growthArt from '../data/growth-art.json';
 
 /*
  * The brochure's About spread, brought over more or less as the client drew it:
@@ -77,65 +78,38 @@ const icons = {
         ))}
       </ul>
 
-      {/* The growth picture, and it is a picture of the SENTENCE opposite it.
+      {/* The growth illustration.
 
-          The client asked for something visible that implies growth, near the
-          handwritten "We don't just manage, We Grow Brands!". Two lines is the
-          whole idea: a flat one that drifts sideways and goes nowhere, and a rising
-          one that does not. That is literally the difference the line claims, so the
-          graphic argues the same thing the copy does instead of decorating it.
+          This was a hand-built SVG of two diverging lines — a flat one and a rising
+          one — arguing the sentence in the other column. The client's own render
+          replaced it: it reads as a real object rather than a diagram, and it speaks
+          the same 3D language as the hero, which the chart never did.
 
-          Deliberately unitless — no axis, no figures, no percentages. It illustrates
-          a positioning statement, and the moment it carries a number it is claiming
-          a result nobody measured.
+          Cropped, resized and converted by tools/growth.mjs; the srcset comes from
+          the manifest it writes, so a re-export cannot leave the page advertising a
+          width that does not exist. width/height are the artwork's real dimensions —
+          they reserve the box before the bytes land, which is the whole of the CLS
+          story for a below-fold image.
 
-          It sits in this column rather than under the handwriting because the right
-          column ended two thirds of the way down and left a visible hole beside it.
-          On a phone the columns stack and it lands just below the line it belongs to. */}
+          alt="" on purpose. The handwritten line beside it says exactly what this
+          says, and a screen reader announcing both would read the same claim twice. */}
       <figure class="growth" data-reveal>
-        <svg viewBox="0 0 320 128" role="img" aria-label="Two paths from the same starting point: one stays flat when social media is only managed, one climbs when the brand is grown.">
-          <defs>
-            {/* runs bottom-left to top-right, so the ramp climbs with the line */}
-            <linearGradient id="growLine" x1="0" y1="1" x2="1" y2="0">
-              <stop class="g0" offset="0" />
-              <stop class="g1" offset="1" />
-            </linearGradient>
-            <radialGradient id="growGlow">
-              <stop class="gl0" offset="0" />
-              <stop class="gl1" offset="1" />
-            </radialGradient>
-          </defs>
-
-          <circle class="glow" cx="298" cy="22" r="40" />
-
-          {/* Both paths open on EXACTLY M18 112. That shared origin is the whole
-              graphic: same business, same month, two outcomes. The first version
-              started them four units apart, which read as two loose ends and a
-              drawing mistake — which is what it was. */}
-          <path
-            class="ln-flat"
-            pathLength="1"
-            d="M18 112C62 110 78 118 118 115S174 108 214 112S270 116 298 111"
-          />
-          <path
-            class="ln-rise"
-            pathLength="1"
-            d="M18 112C92 108 142 98 182 78S258 44 298 22"
-          />
-
-          <circle class="origin" cx="18" cy="112" r="4.4" />
-          <circle class="tail" cx="298" cy="111" r="3.4" style="--d:0.7s" />
-          <circle class="step" cx="182" cy="78" r="4" style="--d:1.05s" />
-          <g class="head" style="--d:1.3s">
-            <circle class="halo" cx="298" cy="22" r="12" />
-            <circle class="dot" cx="298" cy="22" r="5.6" />
-          </g>
-        </svg>
-
-        <figcaption class="legend">
-          <span class="lg flat"><i aria-hidden="true"></i>Just managed</span>
-          <span class="lg up"><i aria-hidden="true"></i>Grown</span>
-        </figcaption>
+        <img
+          src={growthArt.src}
+          srcset={growthArt.sources.map((s) => `${s.src} ${s.w}w`).join(', ')}
+          {/* Must describe the box the image is actually PAINTED in, not the column
+              it sits in. Below 520px the stacked layout gives it the full shell —
+              100vw less the two 20px gutters — and above that the 420px cap in the
+              CSS is the real width. A `sizes` that under-declares is how you end up
+              serving the 280 candidate into a 350px box and wondering why it is
+              soft. */}
+          sizes="(max-width: 520px) calc(100vw - 40px), 420px"
+          width={growthArt.width}
+          height={growthArt.height}
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
       </figure>
     </div>
   </div>
@@ -279,133 +253,52 @@ const icons = {
 
   /* ——— the growth chart ——— */
   .growth {
-    margin-top: clamp(30px, 5vh, 52px);
-    display: grid;
-    gap: 14px;
-  }
-  .growth svg { width: 100%; height: auto; overflow: visible; }
-
-  /* Colours live here rather than on the elements: a `stroke="var(--rose)"`
-     presentation attribute is not reliable across browsers, and these have to
-     follow the tokens — this section is light today and the ramp would be wrong on
-     ink. `stop-color` is the one place a CSS custom property has to be applied
-     through a class rather than inline. */
-  /* No gridlines, no axis, no area fill. All three were chart FURNITURE, and their
-     only effect was to make a conceptual drawing pose as measured data — which is
-     what made it read as forced. What is left is the argument: one origin, two
-     outcomes. The glow gives the graphic presence without pretending to plot
-     anything. */
-  .g0 { stop-color: var(--violet); }
-  .g1 { stop-color: var(--rose); }
-  .gl0 { stop-color: var(--rose); stop-opacity: 0.16; }
-  .gl1 { stop-color: var(--rose); stop-opacity: 0; }
-
-  .glow { fill: url(#growGlow); }
-
-  /* ln- prefix, because .flat is also the legend swatch class in this file */
-
-  /* The dotted texture has to be expressed as a FRACTION OF THE PATH.
-     `pathLength="1"` rescales every dash unit so the whole line measures 1, so the
-     plain `3 5` that was here meant a dash three times longer than the line itself
-     — it rendered solid, in both the animated and the no-JS state. ~0.014 of a
-     ~290-unit path is the 4px dash it was meant to be. Change the path and these
-     want re-checking. */
-  .ln-flat {
-    fill: none;
-    stroke: var(--l3);
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-dasharray: 0.014 0.019;
-    opacity: 0.5;
-  }
-  .ln-rise {
-    fill: none;
-    stroke: url(#growLine);
-    stroke-width: 3.2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  /* The shared start, so it belongs to neither line and takes a neutral colour.
-     It is also the one mark with no entrance delay — the fork cannot happen
-     before the point it forks from. */
-  .origin { fill: var(--paper); stroke: var(--l3); stroke-width: 2.2; }
-  .tail { fill: var(--l3); opacity: 0.5; }
-  .step { fill: var(--paper); stroke: var(--rose); stroke-width: 2.4; }
-  .head .dot { fill: var(--rose); }
-  .head .halo { fill: var(--rose); opacity: 0.16; }
-
-  /* Motion, on the same contract as [data-reveal]: drawn by default, hidden only
-     once .js-motion confirms JS can animate it, so no-JS and reduced-motion both
-     get the finished chart. The flat line draws FIRST and fast — it is the
-     "before", and the rising line reads as the answer to it. */
-  :global(html.js-motion) .growth .ln-flat,
-  :global(html.js-motion) .growth .ln-rise {
-    /* pathLength="1" normalises both paths, so one dash length draws either of
-       them regardless of how long they actually are */
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-    transition: stroke-dashoffset 1s var(--ease-out);
-  }
-  /* The flat line loses its dotted texture while it draws — one dash cannot both
-     be the pattern and be the reveal. It gets it back at rest, below. */
-  :global(html.js-motion) .growth .ln-flat { transition-duration: 0.7s; }
-  :global(html.js-motion) .growth .ln-rise { transition-delay: 0.35s; }
-  :global(html.js-motion) .growth .glow { opacity: 0; transition: opacity 0.9s ease 1.35s; }
-  :global(html.js-motion) .growth .origin,
-  :global(html.js-motion) .growth .tail,
-  :global(html.js-motion) .growth .step,
-  :global(html.js-motion) .growth .head {
-    opacity: 0;
-    transform: scale(0.2);
-    transform-box: fill-box;
-    transform-origin: center;
-    transition: opacity 0.3s ease var(--d, 0.1s), transform 0.45s var(--ease-out) var(--d, 0.1s);
-  }
-  :global(html.js-motion) .growth.is-in .ln-flat,
-  :global(html.js-motion) .growth.is-in .ln-rise { stroke-dashoffset: 0; }
-  /* restore the dotted texture once it has finished drawing */
-  :global(html.js-motion) .growth.is-in .ln-flat {
-    stroke-dasharray: 0.014 0.019;
-    transition: stroke-dashoffset 0.7s var(--ease-out), stroke-dasharray 0s linear 0.7s;
-  }
-  :global(html.js-motion) .growth.is-in .glow { opacity: 1; }
-  :global(html.js-motion) .growth.is-in .origin,
-  :global(html.js-motion) .growth.is-in .tail,
-  :global(html.js-motion) .growth.is-in .step,
-  :global(html.js-motion) .growth.is-in .head { opacity: 1; transform: scale(1); }
-
-  .legend {
+    margin-top: clamp(24px, 4vh, 40px);
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px 20px;
+    justify-content: center;
   }
-  .lg {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--label);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--l3);
+  /* The illustration is a cutout on transparency, so it lands directly on the
+     section's gradient wash with nothing behind it. That is why tools/growth.mjs
+     keeps the alpha channel and why nothing here paints a card or a frame — a panel
+     under it would put a hard-edged rectangle in the middle of a section whose whole
+     job is to be soft.
+
+     aspect-ratio comes from the manifest via the img's own width/height attributes,
+     so the box is reserved before the file arrives. It is lazy-loaded and below the
+     fold, which is exactly the situation where a missing reservation shifts the
+     layout under someone mid-read. */
+  .growth img {
+    width: 100%;
+    /* The artwork caps at 425px. Past that it is being upscaled by the browser and
+       goes soft, so this is the ceiling until a larger export exists. */
+    max-width: 420px;
+    height: auto;
+    /* it is lit from within and sits on paper; a soft drop shadow grounds it */
+    filter: drop-shadow(0 18px 34px rgba(30, 12, 60, 0.22));
   }
-  .lg i { width: 18px; height: 3px; border-radius: 99px; flex: none; }
-  /* dashed, so the swatch is the line it names rather than a generic bar */
-  .lg.flat i {
-    border-radius: 0;
-    background: repeating-linear-gradient(90deg, var(--l3) 0 4px, transparent 4px 7px);
-    opacity: 0.55;
+
+  /* A slow hover. The render is a phone with a hologram standing off it, and holding
+     it perfectly still on the page is the one thing that makes it read as a pasted-in
+     stock image rather than an object. Six seconds is deliberately below the rate the
+     eye tracks — you notice it has moved, not that it is moving.
+
+     Gated on .js-motion for consistency with everything else here, and global.css
+     reduces every animation to 0.001ms under prefers-reduced-motion, so this stops
+     dead for anyone who asked for that. */
+  :global(html.js-motion) .growth img {
+    animation: growth-float 6s var(--ease-tide) infinite;
   }
-  .lg.up i { background: var(--grad); }
-  .lg.up { color: var(--l2); }
+  @keyframes growth-float {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(0, -9px, 0); }
+  }
 
   @media (max-width: 900px) {
     .grid { grid-template-columns: 1fr; gap: 44px; }
     .cat { max-width: none; }
-    /* the columns stack here, which puts the chart directly under the handwritten
-       line — closer to where the client asked for it than the desktop layout can be */
-    .growth { margin-top: clamp(26px, 4vh, 36px); }
+    /* the columns stack here, which puts the illustration directly under the
+       handwritten line — closer to where the client asked for it than the desktop
+       layout can be */
+    .growth { margin-top: clamp(22px, 4vh, 34px); }
   }
 </style>
