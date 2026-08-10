@@ -1,6 +1,7 @@
 ---
 import Logo from './Logo.astro';
 import Socials from './Socials.astro';
+import BuiltByBitbew from './BuiltByBitbew.astro';
 import { site, waLink, telLink, mailLink } from '../data/site';
 import { services } from '../data/services';
 
@@ -44,6 +45,8 @@ const year = new Date().getFullYear();
     <span>&copy; {year} {site.name}. All rights reserved.</span>
     <span class="hrs">{site.timezoneNote}</span>
   </div>
+
+  <BuiltByBitbew />
 </footer>
 
 <style>

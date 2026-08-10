@@ -1,0 +1,155 @@
+---
+/**
+ * Bitbew — "Designed & built by" studio credit. Renders as the last thing in the
+ * footer, below the copyright row.
+ *
+ * Ported from the React/Tailwind drop-in used on other client sites. This project
+ * has neither React nor Tailwind, so the markup is plain Astro and the colours come
+ * from the design tokens rather than stock utility classes — which also means the
+ * strip inherits whatever ground it sits on: `.tone-dark` rebinds --l1/--l3/--hair,
+ * so the same rules read correctly on ink and on paper.
+ *
+ * Two links, on purpose:
+ *   · the wordmark opens bitbew.com     — for someone browsing;
+ *   · the number opens a WhatsApp chat  — for someone ready to talk, with the first
+ *     message already typed for them. A `tel:` link fires a call dialog, which on
+ *     desktop does nothing useful and on mobile is a bigger ask than most curious
+ *     visitors will make.
+ *
+ * The wordmark is a real file (public/brand/bitbew-wordmark.png) rather than the
+ * inlined base64 the React version carries. The credit sits in the footer, so it is
+ * on every page of a multi-page build: as a file it is fetched and cached once,
+ * where 2.7 KB of base64 would ride along in the HTML of every single page.
+ */
+interface Props {
+  /** WhatsApp number in international form. Non-digits are stripped. */
+  phone?: string;
+  /** How the number reads on screen. */
+  phoneLabel?: string;
+  /**
+   * Pre-filled first message. NOTE: WhatsApp pre-fills the *visitor's* outgoing
+   * message, so this is written in their voice, not ours — the "here's who we are"
+   * reply belongs in a WhatsApp Business greeting/away message.
+   */
+  message?: string;
+  /** Where the wordmark points. */
+  site?: string;
+  /** Lead-in text before the wordmark. */
+  prefix?: string;
+  /** Match the ground underneath. The wordmark PNG is white, so a pale ground
+      needs it inverted. */
+  tone?: 'dark' | 'light';
+}
+
+/**
+ * ASCII only, on purpose. Percent-encoding an emoji here is perfectly valid, but the
+ * browser → WhatsApp Desktop protocol handoff mangles non-BMP characters on Windows
+ * and the visitor sees a "?" box sitting in their composer. Not worth risking a first
+ * impression on decoration.
+ */
+const DEFAULT_MESSAGE =
+  "Hi Bitbew! I came across a website you built and I'd love one for my business.";
+
+const {
+  phone = '918146622525',
+  phoneLabel = '+91 81466 22525',
+  message = DEFAULT_MESSAGE,
+  site = 'https://bitbew.com',
+  prefix = 'Designed & built by',
+  tone = 'dark',
+} = Astro.props;
+
+// wa.me takes digits only — no +, spaces or dashes.
+const chatUrl = `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+
+/** WhatsApp glyph (Simple Icons, CC0) — inlined, same reasoning as Socials.astro. */
+const WHATSAPP_PATH =
+  'M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z';
+---
+
+{/* `tone-dark` is a global class that paints a ground and rebinds tokens — this only
+    needs to flip the wordmark, so it uses a hook of its own rather than borrowing it. */}
+<div class={`builtby ${tone === 'light' ? 'on-paper' : 'on-ink'}`}>
+  <p class="shell credit">
+    <span>{prefix}</span>
+
+    <a href={site} target="_blank" rel="noopener noreferrer" aria-label="Bitbew — opens in a new tab" class="mark">
+      <img
+        src="/brand/bitbew-wordmark.png"
+        alt="Bitbew"
+        width="231"
+        height="42"
+        loading="lazy"
+        decoding="async"
+      />
+    </a>
+
+    <span class="dot" aria-hidden="true">·</span>
+
+    <a
+      href={chatUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Chat with Bitbew on WhatsApp at ${phoneLabel}`}
+      title="Chat with us on WhatsApp"
+      class="chat"
+    >
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true">
+        <path d={WHATSAPP_PATH} />
+      </svg>
+      {phoneLabel}
+    </a>
+  </p>
+</div>
+
+<style>
+  /* The hairline sits on the shell, not on the full-bleed wrapper, so it lines up
+     with the copyright row's rule above rather than running the whole viewport. */
+  .credit {
+    border-top: 1px solid var(--hair);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 4px 10px;
+    padding-block: 16px;
+    font-family: var(--label);
+    /* One notch under the copyright row above it: this is a signature, not a
+       second claim on the visitor's attention. */
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--l3);
+  }
+
+  .mark { display: inline-flex; }
+  .mark img {
+    height: 13px;
+    width: auto;
+    opacity: 0.7;
+    transition: opacity var(--dur-fast);
+  }
+  .mark:hover img { opacity: 1; }
+  /* The wordmark ships white-on-transparent for the ink footer; on a pale ground it
+     has to flip or it disappears. */
+  .on-paper .mark img { filter: invert(1); }
+
+  .dot { color: var(--l3); opacity: 0.6; }
+
+  .chat {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-variant-numeric: tabular-nums;
+    color: var(--l3);
+    transition: color var(--dur-fast);
+  }
+  .chat:hover { color: var(--l1); }
+  .chat svg { flex-shrink: 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mark img,
+    .chat { transition: none; }
+  }
+</style>
