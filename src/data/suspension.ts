@@ -61,7 +61,7 @@ export const suspension = {
   label: 'Temporarily offline',
   heading: 'This site is temporarily unavailable.',
   body:
-    'The website has been suspended by Bitbew, the studio that designed and built it, while the account for the project is settled. It will be restored in full — every page exactly as it was — as soon as that is resolved.',
+    'The website has been suspended by Bitbew, the studio that designed and built it, while the account for the project is settled. It will be restored in full as soon as that is resolved.',
   visitorNote:
     'If you were trying to reach Social Surfers, please check back shortly.',
 
