@@ -10,7 +10,10 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "test:enquiry": "node qa/enquiry.mjs"
+    "test:enquiry": "node qa/enquiry.mjs",
+    "site:status": "node tools/suspend.mjs",
+    "site:down": "node tools/suspend.mjs on",
+    "site:up": "node tools/suspend.mjs off"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

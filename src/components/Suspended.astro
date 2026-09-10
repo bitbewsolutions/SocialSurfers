@@ -1,0 +1,195 @@
+---
+/**
+ * The page every route renders while the suspension switch is on. See
+ * data/suspension.ts for the switch itself and for all of the copy.
+ *
+ * Self-contained on purpose: no Nav, no Footer, no section components, no
+ * scripts, no images beyond the Bitbew wordmark that is already in /public.
+ * The reasons are practical rather than tidy —
+ *
+ *   · nothing here can break when the real components are edited later, so the
+ *     notice cannot start throwing a build error six weeks from now;
+ *   · none of the site's own content ships in the HTML, so there is nothing to
+ *     read in view-source and nothing for a crawler to pick up. Hiding the page
+ *     with CSS or an overlay would have left the whole site sitting in the
+ *     markup underneath, one devtools click away.
+ *
+ * It does use the design tokens, because Base.astro imports global.css either
+ * way and a notice set in the site's own typeface reads as a deliberate act by
+ * the people who built it — which is exactly what it is.
+ */
+import {
+  suspension,
+  suspensionWaLink,
+  suspensionTelLink,
+  suspensionMailLink,
+} from '../data/suspension';
+
+const WHATSAPP_PATH =
+  'M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z';
+---
+
+<main id="main" class="sus">
+  <div class="card">
+    <p class="label">{suspension.label}</p>
+    <h1>{suspension.heading}</h1>
+    <p class="lead">{suspension.body}</p>
+    <p class="visitor">{suspension.visitorNote}</p>
+
+    <div class="owner">
+      <p class="owner-h">{suspension.ownerHeading}</p>
+      <p class="owner-note">{suspension.ownerNote}</p>
+
+      <div class="actions">
+        <a class="btn primary" href={suspensionWaLink} target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+            <path d={WHATSAPP_PATH} />
+          </svg>
+          WhatsApp {suspension.phoneLabel}
+        </a>
+        <a class="btn" href={suspensionTelLink}>Call {suspension.phoneLabel}</a>
+        {suspension.email && <a class="btn" href={suspensionMailLink}>{suspension.email}</a>}
+      </div>
+    </div>
+
+    <p class="sig">
+      <span>A notice from</span>
+      <a href={suspension.studioUrl} target="_blank" rel="noopener noreferrer" aria-label="Bitbew — opens in a new tab">
+        <img src="/brand/bitbew-wordmark.png" alt="Bitbew" width="231" height="42" decoding="async" />
+      </a>
+    </p>
+  </div>
+</main>
+
+<style>
+  /* Deep ground rather than the site's paper. Someone who has seen this domain
+     before should register in the first half-second that they are not looking
+     at the website, without having read a word of it. */
+  .sus {
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    padding: 40px 20px;
+    background: var(--ink-deep);
+    color: var(--t1);
+    font-family: var(--body);
+  }
+
+  .card {
+    width: 100%;
+    max-width: 640px;
+    text-align: center;
+  }
+
+  .label {
+    font-family: var(--label);
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--t3);
+    margin: 0 0 20px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: var(--w-display);
+    font-size: clamp(1.9rem, 5.2vw, 3rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 0 0 22px;
+    text-wrap: balance;
+  }
+
+  .lead {
+    font-size: var(--fs-lead);
+    line-height: 1.62;
+    color: var(--t2);
+    margin: 0 auto 16px;
+    max-width: 54ch;
+  }
+
+  .visitor {
+    font-size: var(--fs-small);
+    line-height: 1.6;
+    color: var(--t3);
+    margin: 0 auto;
+    max-width: 54ch;
+  }
+
+  .owner {
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid var(--hair-ink);
+  }
+
+  .owner-h {
+    font-family: var(--label);
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--t1);
+    margin: 0 0 8px;
+  }
+
+  .owner-note {
+    font-size: var(--fs-small);
+    color: var(--t3);
+    margin: 0 0 24px;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 20px;
+    border: 1px solid var(--hair-ink-2);
+    border-radius: 999px;
+    font-size: var(--fs-small);
+    font-weight: 600;
+    line-height: 1;
+    color: var(--t1);
+    text-decoration: none;
+    transition: border-color var(--dur-fast), background-color var(--dur-fast);
+  }
+  .btn:hover { border-color: var(--t1); background: rgba(246, 245, 249, 0.06); }
+
+  /* The one filled control on the page — WhatsApp is the channel that actually
+     gets answered, so it is the only thing here competing for a first tap. */
+  .primary {
+    background: var(--grad-on-dark);
+    border-color: transparent;
+    color: var(--ink-deep);
+    font-weight: 700;
+  }
+  .primary:hover { background: var(--grad-on-dark); border-color: transparent; filter: brightness(1.06); }
+
+  .sig {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 4px 10px;
+    margin: 48px 0 0;
+    font-family: var(--label);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--t3);
+  }
+  .sig a { display: inline-flex; }
+  .sig img { height: 13px; width: auto; opacity: 0.75; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn { transition: none; }
+  }
+</style>

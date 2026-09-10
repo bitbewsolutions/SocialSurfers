@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css';
+import Suspended from '../components/Suspended.astro';
+import { SUSPENDED, suspension } from '../data/suspension';
 import { site } from '../data/site';
 import { services } from '../data/services';
 import heroArt from '../data/hero-art.json';
@@ -19,7 +21,18 @@ const { title, description, isHome = false, breadcrumbs, ogImage = '/og.png', ex
 
 const canonical = new URL(Astro.url.pathname, Astro.site).href.replace(/\/$/, '') || site.url;
 const ogUrl = new URL(ogImage, Astro.site).href;
-const fullTitle = title.includes(site.name) ? title : `${title} — ${site.name}`;
+
+/* ── Suspension. One switch, in data/suspension.ts; `npm run site:up` clears it. ──
+   While it is on, every route renders the notice instead of its own content and
+   the head is rewritten to match: one title for the whole site, and noindex so
+   the notice cannot be cached in search results under the client's own name.
+   Nothing below this block needed to change. */
+const fullTitle = SUSPENDED
+  ? `${suspension.title} — ${site.name}`
+  : title.includes(site.name)
+    ? title
+    : `${title} — ${site.name}`;
+const metaDescription = SUSPENDED ? suspension.description : description;
 
 const localBusiness = {
   '@context': 'https://schema.org',
@@ -74,8 +87,12 @@ const breadcrumbLd = breadcrumbs && {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{fullTitle}</title>
-    <meta name="description" content={description} />
+    <meta name="description" content={metaDescription} />
     <link rel="canonical" href={canonical} />
+    {/* Temporary, and it is the reason the real pages are withheld rather than
+        replaced: the moment the switch flips back, Google recrawls a site whose
+        pages never said anything except what they always said. */}
+    {SUSPENDED && <meta name="robots" content="noindex, nofollow" />}
 
     <!-- One face for display and body, and it is in the LCP element — preload it.
 
@@ -101,7 +118,7 @@ const breadcrumbLd = breadcrumbs && {
         srcset and sizes MUST match the <img> exactly or the browser picks a
         different candidate and downloads the picture twice — which is why both come
         from the same manifest rather than being written out by hand. */}
-    {isHome && (
+    {isHome && !SUSPENDED && (
       <link
         rel="preload"
         as="image"
@@ -115,33 +132,33 @@ const breadcrumbLd = breadcrumbs && {
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:title" content={fullTitle} />
-    <meta property="og:description" content={description} />
+    <meta property="og:description" content={metaDescription} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogUrl} />
     <meta property="og:locale" content="en_IN" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:description" content={metaDescription} />
     <meta name="twitter:image" content={ogUrl} />
 
-    <meta name="theme-color" content="#f6f5f9" />
+    <meta name="theme-color" content={SUSPENDED ? "#0c0620" : "#f6f5f9"} />
     <meta name="format-detection" content="telephone=no" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-    {isHome && (
+    {isHome && !SUSPENDED && (
       <script
         type="application/ld+json"
         set:html={JSON.stringify(localBusiness)}
       />
     )}
-    {breadcrumbLd && (
+    {breadcrumbLd && !SUSPENDED && (
       <script
         type="application/ld+json"
         set:html={JSON.stringify(breadcrumbLd)}
       />
     )}
-    {extraLd && <script type="application/ld+json" set:html={JSON.stringify(extraLd)} />}
+    {extraLd && !SUSPENDED && <script type="application/ld+json" set:html={JSON.stringify(extraLd)} />}
 
     <!-- Adds .js-motion before first paint so reveal elements never flash in
          then hide. Without JS the class is absent and everything is visible. -->
@@ -158,6 +175,6 @@ const breadcrumbLd = breadcrumbs && {
 
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    <slot />
+    {SUSPENDED ? <Suspended /> : <slot />}
   </body>
 </html>
