@@ -66,7 +66,7 @@ export const suspension = {
     'If you were trying to reach Social Surfers, please check back shortly.',
 
   ownerHeading: 'If you are the site owner',
-  ownerNote: 'Message or call us and this comes down the same day.',
+  ownerNote: 'Message or call us.',
 
   /* Bitbew's own channels. The number is the one the footer credit already
      uses, so it is known good. The address is NOT — nothing in this repo
