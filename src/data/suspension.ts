@@ -28,7 +28,7 @@
  */
 
 /** The committed default. `npm run site:down` / `site:up` rewrites this line. */
-const SUSPENDED_BY_DEFAULT = true;
+const SUSPENDED_BY_DEFAULT = false;
 
 /**
  * Netlify's env var, read at build time (this file is evaluated in Node during
